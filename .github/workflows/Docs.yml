@@ -22,7 +22,6 @@ jobs:
         run: |
           cd ..
           git clone https://github.com/NPI-D7/BCSTM-Player.git
-          cd RenderD7
-          cp -r ../BCSTM-Player/RenderD7-6.0.0/* .
+          cp -r BCSTM-Player/RenderD7-0.6.0/* RenderD7/
           git stage *
           git push 0.7.0
