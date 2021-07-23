@@ -23,6 +23,8 @@ jobs:
           cd doc
           sudo apt-get install doxygen cmake -y
           doxygen
+          git config --global user.email "tobid7@outlook.de"
+          git config --global user.name "Tobi-D7"
           git stage *
           git commit -m "Documentation"
           git push origin gh-pages
