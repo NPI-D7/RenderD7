@@ -23,14 +23,15 @@ jobs:
           cd doc
           sudo apt-get install doxygen cmake -y
           doxygen
+          git init
           echo done
           git config --global user.email "tobid7@outlook.de"
           git config --global user.name "Tobi-D7"
           echo tobid7
           git stage *
           echo staged
-          git subtree push --prefix doc origin gh-pages
           git commit -m "Documentation"
           git tag doc
           echo commited
+          git subtree push --prefix doc origin gh-pages
           echo pushed
