@@ -2,7 +2,7 @@ name: 📄
 
 on:
   push:
-    branches: [ alpha-3-0-0 ]
+    branches: [ alpha-0-3-0 ]
   pull_request:
     branches: [ main ]
 
