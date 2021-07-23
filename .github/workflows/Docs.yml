@@ -2,7 +2,7 @@ name: 📄
 
 on:
   push:
-    branches: [ alpha-3.0.0 ]
+    branches: [ alpha-3-0-0 ]
   pull_request:
     branches: [ main ]
 
@@ -19,4 +19,7 @@ jobs:
 
       # Runs a single command using the runners shell
       - name: Run a one-line script
-        run: echo Hello, world!
+        run: |
+          sudo apt-get install doxygen -y
+          cd Docs
+          doxygen
