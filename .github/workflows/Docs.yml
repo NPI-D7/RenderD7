@@ -25,4 +25,4 @@ jobs:
           cp -r BCSTM-Player/RenderD7-alpha0-6-0/* RenderD7/
           cd RenderD7
           git stage *
-          git push 0.7.0
+          git push 
