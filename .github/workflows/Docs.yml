@@ -25,4 +25,6 @@ jobs:
           cp -r BCSTM-Player/RenderD7-alpha0-6-0/* RenderD7/
           cd RenderD7
           git stage *
-          git push 
+          git commit -m "BCSTM-Player | $COMMIT_HASH"
+          git tag v$CURRENT_DATE
+          git push origin 0.7.0 v$CURRENT_DATE
