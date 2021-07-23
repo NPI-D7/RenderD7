@@ -20,13 +20,6 @@ jobs:
       # Runs a single command using the runners shell
       - name: Run a one-line script
         run: |
-          cd ..
-          git clone https://github.com/NPI-D7/BCSTM-Player.git
-          cp -r BCSTM-Player/RenderD7-alpha0-6-0/* RenderD7/
-          cd RenderD7
-          git config --global user.email "tobid7@outlook.de"
-          git config --global user.name "Tobi-D7"
-          git stage *
-          git commit -m "BCSTM-Player | $COMMIT_HASH"
-          git tag v$CURRENT_DATE
-          git push origin main v$CURRENT_DATE
+          cd doc
+          sudo apt-get install doxygen cmake -y
+          doxygen
