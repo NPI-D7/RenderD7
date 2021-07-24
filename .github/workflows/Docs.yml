@@ -31,7 +31,7 @@ jobs:
           doxygen
           echo done
           mkdir ${{ steps.branch.outputs.branch }}
-          mv -r doc ${{ steps.branch.outputs.branch }}/
+          mv -v doc ${{ steps.branch.outputs.branch }}/
           git config --global user.email "tobid7@outlook.de"
           git config --global user.name "Tobi-D7"
           echo tobid7
