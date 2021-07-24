@@ -33,13 +33,13 @@ jobs:
           mkdir -p ${{ steps.branch.outputs.branch }}
           rm -r ${{ steps.branch.outputs.branch }}/*
           mv -v doc ${{ steps.branch.outputs.branch }}/
-          #rm -r doc/
+          rm -r doc/
           git config --global user.email "tobid7@outlook.de"
           git config --global user.name "Tobi-D7"
           echo tobid7
           git stage *
           echo staged
-          git commit -m "Documentation1"
+          git commit -a "Documentation1"
           git tag doc
           cd ..
           echo commited
