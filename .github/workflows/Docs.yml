@@ -44,7 +44,6 @@ jobs:
           echo staged
           git commit -m "Documentation1"
           git tag doc
-          cd ..
           echo commited
           git push origin main
           echo pushed
