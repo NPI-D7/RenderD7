@@ -5,14 +5,24 @@
 #include <time.h>
 #include <unistd.h>
 
+/** Log Class */
 class Log
 {
 	public:
+                /** Construct */
 		Log();
+                /** Deconstruct */
 		~Log();
+                /// Init the log file
+                /// filename: name for the file
 		void Init(const char *filename);
+                /// Write Text to logfile
+                /// debug_text: your text
 		void Write(std::string debug_text);
+                /// Get the date
 		std::string logDate(void);
+                /// Format to logstyle
+                /// fmt_str: the formatted style
 		std::string format(const std::string& fmt_str, ...);
 	private:
 		std::string filename;
