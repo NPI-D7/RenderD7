@@ -35,7 +35,7 @@ jobs:
           cd doc
           echo done
           mkdir -p ${{ steps.branch.outputs.branch }}
-          rm -r ${{ steps.branch.outputs.branch }}/*
+       #   rm -r ${{ steps.branch.outputs.branch }}/*
           mv -v doc ${{ steps.branch.outputs.branch }}/
           rm -r doc/doc
           git config --global user.email "tobid7@outlook.de"
