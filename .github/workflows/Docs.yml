@@ -34,6 +34,7 @@ jobs:
           echo staged
           git commit -m "Documentation"
           git tag doc
+          cd ..
           echo commited
           git subtree push --prefix doc origin gh-pages
           echo pushed
