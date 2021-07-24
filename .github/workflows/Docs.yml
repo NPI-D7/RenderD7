@@ -22,7 +22,7 @@ jobs:
         id: branch
       - name: Display branch name
         shell: bash
-        run: echo ${{ steps.branch.output.branch }}
+        run: echo ${{ steps.branch.outputs.branch }}
       # Runs a single command using the runners shell
       - name: Run a one-line script
         run: |
