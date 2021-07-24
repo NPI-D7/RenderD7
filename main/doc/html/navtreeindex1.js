@@ -163,6 +163,10 @@ var NAVTREEINDEX1 =
 "classnlohmann_1_1json__pointer.html#ae9015c658f99cf3d48a8563accc79988":[2,0,0,4,2],
 "classnlohmann_1_1json__pointer.html#af5a4bc4f82113c271c9a0cd4d3b5f31c":[2,0,0,4,20],
 "classnlohmann_1_1json__pointer.html#afdaacce1edb7145e0434e014f0e8685a":[2,0,0,4,6],
+"classsound.html":[2,0,3],
+"classsound.html#a4a82f1972ceb6a2642bb2dcc067c3d72":[2,0,3,0],
+"classsound.html#abb2c33709eb822528889e32722fc1153":[2,0,3,1],
+"classsound.html#adf45b194f1b8bcbaca3ee6eec0ecc71a":[2,0,3,2],
 "deprecated.html":[0],
 "functions.html":[2,3,0,0],
 "functions.html":[2,3,0],
@@ -223,8 +227,8 @@ var NAVTREEINDEX1 =
 "namespacemembers_type.html":[1,1,2],
 "namespacenlohmann.html":[1,0,0],
 "namespacenlohmann.html":[2,0,0],
-"namespacenlohmann_1_1detail.html":[1,0,0,0],
 "namespacenlohmann_1_1detail.html":[2,0,0,0],
+"namespacenlohmann_1_1detail.html":[1,0,0,0],
 "namespacenlohmann_1_1detail_1_1dtoa__impl.html":[1,0,0,0,0],
 "namespaces.html":[1,0],
 "pages.html":[],
@@ -245,9 +249,5 @@ var NAVTREEINDEX1 =
 "structnlohmann_1_1json__sax.html#a0ad26edef3f8d530dcec3192bba82df6":[2,0,0,5,0],
 "structnlohmann_1_1json__sax.html#a235ee975617f28e6a996d1e36a282312":[2,0,0,5,11],
 "structnlohmann_1_1json__sax.html#a2e0c7ecd80b18d18a8cc76f71cfc2028":[2,0,0,5,8],
-"structnlohmann_1_1json__sax.html#a38c2dbde07138cc436ea7fbf22c1e92d":[2,0,0,5,6],
-"structnlohmann_1_1json__sax.html#a5c53878cf08d463eb4e7ca0270532572":[2,0,0,5,10],
-"structnlohmann_1_1json__sax.html#a60287e3bd85f489e04c83f7e3b76e613":[2,0,0,5,12],
-"structnlohmann_1_1json__sax.html#a82ed080814fa656191a537284bb0c575":[2,0,0,5,1],
-"structnlohmann_1_1json__sax.html#ad0c722d53ff97be700ccf6a9468bd456":[2,0,0,5,9]
+"structnlohmann_1_1json__sax.html#a38c2dbde07138cc436ea7fbf22c1e92d":[2,0,0,5,6]
 };
