@@ -22,8 +22,8 @@
 #include "thread.hpp"
 #include "ini.hpp"
 
-#define RENDERD7VSTRING "6.1.0"
-#define CHANGELOG "6.1.0: rewrite Threadsystem, Improve framerate/n6.0.2: Fix Code in lang.hpp\nadd Draw Text Left Function.\nadd changelog\n6.0.1: add Threading system."
+#define RENDERD7VSTRING "0.6.10"
+#define CHANGELOG "0.6.10: rewrite Threadsystem, Improve framerate/n0.6.02: Fix Code in lang.hpp\nadd Draw Text Left Function.\nadd changelog\n0.6.01: add Threading system."
 #define DEFAULT_CENTER 0.5f
 
 extern C3D_RenderTarget* Top;
@@ -37,11 +37,11 @@ extern touchPosition d7_touch;
 
 extern std::string dspststus;
 
+/// RenderD7
 namespace RenderD7
 {
-   /**	Set current RenderScreen
-   *	target: The RenderTarget Top, Bottom
-   */
+    /// Set current RenderScreen
+    /// target: The RenderTarget Top, Bottom
     void OnScreen(C3D_RenderTarget *target);
     /** The Spritesheet Class */
     class Sheet
@@ -213,4 +213,4 @@ namespace RenderD7
     bool NameIsEndingWith(const std::string &name, const std::vector<std::string> &extensions);
     void GetDirContentsExt(std::vector<RenderD7::DirContent> &dircontent, const std::vector<std::string> &extensions);
     void GetDirContents(std::vector<RenderD7::DirContent> &dircontent);
-}
+} /// RenderD7
