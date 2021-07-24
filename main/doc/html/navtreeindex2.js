@@ -1,5 +1,6 @@
 var NAVTREEINDEX2 =
 {
+"structnlohmann_1_1json__sax.html#a38c2dbde07138cc436ea7fbf22c1e92d":[2,0,0,5,6],
 "structnlohmann_1_1json__sax.html#a5c53878cf08d463eb4e7ca0270532572":[2,0,0,5,10],
 "structnlohmann_1_1json__sax.html#a60287e3bd85f489e04c83f7e3b76e613":[2,0,0,5,12],
 "structnlohmann_1_1json__sax.html#a82ed080814fa656191a537284bb0c575":[2,0,0,5,1],

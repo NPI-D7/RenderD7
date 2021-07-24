@@ -62,6 +62,8 @@ $(document).ready(function(){initNavTree('classsound.html',''); initResizable();
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
+<tr class="memitem:a2f69382c0ac7e2aa90d8278cc5b6bd70"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsound.html#a2f69382c0ac7e2aa90d8278cc5b6bd70">sound</a> (const std::string &amp;path, int channel=1, bool toloop=false)</td></tr>
+<tr class="separator:a2f69382c0ac7e2aa90d8278cc5b6bd70"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4a82f1972ceb6a2642bb2dcc067c3d72"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsound.html#a4a82f1972ceb6a2642bb2dcc067c3d72">~sound</a> ()</td></tr>
 <tr class="separator:a4a82f1972ceb6a2642bb2dcc067c3d72"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abb2c33709eb822528889e32722fc1153"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsound.html#abb2c33709eb822528889e32722fc1153">play</a> ()</td></tr>
@@ -72,6 +74,41 @@ Public Member Functions</h2></td></tr>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Sound Class </p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+<a id="a2f69382c0ac7e2aa90d8278cc5b6bd70"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2f69382c0ac7e2aa90d8278cc5b6bd70">&#9670;&nbsp;</a></span>sound()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">sound::sound </td>
+          <td>(</td>
+          <td class="paramtype">const std::string &amp;&#160;</td>
+          <td class="paramname"><em>path</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>channel</em> = <code>1</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>toloop</em> = <code>false</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Construct new Soundeffect path: Path to the .wav file channel: the channel 1-23 toloop: true:loop the sound, false: don't loop </p>
+
+</div>
+</div>
 <a id="a4a82f1972ceb6a2642bb2dcc067c3d72"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a4a82f1972ceb6a2642bb2dcc067c3d72">&#9670;&nbsp;</a></span>~sound()</h2>
 
@@ -86,12 +123,7 @@ Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<pre class="fragment"> Construct new Soundeffect
- path: Path to the .wav file
- channel: the channel 1-23
- toloop: true:loop the sound, false: don't loop
-"/
-</pre><p> sound(const std::string&amp; path, int channel = 1, bool toloop = false); /** deconstruct the sound </p>
+<p>deconstruct the sound </p>
 
 </div>
 </div>
