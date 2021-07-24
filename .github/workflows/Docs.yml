@@ -42,7 +42,7 @@ jobs:
           echo tobid7
           git stage *
           echo staged
-          git commit -a "Documentation1"
+          git commit -m "Documentation1"
           git tag doc
           cd ..
           echo commited
