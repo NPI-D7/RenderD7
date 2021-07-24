@@ -31,7 +31,7 @@ jobs:
           git config --global user.name "Tobi-D7"
           echo tobid7
           git stage *
-          git pull gh-pages
+          git pull
           echo staged
           git commit -m "Documentation"
           git tag doc
