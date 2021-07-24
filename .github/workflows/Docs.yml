@@ -20,6 +20,9 @@ jobs:
         shell: bash
         run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
         id: branch
+      - name: Display branch name
+        shell: bash
+        run: echo ${{ steps.branch.output.branch }}
       # Runs a single command using the runners shell
       - name: Run a one-line script
         run: |
