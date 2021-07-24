@@ -30,7 +30,7 @@ jobs:
           sudo apt-get install doxygen cmake -y
           doxygen
           echo done
-          mkdir ${{ steps.branch.outputs.branch }}
+          mkdir -p ${{ steps.branch.outputs.branch }}
           mv -v doc ${{ steps.branch.outputs.branch }}/
           rm -r doc/
           git config --global user.email "tobid7@outlook.de"
