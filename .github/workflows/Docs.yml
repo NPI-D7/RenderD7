@@ -33,5 +33,5 @@ jobs:
           git tag doc
           cd ..
           echo commited
-          git push origin gh-pages
+          git push origin gh-pages --force
           echo pushed
