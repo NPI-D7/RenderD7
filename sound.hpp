@@ -11,7 +11,7 @@ public:
         *path: Path to the .wav file
         *channel: the channel 1-23
         *toloop: true:loop the sound, false: don't loop
-        "/
+        */
 	sound(const std::string& path, int channel = 1, bool toloop = false);
         /** deconstruct the sound */
 	~sound();
