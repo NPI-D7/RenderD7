@@ -41,7 +41,7 @@ namespace RenderD7
 {
    /**	Set current RenderScreen
    *	target: The RenderTarget Top, Bottom
-   **/
+   */
     void OnScreen(C3D_RenderTarget *target);
     class Sheet
     {
