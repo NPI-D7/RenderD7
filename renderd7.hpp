@@ -47,10 +47,16 @@ namespace RenderD7
     class Sheet
     {
         public:
+        /// Construct sheet
         Sheet();
+        // Deconstruct sheet
         ~Sheet();
+        /// Load a Sritesheet
+        /// path: Path to the Spritesheet (.t3x)
         Result Load(const char *path);
+        /// Unload the Spritesheet
         void Free();
+        // The Spritesheet
         C2D_SpriteSheet spritesheet;
     };
     class Image
