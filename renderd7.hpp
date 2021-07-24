@@ -43,6 +43,7 @@ namespace RenderD7
    *	target: The RenderTarget Top, Bottom
    */
     void OnScreen(C3D_RenderTarget *target);
+    /** The Spritesheet Class */
     class Sheet
     {
         public:
