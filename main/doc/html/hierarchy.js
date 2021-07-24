@@ -26,6 +26,7 @@ var hierarchy =
     [ "nlohmann::basic_json::json_value", "unionnlohmann_1_1basic__json_1_1json__value.html", null ],
     [ "std::less<::nlohmann::detail::value_t >", "structstd_1_1less_3_1_1nlohmann_1_1detail_1_1value__t_01_4.html", null ],
     [ "nlohmann::detail::lexer< BasicJsonType, InputAdapterType >", "classnlohmann_1_1detail_1_1lexer.html", null ],
+    [ "Log", "classLog.html", null ],
     [ "nlohmann::ordered_map< Key, T, IgnoredLess, Allocator >", "structnlohmann_1_1ordered__map.html", null ],
     [ "nlohmann::detail::output_adapter_protocol< CharType >", "structnlohmann_1_1detail_1_1output__adapter__protocol.html", [
       [ "nlohmann::detail::output_stream_adapter< CharType >", "classnlohmann_1_1detail_1_1output__stream__adapter.html", null ],
