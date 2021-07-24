@@ -28,6 +28,8 @@ jobs:
         run: |
           cd doc
           cp Doxyfile ../
+          rm *
+          cd ..
           sudo apt-get install doxygen cmake -y
           doxygen
           echo done
