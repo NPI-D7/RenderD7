@@ -1,5 +1,6 @@
 var NAVTREEINDEX2 =
 {
+"namespaces.html":[1,0],
 "pages.html":[],
 "structnlohmann_1_1adl__serializer.html":[2,0,0,1],
 "structnlohmann_1_1detail_1_1internal__iterator.html":[2,0,0,0,5],

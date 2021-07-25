@@ -18,6 +18,7 @@ var NAVTREEINDEX0 =
 "classRenderD7_1_1Sheet.html#a869b5bb61b4197eee2b3258e2f3b64e5":[2,0,1,1,1],
 "classRenderD7_1_1Sheet.html#a950debb41e4b392a4a80a9607f4ae7cd":[2,0,1,1,2],
 "classRenderD7_1_1Sprite.html":[2,0,1,2],
+"classRenderD7_1_1Sprite.html#ae2924bcf030217135967253672e2b33e":[2,0,1,2,0],
 "classes.html":[2,1],
 "classnlohmann_1_1basic__json.html":[2,0,0,2],
 "classnlohmann_1_1basic__json.html#a00601649a4242a528f60b9e0c7b89bd6":[2,0,0,2,68],
@@ -248,6 +249,5 @@ var NAVTREEINDEX0 =
 "classnlohmann_1_1detail_1_1binary__reader.html#a8bebd21ceef09b6b2562e87861832700":[2,0,0,0,0,18],
 "classnlohmann_1_1detail_1_1binary__reader.html#a9940f56290b9278c58772eda2931e599":[2,0,0,0,0,5],
 "classnlohmann_1_1detail_1_1binary__reader.html#a9c413c9a1bade1ce345740f4d69156f0":[2,0,0,0,0,32],
-"classnlohmann_1_1detail_1_1binary__reader.html#aa03c779d4512b5764895dc341b0ef902":[2,0,0,0,0,35],
-"classnlohmann_1_1detail_1_1binary__reader.html#ab47df98119524e9c7d9ff0b820913883":[2,0,0,0,0,34]
+"classnlohmann_1_1detail_1_1binary__reader.html#aa03c779d4512b5764895dc341b0ef902":[2,0,0,0,0,35]
 };
