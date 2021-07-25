@@ -14,6 +14,7 @@ var hierarchy =
     ] ],
     [ "nlohmann::detail::file_input_adapter", "classnlohmann_1_1detail_1_1file__input__adapter.html", null ],
     [ "std::hash< nlohmann::json >", "structstd_1_1hash_3_01nlohmann_1_1json_01_4.html", null ],
+    [ "RenderD7::Image", "classRenderD7_1_1Image.html", null ],
     [ "nlohmann::detail::input_stream_adapter", "classnlohmann_1_1detail_1_1input__stream__adapter.html", null ],
     [ "nlohmann::detail::internal_iterator< BasicJsonType >", "structnlohmann_1_1detail_1_1internal__iterator.html", null ],
     [ "nlohmann::detail::internal_iterator< typename std::remove_const< BasicJsonType >::type >", "structnlohmann_1_1detail_1_1internal__iterator.html", null ],
