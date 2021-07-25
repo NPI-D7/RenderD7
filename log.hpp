@@ -14,7 +14,7 @@ class Log
                 /** Deconstruct */
 		~Log();
                 /// Init the log file
-                /// filename: name for the file
+                /// \param filename name for the file
 		void Init(const char *filename);
                 /// Write Text to logfile
                 /// debug_text: your text
