@@ -52,7 +52,7 @@ var NAVTREEINDEX =
 [
 ".html",
 "classnlohmann_1_1detail_1_1binary__reader.html#a8bebd21ceef09b6b2562e87861832700",
-"namespacenlohmann.html"
+"namespacenlohmann_1_1detail.html"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';
