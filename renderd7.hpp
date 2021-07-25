@@ -59,6 +59,7 @@ namespace RenderD7
         // The Spritesheet
         C2D_SpriteSheet spritesheet;
     };
+      
     class Image
     {
         public:
@@ -69,7 +70,7 @@ namespace RenderD7
         C2D_Image img;
         bool loadet = false;
     };
-
+    /// Sprite Class
     class Sprite
     {
         public:
