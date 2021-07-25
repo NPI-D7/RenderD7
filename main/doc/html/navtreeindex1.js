@@ -1,5 +1,6 @@
 var NAVTREEINDEX1 =
 {
+"classnlohmann_1_1detail_1_1binary__reader.html#a8bebd21ceef09b6b2562e87861832700":[2,0,0,0,0,18],
 "classnlohmann_1_1detail_1_1binary__reader.html#a9940f56290b9278c58772eda2931e599":[2,0,0,0,0,5],
 "classnlohmann_1_1detail_1_1binary__reader.html#a9c413c9a1bade1ce345740f4d69156f0":[2,0,0,0,0,32],
 "classnlohmann_1_1detail_1_1binary__reader.html#aa03c779d4512b5764895dc341b0ef902":[2,0,0,0,0,35],
@@ -194,8 +195,8 @@ var NAVTREEINDEX1 =
 "functions_d.html":[2,3,0,3],
 "functions_e.html":[2,3,0,4],
 "functions_f.html":[2,3,0,5],
-"functions_func.html":[2,3,1,0],
 "functions_func.html":[2,3,1],
+"functions_func.html":[2,3,1,0],
 "functions_func_b.html":[2,3,1,1],
 "functions_func_c.html":[2,3,1,2],
 "functions_func_d.html":[2,3,1,3],
@@ -248,6 +249,5 @@ var NAVTREEINDEX1 =
 "namespacemembers_enum.html":[1,1,3],
 "namespacemembers_func.html":[1,1,1],
 "namespacemembers_type.html":[1,1,2],
-"namespacenlohmann.html":[2,0,0],
-"namespacenlohmann.html":[1,0,0]
+"namespacenlohmann.html":[2,0,0]
 };

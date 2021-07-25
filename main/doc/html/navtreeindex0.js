@@ -6,6 +6,7 @@ var NAVTREEINDEX0 =
 "classLog.html#a0fbfda88fbee5027c89f6eb121059360":[2,0,3,1],
 "classLog.html#a4fa454441efc3a17a4f6d920523feb43":[2,0,3,4],
 "classLog.html#a7021cb723a7dff6a02f4e88705e25b13":[2,0,3,2],
+"classLog.html#a855b057411fe7f5c69dd5ee80b3d0179":[2,0,3,6],
 "classLog.html#ae0702c44f02849b538f2d4d761b56ee2":[2,0,3,5],
 "classLog.html#aef5a70d6e91909c792df54e501397d83":[2,0,3,3],
 "classLog.html#af6071a60aa52b6c1b511f99b4bc1b8fe":[2,0,3,0],
@@ -248,6 +249,5 @@ var NAVTREEINDEX0 =
 "classnlohmann_1_1detail_1_1binary__reader.html#a61a0bd8bbe7b560bd429fa990ba3ba1a":[2,0,0,0,0,30],
 "classnlohmann_1_1detail_1_1binary__reader.html#a7b6c2d4c95d56751e233e285a5f1fea7":[2,0,0,0,0,22],
 "classnlohmann_1_1detail_1_1binary__reader.html#a7d323283c60a0b89ee5eeadf5cb9a5ad":[2,0,0,0,0,31],
-"classnlohmann_1_1detail_1_1binary__reader.html#a7e5e0b71548d0649ce4f131280d06c33":[2,0,0,0,0,23],
-"classnlohmann_1_1detail_1_1binary__reader.html#a8bebd21ceef09b6b2562e87861832700":[2,0,0,0,0,18]
+"classnlohmann_1_1detail_1_1binary__reader.html#a7e5e0b71548d0649ce4f131280d06c33":[2,0,0,0,0,23]
 };

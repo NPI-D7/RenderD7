@@ -53,6 +53,7 @@ $(document).ready(function(){initNavTree('classLog.html',''); initResizable(); }
 <div class="header">
   <div class="summary">
 <a href="#pub-methods">Public Member Functions</a> &#124;
+<a href="#pri-attribs">Private Attributes</a> &#124;
 <a href="classLog-members.html">List of all members</a>  </div>
   <div class="headertitle">
 <div class="title">Log Class Reference</div>  </div>
@@ -67,7 +68,7 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:af6071a60aa52b6c1b511f99b4bc1b8fe"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0fbfda88fbee5027c89f6eb121059360"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classLog.html#a0fbfda88fbee5027c89f6eb121059360">~Log</a> ()</td></tr>
 <tr class="separator:a0fbfda88fbee5027c89f6eb121059360"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7021cb723a7dff6a02f4e88705e25b13"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classLog.html#a7021cb723a7dff6a02f4e88705e25b13">Init</a> (const char *filename)</td></tr>
+<tr class="memitem:a7021cb723a7dff6a02f4e88705e25b13"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classLog.html#a7021cb723a7dff6a02f4e88705e25b13">Init</a> (const char *<a class="el" href="classLog.html#a855b057411fe7f5c69dd5ee80b3d0179">filename</a>)</td></tr>
 <tr class="separator:a7021cb723a7dff6a02f4e88705e25b13"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aef5a70d6e91909c792df54e501397d83"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classLog.html#aef5a70d6e91909c792df54e501397d83">Write</a> (std::string debug_text)</td></tr>
 <tr class="separator:aef5a70d6e91909c792df54e501397d83"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -77,6 +78,13 @@ std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hre
 <tr class="separator:a4fa454441efc3a17a4f6d920523feb43"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae0702c44f02849b538f2d4d761b56ee2"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classLog.html#ae0702c44f02849b538f2d4d761b56ee2">format</a> (const std::string &amp;fmt_str,...)</td></tr>
 <tr class="separator:ae0702c44f02849b538f2d4d761b56ee2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pri-attribs"></a>
+Private Attributes</h2></td></tr>
+<tr class="memitem:a855b057411fe7f5c69dd5ee80b3d0179"><td class="memItemLeft" align="right" valign="top"><a id="a855b057411fe7f5c69dd5ee80b3d0179"></a>
+std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classLog.html#a855b057411fe7f5c69dd5ee80b3d0179">filename</a></td></tr>
+<tr class="memdesc:a855b057411fe7f5c69dd5ee80b3d0179"><td class="mdescLeft">&#160;</td><td class="mdescRight">param filename the name of the logfile <br /></td></tr>
+<tr class="separator:a855b057411fe7f5c69dd5ee80b3d0179"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p><a class="el" href="classLog.html">Log</a> Class </p>
@@ -157,7 +165,12 @@ std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hre
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Write Text to logfile debug_text: your text </p>
+<p>Write Text to logfile </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">debug_text</td><td>your text </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
@@ -186,7 +199,12 @@ std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hre
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Format to logstyle fmt_str: the formatted style </p>
+<p>Format to logstyle </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">fmt_str</td><td>the formatted style </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
