@@ -59,12 +59,19 @@ namespace RenderD7
         // The Spritesheet
         C2D_SpriteSheet spritesheet;
     };
-      
+    /// Image Class
     class Image
     {
         public:
+        /// Load Image from Png
+        /// path: path to png file
         void LoadPng(const std::string path);
+        /// Load the Image from buffer
+        /// buffer: the frame buffer
         void LoadPFromBuffer(const std::vector<u8> &buffer);
+        /// Draw the Image directly
+        /// x: The x position
+        /// y: the y position
         bool Draw(float x, float y, float scaleX = 1.0f, float scaleY = 1.0f);
         C2D_Image Get(){return this->img;}
         C2D_Image img;
