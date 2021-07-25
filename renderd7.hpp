@@ -41,7 +41,7 @@ extern std::string dspststus;
 namespace RenderD7
 {
     /// Set current RenderScreen
-    /// target: The RenderTarget Top, Bottom
+    /// @param target The RenderTarget Top, Bottom
     void OnScreen(C3D_RenderTarget *target);
     /** The Spritesheet Class */
     class Sheet
