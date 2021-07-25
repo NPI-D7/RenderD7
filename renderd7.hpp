@@ -70,8 +70,8 @@ namespace RenderD7
         /// buffer: the frame buffer
         void LoadPFromBuffer(const std::vector<u8> &buffer);
         /// Draw the Image directly
-        /// x: The x position
-        /// y: the y position
+        /// \param x The x position
+        /// \param y the y position
         bool Draw(float x, float y, float scaleX = 1.0f, float scaleY = 1.0f);
         C2D_Image Get(){return this->img;}
         C2D_Image img;
@@ -81,6 +81,7 @@ namespace RenderD7
     class Sprite
     {
         public:
+        /// \brief Construct Sprite
         Sprite();
         ~Sprite();
         void FromSheet(RenderD7::Sheet *sheet, size_t index);
