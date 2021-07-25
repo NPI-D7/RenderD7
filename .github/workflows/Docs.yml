@@ -27,7 +27,7 @@ jobs:
       - name: Run a one-line script
         run: |
           sudo apt-get install doxygen cmake -y
-          doxygen -w html header.html d.html doxygen.css
+          doxygen
           echo done
           ls -r
           mkdir -p ${{ steps.branch.outputs.branch }}
