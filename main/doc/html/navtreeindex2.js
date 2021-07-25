@@ -1,5 +1,8 @@
 var NAVTREEINDEX2 =
 {
+"namespacenlohmann_1_1detail.html":[2,0,0,0],
+"namespacenlohmann_1_1detail.html":[1,0,0,0],
+"namespacenlohmann_1_1detail_1_1dtoa__impl.html":[1,0,0,0,0],
 "namespaces.html":[1,0],
 "pages.html":[],
 "structnlohmann_1_1adl__serializer.html":[2,0,0,1],
