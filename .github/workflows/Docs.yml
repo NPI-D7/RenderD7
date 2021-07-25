@@ -27,7 +27,7 @@ jobs:
       - name: Run a one-line script
         run: |
           sudo apt-get install doxygen cmake -y
-          doxygen
+          doxygen docs/doxygen.css
           echo done
           mkdir -p ${{ steps.branch.outputs.branch }}
           rm -r ${{ steps.branch.outputs.branch }}/*
