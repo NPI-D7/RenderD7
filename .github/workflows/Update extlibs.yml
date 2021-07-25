@@ -13,24 +13,42 @@ on:
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  # This workflow contains a single job called "build"
   build:
-    # The type of runner that the job will run on
     runs-on: ubuntu-latest
-
-    # Steps represent a sequence of tasks that will be executed as part of the job
+    container: devkitpro/devkitarm
+    name: Build with Docker using devkitARM
+    outputs:
+      commit_tag: ${{ steps.build.outputs.commit_tag }}
+      commit_hash: ${{ steps.build.outputs.commit_hash }}
+      author_name: ${{ steps.build.outputs.author_name }}
+      committer_name: ${{ steps.build.outputs.committer_name }}
+      commit_subject: ${{ steps.build.outputs.commit_subject }}
+      commit_message: ${{ steps.build.outputs.commit_message }}
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v2
-
-      # Runs a single command using the runners shell
-      - name: Run a one-line script
-        run: echo Hello, world!
-
-      # Runs a set of commands using the runners shell
-      - name: Run a multi-line script
+      - name: Checkout repo
+        uses: actions/checkout@v1
+        with:
+          submodules: recursive
+      - name: Install tools
         run: |
-          echo Add other actions to build,
-          echo test, and deploy your project.
+          sudo apt-get update
+          sudo apt-get install p7zip-full -y
+          curl -L https://github.com/Steveice10/bannertool/releases/download/1.2.0/bannertool.zip -o bannertool.zip
+          sudo 7z e bannertool.zip linux-x86_64/bannertool
+          sudo chmod +x bannertool
+          mv bannertool /usr/local/bin
+          rm bannertool.zip
+          curl -L https://github.com/3DSGuy/Project_CTR/releases/download/makerom-v0.17/makerom-v0.17-ubuntu_x86_64.zip -o makerom-v0.17-ubuntu_x86_64.zip
+          sudo 7z e makerom-v0.17-ubuntu_x86_64.zip
+          sudo chmod +x makerom
+          mv makerom /usr/local/bin
+          rm makerom-v0.17-ubuntu_x86_64.zip
+      - name: Build
+        id: build
+        run: |
+          cd extlibs
+          git clone https://github.com/devkitpro/citro3d.git
+          git stage *
+          git commit -m "update"
+          git push origin main
