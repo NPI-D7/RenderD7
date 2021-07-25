@@ -6,12 +6,10 @@
 /** Sound Class */
 class sound {
 public:
-        /**
-        *  Construct new Soundeffect
-        *  path: Path to the .wav file
-        *  channel: the channel 1-23
-        *  toloop: true:loop the sound, false: don't loop
-        */
+        /// \brief Construct new Soundeffect
+        /// \param path Path to the .wav file
+        /// \param channel the channel 1-23
+        /// \param toloop true:loop the sound, false: don't loop
 	sound(const std::string& path, int channel = 1, bool toloop = false);
         /** deconstruct the sound */
 	~sound();
