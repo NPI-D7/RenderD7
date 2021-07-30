@@ -34,7 +34,7 @@ jobs:
           git clone https://github.com/NPI-D7/NPI-D7.github.io.git
           mkdir -p NPI-D7.github.io/${{ steps.branch.outputs.branch }}
           #rm -r NPI-D7.github.io/${{ steps.branch.outputs.branch }}/*
-          mv -v doc NPI-D7.github.io/${{ steps.branch.outputs.branch }}/
+          mv -v RenderD7/doc NPI-D7.github.io/${{ steps.branch.outputs.branch }}/
           #rm -r doc
           cd NPI-D7.github.io
           git config --global user.email "tobid7@outlook.de"
