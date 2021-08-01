@@ -163,6 +163,7 @@ namespace RenderD7
     void ClearTextBufs(void);
    
     bool DrawRect(float x, float y, float w, float h, u32 color);
+    bool DrawPx(float x, float y, u32 color);
     void DrawTextCentered(float x, float y, float size, u32 color, std::string Text, int maxWidth = 0, int maxHeight = 0, C2D_Font fnt = nullptr);
 	void DrawText(float x, float y, float size, u32 color, std::string Text, int maxWidth = 0, int maxHeight = 0, C2D_Font fnt = nullptr);
     void DrawTextLeft(float x, float y, float size, u32 color, std::string Text, int maxWidth = 0, int maxHeight = 0, C2D_Font fnt = nullptr);
