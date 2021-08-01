@@ -358,6 +358,11 @@ bool RenderD7::DrawRect(float x, float y, float w, float h, u32 color)
 	return C2D_DrawRectSolid(x, y, 0.5f, w, h, color);
 }
 
+bool RenderD7::DrawPx(float x, float y, u32 color)
+{
+	return C2D_DrawRectSolid(x, y, 0.5f, 1, 1, color);
+}
+
 void RenderD7::DrawTextCentered(float x, float y, float size, u32 color, std::string Text, int maxWidth, int maxHeight, C2D_Font fnt) {
 	float lineHeight, widthScale;
 
