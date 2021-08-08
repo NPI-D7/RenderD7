@@ -48,7 +48,7 @@ namespace RenderD7
     {
          NUMPAD,
          STANDARD
-    }
+    };
     /// Set current RenderScreen
     /// \param target The RenderTarget Top, Bottom
     void OnScreen(C3D_RenderTarget *target);
