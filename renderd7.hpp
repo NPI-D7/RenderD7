@@ -21,6 +21,7 @@
 #include "parameter.hpp"
 #include "thread.hpp"
 #include "ini.hpp"
+#include "stringtool.hpp"
 
 #define RENDERD7VSTRING "0.6.10"
 #define CHANGELOG "0.6.10: rewrite Threadsystem, Improve framerate/n0.6.02: Fix Code in lang.hpp\nadd Draw Text Left Function.\nadd changelog\n0.6.01: add Threading system."
