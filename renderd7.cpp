@@ -592,6 +592,24 @@ void RenderD7::DrawTObjects(std::vector<RenderD7::TObject> tobjects, u32 color, 
 		}
 	}
 }
+
+void RenderD7::DrawTLBtns(std::vector<RenderD7::TLBtn> btns, u32 color, int selection, u32 selbgcolor, u32 selcolor)
+{
+	for(int i = 0; i < (int)tobjects.size(); i++)
+	{
+		if (selection == i)
+		{
+			RenderD7::DrawRect(btns[i].x - 2, btns[i].y - 2, btns[i].w + 4, btns[i].h + 4, selbgcolor);
+			RenderD7::DrawRect(btns[i].x, btns[i].y, btns[i].w, btns[i].h, color);
+			RenderD7::DrawRect(btns[i].x, btns[i].y, btns[i].w,  btns[i].h, selcolor);
+	        }
+		else
+		{
+			RenderD7::DrawRect(btns[i].x, btns[i].y - 1, btns[i].w, btns[i].h, color);
+		}
+	}
+}
+
 void RenderD7::ExitApp()
 {
 	running = false;
