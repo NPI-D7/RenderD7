@@ -123,12 +123,12 @@ namespace RenderD7
     	virtual ~Scene() {}
     	virtual void Logic(u32 hDown, u32 hHeld, u32 hUp, touchPosition touch) = 0;
     	virtual void Draw() const = 0;
-        virtual void Ovl() const = 0;
+        //virtual void Ovl() const = 0;
         static void Load(std::unique_ptr<Scene> scene);
         static void Back();
         static void doDraw();
         static void doLogic(u32 hDown, u32 hHeld, u32 hUp, touchPosition touch);
-        static void HandleOvl();
+        //static void HandleOvl();
     };
 
     namespace Color
