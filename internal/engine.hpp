@@ -26,8 +26,14 @@ enum EngineType
     _2D,
     _3D
 };
+
+namespace Npi
 class Game {
     public:
     Game(EngineType, std::string name);
-    ~Game();
+    ~Game(){}
+    private:
+    std::string g_name;
+    EngineType g_etype;
 };
+}
