@@ -15,6 +15,7 @@
 #include <algorithm>
 #include <iostream>
 #include <codecvt>
+#include <map>
 #include "lang.hpp"
 #include "parameter.hpp"
 #include "thread.hpp"
