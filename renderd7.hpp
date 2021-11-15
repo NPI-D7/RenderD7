@@ -254,14 +254,14 @@ namespace RenderD7
     };
     struct rgba
     {
-        int r, g, b, a
+        int r, g, b, a;
     };
     class Console
     {
          public:
            Console(int x, int y, int w, int h, int a = 255);
            Console(int x, int y, int w, int h, rgba col);
-           Console(int x, int y, int w, int h, std::string name, rgba col = {255, 255, 255, 255};, rgba barcol = {0, 0, 0, 255};, rgba outline = {222, 222, 222, 255};);
+           Console(int x, int y, int w, int h, std::string name, rgba col = {255, 255, 255, 255}, rgba barcol = {0, 0, 0, 255}, rgba outline = {222, 222, 222, 255});
            ~Console();
          private:
            int x, y, w, h, a;
