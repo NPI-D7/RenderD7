@@ -254,7 +254,7 @@ namespace RenderD7
     };
     struct rgba
     {
-        int r, g, b, a;
+        u8 r, g, b, a;
     };
     class Console
     {
@@ -264,11 +264,13 @@ namespace RenderD7
            Console(int x, int y, int w, int h, std::string name, rgba col = {255, 255, 255, 255}, rgba barcol = {0, 0, 0, 255}, rgba outline = {222, 222, 222, 255});
            ~Console();
          private:
-           int x, y, w, h, a;
+           std::vector<std::string> m_lines;
+           int x, y, w, h;
+           u8 a;
            rgba color = {255, 255, 255, 255};
            rgba outline = {222, 222, 222, 255};
            rgba barcolor = {0, 0, 0, 255};
-    }!
+    };
 
     bool NameIsEndingWith(const std::string &name, const std::vector<std::string> &extensions);
     void GetDirContentsExt(std::vector<RenderD7::DirContent> &dircontent, const std::vector<std::string> &extensions);
