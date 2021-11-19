@@ -261,14 +261,14 @@ namespace RenderD7
          public:
            Console(int x, int y, int w, int h, int a = 255);
            Console(int x, int y, int w, int h, rgba col);
-           Console(int x, int y, int w, int h, std::string name, rgba col = {255, 255, 255, 255}, rgba barcol = {0, 0, 0, 255}, rgba outline = {222, 222, 222, 255});
+           Console(int x, int y, int w, int h, std::string name, rgba col = {255, 255, 255, 255}, rgba barcol = {0, 0, 0, 255}, rgba outlinecol = {222, 222, 222, 255});
            ~Console();
          private:
            std::vector<std::string> m_lines;
            int x, y, w, h;
            u8 a;
            rgba color = {255, 255, 255, 255};
-           rgba outline = {222, 222, 222, 255};
+           rgba outlinecol = {222, 222, 222, 255};
            rgba barcolor = {0, 0, 0, 255};
     };
 
