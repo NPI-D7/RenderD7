@@ -798,3 +798,28 @@ void RenderD7::DrawMetrikOvl()
 	RenderD7::OnScreen(Top);
 	RenderD7::DrawText(0, 0, 0.6f, mt_color, "HI");
 }
+
+RenderD7::Console::Console(int x, int y, int w, int h, u8 a)
+{
+
+}
+RenderD7::Console::Console(int x, int y, int w, int h, RenderD7::rgba col)
+{
+
+}
+RenderD7::Console::Console(int x, int y, int w, int h, std::string name, RenderD7::rgba col, RenderD7::rgba barcol, RenderD7::rgba outlinecol)
+{
+
+}
+RenderD7::Console::~Console()
+{
+
+}
+void RenderD7::Console::On(C3D_RenderTarget *t_cscreen)
+{
+     this->cscreen = t_cscreen;
+}
+bool RenderD7:: Console::Update()
+{
+
+}
