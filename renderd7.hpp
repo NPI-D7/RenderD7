@@ -275,4 +275,5 @@ namespace RenderD7
     bool NameIsEndingWith(const std::string &name, const std::vector<std::string> &extensions);
     void GetDirContentsExt(std::vector<RenderD7::DirContent> &dircontent, const std::vector<std::string> &extensions);
     void GetDirContents(std::vector<RenderD7::DirContent> &dircontent);
+
 } /// RenderD7
