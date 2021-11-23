@@ -256,7 +256,7 @@ namespace RenderD7
     {
         u8 r, g, b, a;
     };
-    class Console
+   /* class Console
     {
          public:
            Console(int x, int y, int w, int h, int a = 255);
@@ -275,7 +275,7 @@ namespace RenderD7
            rgba color = {255, 255, 255, 255};
            rgba outlinecol = {222, 222, 222, 255};
            rgba barcolor = {0, 0, 0, 255};
-    };
+    };*/
 
     bool NameIsEndingWith(const std::string &name, const std::vector<std::string> &extensions);
     void GetDirContentsExt(std::vector<RenderD7::DirContent> &dircontent, const std::vector<std::string> &extensions);
