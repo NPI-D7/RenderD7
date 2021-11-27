@@ -799,7 +799,7 @@ void RenderD7::DrawMetrikOvl()
 	RenderD7::DrawText(0, 0, 0.6f, mt_color, "HI");
 }
 
-RenderD7::Console::Console()
+/*RenderD7::Console::Console()
 {
     this->x = 0;
     this->y = 0;
@@ -848,4 +848,4 @@ bool RenderD7:: Console::Update()
      bool dr_sc = true;
      return dr_sc;
 }
-
+*/
