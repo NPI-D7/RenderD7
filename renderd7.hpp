@@ -144,7 +144,7 @@ namespace RenderD7
     }
     namespace Init
     {
-        Result Main();
+        Result Main(std::string app_name = "RD7Game");
         void NdspFirm(bool useit = false);
     }
     namespace Exit
