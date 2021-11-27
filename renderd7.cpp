@@ -525,7 +525,7 @@ Result RenderD7::Init::Main(std::string app_name)
     aptInit();
     romfsInit();
     cfguInit();
-    D_app_name = app_name
+    D_app_name = app_name;
     std::string cfgpath = "sdmc:/RenderD7/Apps/";
     cfgpath += D_app_name;
 	mkdir("sdmc:/RenderD7/", 0777);
