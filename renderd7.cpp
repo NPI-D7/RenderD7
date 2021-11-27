@@ -17,6 +17,8 @@ std::string dspststus = "Not Initialisized!";
 std::unique_ptr<INI::INIFile> cfgfile = nullptr;
 INI::INIStructure cfgstruct;
 
+std::string D_app_name;
+
 u32 d7_hDown;
 u32 d7_hHeld;
 u32 d7_hUp;
@@ -517,16 +519,20 @@ void MetrikThread(RenderD7::Parameter param) {
         RenderD7::Thread::sleep(1000 * 1); // wait; also, this is needed to allow for concurrency (refer to the documentation for m3d::Thread::sleep())
     }
 }
-Result RenderD7::Init::Main()
+Result RenderD7::Init::Main(std::string app_name)
 {
     gfxInitDefault();
     aptInit();
     romfsInit();
     cfguInit();
+    D_app_name = app_name
+    std::string cfgpath = "sdmc:/RenderD7/";
+    cfgpath += D_app_name;
 	mkdir("sdmc:/RenderD7/", 0777);
-	if (!FS::FileExist("sdmc:/RenderD7/config.ini"))
+        mkdir(cfgpath.c_str(), 0777);
+	if (!FS::FileExist(cfgpath + "/config.ini"))
 	{
-		cfgfile = std::make_unique<INI::INIFile>("sdmc:/RenderD7/config.ini");
+		cfgfile = std::make_unique<INI::INIFile>(cfgpath+ "/config.ini");
 		cfgfile->read(cfgstruct);
 		cfgstruct["info"]["version"] = CFGVER;
 		cfgstruct["info"]["renderd7ver"] = RENDERD7VSTRING;
@@ -540,7 +546,7 @@ Result RenderD7::Init::Main()
 		cfgstruct["metrik-settings"]["ColorA"] = "255";
 		cfgfile->write(cfgstruct);
 	}
-	cfgfile = std::make_unique<INI::INIFile>("sdmc:/RenderD7/config.ini");
+	cfgfile = std::make_unique<INI::INIFile>(cfgpath+ "/config.ini");
 	cfgfile->read(cfgstruct);
 	std::string Fps = cfgstruct["settings"]["forceFrameRate"];
 	C3D_FrameRate(RenderD7::Convert::StringtoFloat(Fps));
