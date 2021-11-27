@@ -801,19 +801,39 @@ void RenderD7::DrawMetrikOvl()
 
 RenderD7::Console::Console()
 {
-
+    this->x = 0;
+    this->y = 0;
+    this->w = 320;
+    this->h = 240;
+    this->color = {0, 0, 0, 255};
 }
 RenderD7::Console::Console(int x, int y, int w, int h, u8 a)
 {
-
+    this->x = x;
+    this->y = y;
+    this->w = w;
+    this->h = h;
+    this->color = {0, 0, 0, a};
+    
 }
 RenderD7::Console::Console(int x, int y, int w, int h, RenderD7::rgba col)
 {
-
+    this->x = x;
+    this->y = y;
+    this->w = w;
+    this->h = h;
+    this->color = col;
 }
 RenderD7::Console::Console(int x, int y, int w, int h, std::string name, RenderD7::rgba col, RenderD7::rgba barcol, RenderD7::rgba outlinecol)
 {
-
+    this->x = x;
+    this->y = y;
+    this->w = w;
+    this->h = h;
+    this->color = col;
+    this->outlinecol = outlinecol;
+    this->barcolor = barcol;
+    this->m_name = name;
 }
 RenderD7::Console::~Console()
 {
@@ -825,6 +845,7 @@ void RenderD7::Console::On(C3D_RenderTarget *t_cscreen)
 }
 bool RenderD7:: Console::Update()
 {
-
+     bool dr_sc = true;
+     return dr_sc;
 }
 
