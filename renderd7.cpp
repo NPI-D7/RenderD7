@@ -266,6 +266,9 @@ bool RenderD7::MainLoop()
 	C2D_TargetClear(Top, C2D_Color32(0, 0, 0, 0));
 	C2D_TargetClear(Bottom, C2D_Color32(0, 0, 0, 0));
     frameloop();
+        RenderD7::Scene::doDraw();
+        RenderD7::Scene::doLogic(d7_hDown, d7_hHeld, d7_hUp, d7_touch);
+        
 	if (metrikd)RenderD7::DrawMetrikOvl();
     return running;
 }
