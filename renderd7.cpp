@@ -564,7 +564,7 @@ Result RenderD7::Init::Main(std::string app_name)
 	mt_txtcolor = RenderD7::Color::Hex(cfgstruct["metrik-settings"]["txtColor"], (u8)RenderD7::Convert::StringtoFloat(cfgstruct["metrik-settings"]["txtColorA"]));
         mt_color = RenderD7::Color::Hex(cfgstruct["metrik-settings"]["Color"], (u8)RenderD7::Convert::StringtoFloat(cfgstruct["metrik-settings"]["ColorA"]));
         mt_txtSize = RenderD7::Convert::StringtoFloat(cfgstruct["metrik-settings"]["txtSize"]);
-        switch (RenderD7::Convert::StringtoFloat(cfgstruct["metrik-settings"]["txtSize"]))
+        switch (RenderD7::Convert::StringtoInt(cfgstruct["metrik-settings"]["txtSize"]))
         {
             case 0:
                 mt_screen = Top;
