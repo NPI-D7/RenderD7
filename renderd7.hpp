@@ -161,6 +161,7 @@ namespace RenderD7
     namespace Convert
     {
         inline float StringtoFloat(std::string inp){return std::atof(inp.c_str());}
+        inline int StringtoInt(std::string inp){return std::atoi(inp.c_str());}
         inline bool FloatToBool(float inp){if(inp == 1)return true; else return false;}
     }
     namespace FS
