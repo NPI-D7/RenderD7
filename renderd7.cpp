@@ -37,7 +37,7 @@ float d11framerate = 0;
 //Metrik-------------------------------------
 u32 mt_color;
 u32 mt_txtcolor;
-C3D_RenderTarget *mt_screen;
+int mt_screen;
 float mt_txtSize;
 //-------------------------------------------
 bool currentScreen = false;
@@ -564,15 +564,8 @@ Result RenderD7::Init::Main(std::string app_name)
 	mt_txtcolor = RenderD7::Color::Hex(cfgstruct["metrik-settings"]["txtColor"], (u8)RenderD7::Convert::StringtoFloat(cfgstruct["metrik-settings"]["txtColorA"]));
         mt_color = RenderD7::Color::Hex(cfgstruct["metrik-settings"]["Color"], (u8)RenderD7::Convert::StringtoFloat(cfgstruct["metrik-settings"]["ColorA"]));
         mt_txtSize = RenderD7::Convert::StringtoFloat(cfgstruct["metrik-settings"]["txtSize"]);
-        switch (RenderD7::Convert::StringtoInt(cfgstruct["metrik-settings"]["Screen"]))
-        {
-            case 0:
-                mt_screen = Top;
-            case 1:
-                mt_screen = Bottom;
-            default:
-                mt_screen = Bottom;
-        }
+        mt_screen = RenderD7::Convert::StringtoInt(cfgstruct["metrik-settings"]["Screen"])
+        
         osSetSpeedupEnable(true);
 	/*if(metrikd)
 	{
@@ -822,7 +815,15 @@ void RenderD7::DrawList1(RenderD7::ScrollList1 &l, float txtsize, C3D_RenderTarg
 
 void RenderD7::DrawMetrikOvl()
 {
-	RenderD7::OnScreen(mt_screen);
+        switch (mt_screen)
+        {
+            case 0:
+                RenderD7::OnScreen(Top);
+            case 1:
+                RenderD7::OnScreen(Bottom);
+            default:
+                RenderD7::OnScreen(Bottom);
+        }
 	RenderD7::DrawText(0, 0, mt_txtSize, mt_txtcolor, "HI");
 }
 
