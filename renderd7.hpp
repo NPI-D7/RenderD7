@@ -133,6 +133,17 @@ namespace RenderD7
 
     namespace Color
     {
+        struct rgba
+        {
+            u8 r, g, b, a;
+        };
+        class RGB{
+            public:
+            RGB(u8 r, u8 g, u8 b) : r(),g(),b(),a(255){}
+            uint32_t Color::toRGBA() const {return (r << 24) | (g << 16) | (b << 8) | a;}
+            
+            u8 r, g ,b, a;
+        };
         u32 Hex(const std::string color, u8 a = 255);
     }
     void DrawMetrikOvl();
@@ -253,10 +264,7 @@ namespace RenderD7
         std::string path;
         bool isDir;
     };
-    struct rgba
-    {
-        u8 r, g, b, a;
-    };
+    
     /*class Console
     {
          public:
