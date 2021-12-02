@@ -1,4 +1,4 @@
-#include "Click.hpp"
+#include "Clock.hpp"
 
 namespace rnd7{
     enum class TweenType : int {Position = 1, Color, Alpha};
@@ -8,5 +8,10 @@ namespace rnd7{
     enum class TweenDirection : int {Current, Forward, Backward};
 
     enum class TweenState : int {Playing = 1, Stopped};
-    
+    class Tween
+    {
+        public:
+        Tween(float from, float to, float duration, TweenLoop loop, TweenState state);
+
+    };
 }
