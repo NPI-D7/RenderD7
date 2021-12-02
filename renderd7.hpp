@@ -137,12 +137,12 @@ namespace RenderD7
         {
             u8 r, g, b, a;
         };
-        class RGB{
+        class RGBA{
             public:
-            RGB(u8 r, u8 g, u8 b) : r(),g(),b(),a(255){}
+            RGBA(u8 r, u8 g, u8 b, u8 a) : m_r(r),m_g(g),m_b(b),m_a(a){}
             uint32_t Color::toRGBA() const {return (r << 24) | (g << 16) | (b << 8) | a;}
             
-            u8 r, g ,b, a;
+            u8 m_r, m_g ,m_b, m_a;
         };
         u32 Hex(const std::string color, u8 a = 255);
     }
