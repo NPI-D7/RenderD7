@@ -140,7 +140,7 @@ namespace RenderD7
         class RGBA{
             public:
             RGBA(u8 r, u8 g, u8 b, u8 a) : m_r(r),m_g(g),m_b(b),m_a(a){}
-            uint32_t Color::toRGBA() const {return (r << 24) | (g << 16) | (b << 8) | a;}
+            u32 toRGBA() const {return (r << 24) | (g << 16) | (b << 8) | a;}
             
             u8 m_r, m_g ,m_b, m_a;
         };
