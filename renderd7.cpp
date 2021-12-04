@@ -830,8 +830,8 @@ void RenderD7::DrawMetrikOvl()
                 RenderD7::OnScreen(Bottom);
         }
 	RenderD7::DrawText(0, 0, mt_txtSize, mt_txtcolor, "FPS: " + RenderD7::GetFramerate());
-        RenderD7::DrawText(0, 50, mt_txtSize, C2D_Color32(255, 255, 255, 255), "CPU: " + C3D_GetProcessingTime()*6.0f + "/" + C3D_GetProcessingTime());
-        RenderD7::DrawText(0, 70, mt_txtSize, C2D_Color32(255, 255, 255, 255), "GPU: " + C3D_GetDrawingTime()*6.0f + "/" + C3D_GetDrawingTime());
+        RenderD7::DrawText(0, 50, mt_txtSize, mt_txtcolor, "CPU: " + std::to_string(C3D_GetProcessingTime()*6.0f) + "/" + std::to_string(C3D_GetProcessingTime()));
+        RenderD7::DrawText(0, 70, mt_txtSize, mt_txtcolor, "GPU: " + std::to_string(C3D_GetDrawingTime()*6.0f) + "/" + std::to_string(C3D_GetDrawingTime()));
 }
 
 /*RenderD7::Console::Console()
