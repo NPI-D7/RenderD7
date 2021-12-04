@@ -13,6 +13,8 @@ std::stack<std::unique_ptr<RenderD7::Scene>> RenderD7::Scene::scenes;
 bool usedbgmsg = false;
 std::string dspststus = "Not Initialisized!";
 
+int cobj___;
+int maxobj__;
 //INI::INIFile cfgfile;
 std::unique_ptr<INI::INIFile> cfgfile = nullptr;
 INI::INIStructure cfgstruct;
@@ -532,6 +534,8 @@ Result RenderD7::Init::Main(std::string app_name)
     aptInit();
     romfsInit();
     cfguInit();
+    if (cobj___){maxobj__ = cobj___;}
+    if (!cobj___){maxobj__ = C2D_DEFAULT_MAX_OBJECTS;}
     D_app_name = app_name;
     std::string cfgpath = "sdmc:/RenderD7/Apps/";
     cfgpath += D_app_name;
@@ -574,7 +578,7 @@ Result RenderD7::Init::Main(std::string app_name)
 		tr.start();
 	}*/
     C3D_Init(C3D_DEFAULT_CMDBUF_SIZE);
-	C2D_Init(C2D_DEFAULT_MAX_OBJECTS);
+	C2D_Init(size_t(maxobj__));
 	C2D_Prepare();
 	Top = C2D_CreateScreenTarget(GFX_TOP, GFX_LEFT);
 	TopRight = C2D_CreateScreenTarget(GFX_TOP, GFX_RIGHT);
