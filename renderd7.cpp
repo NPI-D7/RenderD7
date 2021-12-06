@@ -590,6 +590,7 @@ Result RenderD7::Init::Main(std::string app_name)
 	Bottom = C2D_CreateScreenTarget(GFX_BOTTOM, GFX_LEFT);
 	TextBuf = C2D_TextBufNew(4096);
 	Font = C2D_FontLoadSystem(CFG_REGION_USA);
+        RenderD7::Msg::Display("RenderD7", "RenderD7 imit success!\nWaiting for MainLoop!", Top);
 	return 0;
 }
 void RenderD7::Exit::Main()
@@ -839,7 +840,7 @@ void RenderD7::DrawMetrikOvl()
         //RenderD7::DrawText(0, 70, mt_txtSize, mt_txtcolor, "GPU: " + std::to_string(C3D_GetDrawingTime()*6.0f) + "/" + std::to_string(C3D_GetDrawingTime()));
         for (int z = 0; z < 320; z++)
         {
-             C2D_DrawLine(z, 239 - mt_framegraph[z], mt_txtcolor, z + 1, 239 - mt_framegraph[z + 1], mt_txtcolor, 1, 1);
+             C2D_DrawLine(z, 239 - mt_fpsgraph[z], mt_txtcolor, z + 1, 239 - mt_fpsgraph[z + 1], mt_txtcolor, 1, 1);
         }
 }
 
