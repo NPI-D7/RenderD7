@@ -590,7 +590,7 @@ Result RenderD7::Init::Main(std::string app_name)
 	Bottom = C2D_CreateScreenTarget(GFX_BOTTOM, GFX_LEFT);
 	TextBuf = C2D_TextBufNew(4096);
 	Font = C2D_FontLoadSystem(CFG_REGION_USA);
-        RenderD7::Msg::Display("RenderD7", "RenderD7 init success!\nWaiting for MainLoop!", Top);
+        //RenderD7::Msg::Display("RenderD7", "RenderD7 init success!\nWaiting for MainLoop!", Top);
 	return 0;
 }
 void RenderD7::Exit::Main()
