@@ -266,6 +266,12 @@ namespace RenderD7
         std::string path;
         bool isDir;
     };
+    struct Checkbox
+    {
+        float x, y, w, h;
+        bool is_chexked = false;
+        u32 outcol, incol, chcol;
+    };
     
     /*class Console
     {
