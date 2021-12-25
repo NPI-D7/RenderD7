@@ -268,11 +268,11 @@ namespace RenderD7
     };
     struct Checkbox
     {
-        float x, y, w, h;
+        float x, y, s;
         bool is_chexked = false;
         u32 outcol, incol, chcol;
     };
-    
+    void DrawCheckbox(Checkbox box);
     /*class Console
     {
          public:
