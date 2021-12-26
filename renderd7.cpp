@@ -846,10 +846,10 @@ void RenderD7::DrawMetrikOvl()
 
 bool RenderD7::DrawNFRect(float p1x, float p1y, float w, float h, u32 color, float scale)
 {  
-    C2D_DrawLine(p1x, p1y, color,w, p1y, color, 1, 1);
-    C2D_DrawLine(w, p1y, color,w, h, color, 1, 1);
-    C2D_DrawLine(w, h, color,p1x, h, color, 1, 1);
-    C2D_DrawLine(p1x, h, color,p1x, p1y, color, 1, 1);
+    C2D_DrawLine(p1x, p1y, color,w, p1y, color, scale, 1);
+    C2D_DrawLine(w, p1y, color,w, h, color, scale, 1);
+    C2D_DrawLine(w, h, color,p1x, h, color, scale, 1);
+    C2D_DrawLine(p1x, h, color,p1x, p1y, color, scale, 1);
     return true;
 }
 
