@@ -11,6 +11,7 @@
 #include <unistd.h>
 #include <stdio.h>
 #include <cstring>
+#include <random>
 #include <sys/stat.h>
 #include <algorithm>
 #include <iostream>
@@ -147,6 +148,7 @@ namespace RenderD7
         };
         u32 Hex(const std::string color, u8 a = 255);
     }
+    int GetRandomInt(int b, int e);
     void DrawMetrikOvl();
     bool DrawImageFromSheet(RenderD7::Sheet* sheet, size_t index, float x, float y, float scaleX = 1.0, float scaleY = 1.0);
     namespace Error

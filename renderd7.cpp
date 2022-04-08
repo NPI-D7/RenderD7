@@ -652,6 +652,14 @@ bool RenderD7::touchTObj(touchPosition touch, RenderD7::TObject button)
     else	return false;
 }
 
+int RenderD7::GetRandomInt(int b, int e)
+{
+	std::default_random_engine generator;
+	std::uniform_int_distribution<int> distribution(b, e);
+	int r = distribution(generator); 
+	return r;
+}
+
 void RenderD7::DrawSTObject(std::vector<RenderD7::TObject> tobject, int tobjectindex, u32 color, u32 txtcolor)
 {
 	RenderD7::DrawRect(tobject[tobjectindex].x, tobject[tobjectindex].y, tobject[tobjectindex].w, tobject[tobjectindex].h, color);
