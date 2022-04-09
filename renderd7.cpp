@@ -251,7 +251,7 @@ void frameloop()
 		last_time = osGetTime();
 	}
 	d11framerate = current_fps;
-       // mt_fpsgraph[320] = current_fps;
+	mt_fpsgraph[320] = current_fps;
 }
 float getframerate()
 {
@@ -846,6 +846,7 @@ void RenderD7::DrawMetrikOvl()
 	RenderD7::DrawText(0, 0, mt_txtSize, mt_txtcolor, "FPS: " + RenderD7::GetFramerate());
     RenderD7::DrawText(0, 50, mt_txtSize, mt_txtcolor, "CPU: " + std::to_string(C3D_GetProcessingTime()*6.0f) + "/" + std::to_string(C3D_GetProcessingTime()));
     RenderD7::DrawText(0, 70, mt_txtSize, mt_txtcolor, "GPU: " + std::to_string(C3D_GetDrawingTime()*6.0f) + "/" + std::to_string(C3D_GetDrawingTime()));
+	
     for (int z = 0; z < 320; z++)
     {
         C2D_DrawLine(z, 239 - mt_fpsgraph[z], mt_txtcolor, z + 1, 239 - mt_fpsgraph[z + 1], mt_txtcolor, 1, 1);
@@ -875,7 +876,8 @@ void RenderD7::FrameEnd()
 {
 	overlays.push_back(overlay);
 }*/
-RenderD7::Console::Console()
+
+/*RenderD7::Console::Console()
 {
     this->x = 0;
     this->y = 0;
@@ -924,4 +926,4 @@ bool RenderD7::Console::Update()
      bool dr_sc = true;
      return dr_sc;
 }
-
+*/

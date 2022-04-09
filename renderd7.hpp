@@ -282,7 +282,7 @@ namespace RenderD7
         u32 outcol, incol, chcol;
     };
     void DrawCheckbox(Checkbox box);
-    class Console
+    /*class Console
     {
          public:
            Console();
@@ -302,7 +302,7 @@ namespace RenderD7
            RenderD7::Color::rgba color = {255, 255, 255, 255};
            RenderD7::Color::rgba outlinecol = {222, 222, 222, 255};
            RenderD7::Color::rgba barcolor = {0, 0, 0, 255};
-    };
+    };*/
 
     bool NameIsEndingWith(const std::string &name, const std::vector<std::string> &extensions);
     void GetDirContentsExt(std::vector<RenderD7::DirContent> &dircontent, const std::vector<std::string> &extensions);
