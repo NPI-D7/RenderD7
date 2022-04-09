@@ -134,12 +134,12 @@ namespace RenderD7
         //static void HandleOvl();
     };
 
-    class Ovl {
+    /*class Ovl {
         public:
         virtual ~Ovl(){}
         virtual void Draw() const = 0;
     };
-    void AddOvl(RenderD7::Ovl overlay);
+    void AddOvl(RenderD7::Ovl overlay);*/
     namespace Color
     {
         struct rgba
@@ -282,7 +282,7 @@ namespace RenderD7
         u32 outcol, incol, chcol;
     };
     void DrawCheckbox(Checkbox box);
-    /*class Console
+    class Console
     {
          public:
            Console();
@@ -302,7 +302,7 @@ namespace RenderD7
            RenderD7::rgba color = {255, 255, 255, 255};
            RenderD7::rgba outlinecol = {222, 222, 222, 255};
            RenderD7::rgba barcolor = {0, 0, 0, 255};
-    };*/
+    };
 
     bool NameIsEndingWith(const std::string &name, const std::vector<std::string> &extensions);
     void GetDirContentsExt(std::vector<RenderD7::DirContent> &dircontent, const std::vector<std::string> &extensions);

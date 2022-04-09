@@ -10,7 +10,7 @@ float animtime;
 bool isndspinit = false;
 bool running = true;
 std::stack<std::unique_ptr<RenderD7::Scene>> RenderD7::Scene::scenes;
-std::vector<RenderD7::Ovl> overlays;
+//std::vector<RenderD7::Ovl> overlays;
 bool usedbgmsg = false;
 std::string dspststus = "Not Initialisized!";
 
@@ -864,18 +864,18 @@ bool RenderD7::DrawNFRect(float p1x, float p1y, float w, float h, u32 color, flo
 void RenderD7::FrameEnd()
 {
 	if (metrikd)RenderD7::DrawMetrikOvl();
-	for (int i = 0; i < (int)overlays.size(); i++)
+	/*for (int i = 0; i < (int)overlays.size(); i++)
 	{
 		overlays[i].Draw();
-	}
+	}*/
 	C3D_FrameEnd(0);
 }
 
-void RenderD7::AddOvl(RenderD7::Ovl overlay)
+/*void RenderD7::AddOvl(RenderD7::Ovl overlay)
 {
 	overlays.push_back(overlay);
-}
-/*RenderD7::Console::Console()
+}*/
+RenderD7::Console::Console()
 {
     this->x = 0;
     this->y = 0;
@@ -919,10 +919,9 @@ void RenderD7::Console::On(C3D_RenderTarget *t_cscreen)
 {
      this->cscreen = t_cscreen;
 }
-bool RenderD7:: Console::Update()
+bool RenderD7::Console::Update()
 {
      bool dr_sc = true;
      return dr_sc;
 }
 
-*/
