@@ -287,8 +287,8 @@ namespace RenderD7
          public:
            Console();
            Console(int x, int y, int w, int h, int a = 255);
-           Console(int x, int y, int w, int h, RenderD7::rgba col);
-           Console(int x, int y, int w, int h, std::string name, RenderD7::rgba col = {255, 255, 255, 255}, RenderD7::rgba barcol = {0, 0, 0, 255}, RenderD7::rgba outlinecol = {222, 222, 222, 255});
+           Console(int x, int y, int w, int h, RenderD7::Color::rgba col);
+           Console(int x, int y, int w, int h, std::string name, RenderD7::Color::rgba col = {255, 255, 255, 255}, RenderD7::Color::rgba barcol = {0, 0, 0, 255}, RenderD7::Color::rgba outlinecol = {222, 222, 222, 255});
            void On(C3D_RenderTarget *t_cscreen);
            bool Update();
            ~Console();
@@ -299,9 +299,9 @@ namespace RenderD7
            C3D_RenderTarget *cscreen;
            bool m_nconsole = false;
            bool m_mconsole = false;
-           RenderD7::rgba color = {255, 255, 255, 255};
-           RenderD7::rgba outlinecol = {222, 222, 222, 255};
-           RenderD7::rgba barcolor = {0, 0, 0, 255};
+           RenderD7::Color::rgba color = {255, 255, 255, 255};
+           RenderD7::Color::rgba outlinecol = {222, 222, 222, 255};
+           RenderD7::Color::rgba barcolor = {0, 0, 0, 255};
     };
 
     bool NameIsEndingWith(const std::string &name, const std::vector<std::string> &extensions);

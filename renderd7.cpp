@@ -892,7 +892,7 @@ RenderD7::Console::Console(int x, int y, int w, int h, u8 a)
     this->color = {0, 0, 0, a};
     
 }
-RenderD7::Console::Console(int x, int y, int w, int h, RenderD7::rgba col)
+RenderD7::Console::Console(int x, int y, int w, int h, RenderD7::Color::rgba col)
 {
     this->x = x;
     this->y = y;
@@ -900,7 +900,7 @@ RenderD7::Console::Console(int x, int y, int w, int h, RenderD7::rgba col)
     this->h = h;
     this->color = col;
 }
-RenderD7::Console::Console(int x, int y, int w, int h, std::string name, RenderD7::rgba col, RenderD7::rgba barcol, RenderD7::rgba outlinecol)
+RenderD7::Console::Console(int x, int y, int w, int h, std::string name, RenderD7::Color::rgba col, RenderD7::Color::rgba barcol, RenderD7::Color::rgba outlinecol)
 {
     this->x = x;
     this->y = y;
