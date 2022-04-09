@@ -139,7 +139,7 @@ namespace RenderD7
         virtual ~Ovl(){}
         virtual void Draw() const = 0;
     };
-    void AddOvl(Ovl overlay);
+    void AddOvl(RenderD7::Ovl overlay);
     namespace Color
     {
         struct rgba

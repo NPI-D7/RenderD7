@@ -871,7 +871,7 @@ void RenderD7::FrameEnd()
 	C3D_FrameEnd(0);
 }
 
-void AddOvl(Ovl overlay)
+void RenderD7::AddOvl(RenderD7::Ovl overlay)
 {
 	overlays.push_back(overlay);
 }
