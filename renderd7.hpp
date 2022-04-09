@@ -203,7 +203,7 @@ namespace RenderD7
 	Result unloadFont(C2D_Font &fnt);
     bool DrawCircle(float x, float y, float radius, u32 color);
     bool DrawImage(C2D_Image img, float x, float y, float scaleX = 1.0f, float scaleY = 1.0f);
-    
+    void FrameEnd();
 
     class SpriteSheetAnimation : public RenderD7::Sprite
     {

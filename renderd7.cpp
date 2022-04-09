@@ -848,7 +848,7 @@ void RenderD7::DrawMetrikOvl()
         //RenderD7::DrawText(0, 70, mt_txtSize, mt_txtcolor, "GPU: " + std::to_string(C3D_GetDrawingTime()*6.0f) + "/" + std::to_string(C3D_GetDrawingTime()));
         for (int z = 0; z < 320; z++)
         {
-             C2D_DrawLine(z, 239 - mt_fpsgraph[z], mt_txtcolor, z + 1, 239 - mt_fpsgraph[z + 1], mt_txtcolor, 1, 1);
+            C2D_DrawLine(z, 239 - mt_fpsgraph[z], mt_txtcolor, z + 1, 239 - mt_fpsgraph[z + 1], mt_txtcolor, 1, 1);
         }
 }
 
@@ -859,6 +859,12 @@ bool RenderD7::DrawNFRect(float p1x, float p1y, float w, float h, u32 color, flo
     C2D_DrawLine(w, h, color,p1x, h, color, scale, 1);
     C2D_DrawLine(p1x, h, color,p1x, p1y, color, scale, 1);
     return true;
+}
+
+void RenderD7::FrameEnd()
+{
+	if (metrikd)RenderD7::DrawMetrikOvl();
+	C3D_FrameEnd(0);
 }
 
 /*RenderD7::Console::Console()
