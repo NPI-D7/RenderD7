@@ -138,7 +138,7 @@ void RenderD7::Msg::DisplayWithProgress(std::string titletext, std::string subte
 }
 void RenderD7::SetupLog()
 {
-    renderd7log.Init("sdmc:/Flappy-Bird-RenderD7.log");
+    renderd7log.Init("sdmc:/RenderD7.log");
 }
 void RenderD7::SpriteSheetAnimation::Setup(RenderD7::Sheet *sheet, size_t imagecount, size_t startimage, float frame_begin, float frame_finish)
 {

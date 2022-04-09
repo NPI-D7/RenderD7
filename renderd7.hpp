@@ -25,8 +25,8 @@
 #include "stringtool.hpp"
 #include "Clock.hpp"
 
-#define RENDERD7VSTRING "0.6.10"
-#define CHANGELOG "0.6.10: rewrite Threadsystem, Improve framerate/n0.6.02: Fix Code in lang.hpp\nadd Draw Text Left Function.\nadd changelog\n0.6.01: add Threading system."
+#define RENDERD7VSTRING "0.6.2"
+#define CHANGELOG "0.6.2:  \n0.6.10: rewrite Threadsystem, Improve framerate\n0.6.02: Fix Code in lang.hpp\nadd Draw Text Left Function.\nadd changelog\n0.6.01: add Threading system."
 #define DEFAULT_CENTER 0.5f
 
 extern C3D_RenderTarget* Top;
