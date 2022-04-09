@@ -846,7 +846,7 @@ void RenderD7::DrawMetrikOvl()
 	RenderD7::DrawText(0, 0, mt_txtSize, mt_txtcolor, "FPS: " + RenderD7::GetFramerate());
     RenderD7::DrawText(0, 50, mt_txtSize, mt_txtcolor, "CPU: " + std::to_string(C3D_GetProcessingTime()*6.0f) + "/" + std::to_string(C3D_GetProcessingTime()));
     RenderD7::DrawText(0, 70, mt_txtSize, mt_txtcolor, "GPU: " + std::to_string(C3D_GetDrawingTime()*6.0f) + "/" + std::to_string(C3D_GetDrawingTime()));
-	
+	RenderD7::DrawText(0, 90, mt_txtSize, mt_txtcolor, "CMD: " + std::to_string(C3D_GetCmdBufUsage()*100.0f) + "/" + std::to_string(C3D_GetCmdBufUsage()));
     for (int z = 0; z < 320; z++)
     {
         C2D_DrawLine(z, 239 - mt_fpsgraph[z], mt_txtcolor, z + 1, 239 - mt_fpsgraph[z + 1], mt_txtcolor, 1, 1);
