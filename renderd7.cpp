@@ -10,6 +10,7 @@ float animtime;
 bool isndspinit = false;
 bool running = true;
 std::stack<std::unique_ptr<RenderD7::Scene>> RenderD7::Scene::scenes;
+std::vevtor<RenderD7::Ovl> overlays;
 bool usedbgmsg = false;
 std::string dspststus = "Not Initialisized!";
 
@@ -561,9 +562,9 @@ Result RenderD7::Init::Main(std::string app_name)
 		cfgstruct["metrik-settings"]["Screen"] = "0";
 		cfgstruct["metrik-settings"]["txtColor"] = "#ffffff";
 		cfgstruct["metrik-settings"]["txtColorA"] = "255";
-                cfgstruct["metrik-settings"]["ColorA"] = "255";
-                cfgstruct["metrik-settings"]["Color"] = "#000000";
-                cfgstruct["metrik-settings"]["txtSize"] = "0.7f";
+        cfgstruct["metrik-settings"]["ColorA"] = "255";
+        cfgstruct["metrik-settings"]["Color"] = "#000000";
+        cfgstruct["metrik-settings"]["txtSize"] = "0.7f";
 		cfgfile->write(cfgstruct);
 	}
 	cfgfile = std::make_unique<INI::INIFile>(cfgpath+ "/config.ini");
@@ -572,16 +573,12 @@ Result RenderD7::Init::Main(std::string app_name)
 	C3D_FrameRate(RenderD7::Convert::StringtoFloat(Fps));
 	metrikd = RenderD7::Convert::FloatToBool(RenderD7::Convert::StringtoFloat(cfgstruct["metrik-settings"]["enableoverlay"]));
 	mt_txtcolor = RenderD7::Color::Hex(cfgstruct["metrik-settings"]["txtColor"], (u8)RenderD7::Convert::StringtoFloat(cfgstruct["metrik-settings"]["txtColorA"]));
-        mt_color = RenderD7::Color::Hex(cfgstruct["metrik-settings"]["Color"], (u8)RenderD7::Convert::StringtoFloat(cfgstruct["metrik-settings"]["ColorA"]));
-        mt_txtSize = RenderD7::Convert::StringtoFloat(cfgstruct["metrik-settings"]["txtSize"]);
-        mt_screen = RenderD7::Convert::StringtoInt(cfgstruct["metrik-settings"]["Screen"]);
+    mt_color = RenderD7::Color::Hex(cfgstruct["metrik-settings"]["Color"], (u8)RenderD7::Convert::StringtoFloat(cfgstruct["metrik-settings"]["ColorA"]));
+    mt_txtSize = RenderD7::Convert::StringtoFloat(cfgstruct["metrik-settings"]["txtSize"]);
+    mt_screen = RenderD7::Convert::StringtoInt(cfgstruct["metrik-settings"]["Screen"]);
         
         osSetSpeedupEnable(true);
-	/*if(metrikd)
-	{
-		RenderD7::Thread tr(MetrikThread);
-		tr.start();
-	}*/
+	
     C3D_Init(C3D_DEFAULT_CMDBUF_SIZE);
 	C2D_Init(size_t(maxobj__));
 	C2D_Prepare();
@@ -834,22 +831,25 @@ void RenderD7::DrawList1(RenderD7::ScrollList1 &l, float txtsize, C3D_RenderTarg
 
 void RenderD7::DrawMetrikOvl()
 {
-        switch (mt_screen)
-        {
-            case 0:
-                RenderD7::OnScreen(Top);
-            case 1:
-                RenderD7::OnScreen(Bottom);
-            default:
-                RenderD7::OnScreen(Bottom);
-        }
+    switch (mt_screen)
+    {
+        case 0:
+        RenderD7::OnScreen(Top);
+		break;
+        case 1:
+        RenderD7::OnScreen(Bottom);
+		break;
+        default:
+        RenderD7::OnScreen(Bottom);
+		break;
+    }
 	RenderD7::DrawText(0, 0, mt_txtSize, mt_txtcolor, "FPS: " + RenderD7::GetFramerate());
-        //RenderD7::DrawText(0, 50, mt_txtSize, mt_txtcolor, "CPU: " + std::to_string(C3D_GetProcessingTime()*6.0f) + "/" + std::to_string(C3D_GetProcessingTime()));
-        //RenderD7::DrawText(0, 70, mt_txtSize, mt_txtcolor, "GPU: " + std::to_string(C3D_GetDrawingTime()*6.0f) + "/" + std::to_string(C3D_GetDrawingTime()));
-        for (int z = 0; z < 320; z++)
-        {
-            C2D_DrawLine(z, 239 - mt_fpsgraph[z], mt_txtcolor, z + 1, 239 - mt_fpsgraph[z + 1], mt_txtcolor, 1, 1);
-        }
+    RenderD7::DrawText(0, 50, mt_txtSize, mt_txtcolor, "CPU: " + std::to_string(C3D_GetProcessingTime()*6.0f) + "/" + std::to_string(C3D_GetProcessingTime()));
+    RenderD7::DrawText(0, 70, mt_txtSize, mt_txtcolor, "GPU: " + std::to_string(C3D_GetDrawingTime()*6.0f) + "/" + std::to_string(C3D_GetDrawingTime()));
+    for (int z = 0; z < 320; z++)
+    {
+        C2D_DrawLine(z, 239 - mt_fpsgraph[z], mt_txtcolor, z + 1, 239 - mt_fpsgraph[z + 1], mt_txtcolor, 1, 1);
+    }
 }
 
 bool RenderD7::DrawNFRect(float p1x, float p1y, float w, float h, u32 color, float scale)
@@ -864,9 +864,17 @@ bool RenderD7::DrawNFRect(float p1x, float p1y, float w, float h, u32 color, flo
 void RenderD7::FrameEnd()
 {
 	if (metrikd)RenderD7::DrawMetrikOvl();
+	for (int i = 0; i < (int))overlays.size(); i++)
+	{
+		overlays[i].Draw();
+	}
 	C3D_FrameEnd(0);
 }
 
+void AddOvl(Ovl overlay)
+{
+	overlays.push_back(overlay);
+}
 /*RenderD7::Console::Console()
 {
     this->x = 0;

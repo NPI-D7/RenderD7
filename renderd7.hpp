@@ -6,6 +6,7 @@
 #include <stack>
 #include <string>
 #include <functional>
+#include <map>
 #include <vector>
 #include <dirent.h>
 #include <unistd.h>
@@ -133,6 +134,12 @@ namespace RenderD7
         //static void HandleOvl();
     };
 
+    class Ovl {
+        public:
+        virtual ~Ovl(){}
+        virtual void Draw() const = 0;
+    };
+    void AddOvl(Ovl overlay);
     namespace Color
     {
         struct rgba
