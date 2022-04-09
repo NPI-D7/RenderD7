@@ -10,7 +10,7 @@ float animtime;
 bool isndspinit = false;
 bool running = true;
 std::stack<std::unique_ptr<RenderD7::Scene>> RenderD7::Scene::scenes;
-std::vevtor<RenderD7::Ovl> overlays;
+std::vector<RenderD7::Ovl> overlays;
 bool usedbgmsg = false;
 std::string dspststus = "Not Initialisized!";
 
@@ -864,7 +864,7 @@ bool RenderD7::DrawNFRect(float p1x, float p1y, float w, float h, u32 color, flo
 void RenderD7::FrameEnd()
 {
 	if (metrikd)RenderD7::DrawMetrikOvl();
-	for (int i = 0; i < (int))overlays.size(); i++)
+	for (int i = 0; i < (int)overlays.size(); i++)
 	{
 		overlays[i].Draw();
 	}
