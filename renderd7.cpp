@@ -898,6 +898,10 @@ void RenderD7::RSettings::Logic(u32 hDown, u32 hHeld, u32 hUp, touchPosition tou
 	
 }
 
+void LoadSettings(){
+	RenderD7::Scene::Load(std::make_unique<RenderD7::RSettings>());
+}
+
 /*void RenderD7::AddOvl(RenderD7::Ovl overlay)
 {
 	overlays.push_back(overlay);
