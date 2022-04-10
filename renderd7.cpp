@@ -869,6 +869,11 @@ void RenderD7::FrameEnd()
 	{
 		overlays[i].Draw();
 	}*/
+	if (d7_hDown & KEY_Y)
+	{
+		RenderD7::LoadSettings();
+	}
+	
 	C3D_FrameEnd(0);
 }
 
