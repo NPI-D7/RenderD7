@@ -869,7 +869,7 @@ void RenderD7::FrameEnd()
 	{
 		overlays[i].Draw();
 	}*/
-	if (d7_hHeld & KEY_L && d7_hHeld & KEY_R && d7_hDown & KEY_DDOWN)
+	if (d7_hHeld & KEY_L && d7_hHeld & KEY_R && d7_hDown & KEY_Y)
 	{
 		RenderD7::LoadSettings();
 	}
@@ -889,11 +889,12 @@ RenderD7::RSettings::~RSettings()
 
 void RenderD7::RSettings::Draw(void) const
 {
+	std::string mrtkkkkk = "Metrik: " + metrikd ? "true" : "false";
 	RenderD7::OnScreen(Top);
 	RenderD7::DrawRect(0, 0, 400, 20, RenderD7::Color::Hex("#111111"));
 	RenderD7::DrawRect(0, 20, 400, 220, RenderD7::Color::Hex("#eeeeee"));
 	RenderD7::DrawText(0, 0, 0.7f, DSEVENWHITE, "RenderD7->Settings");
-	RenderD7::DrawText(0, 22, 0.7f, DSEVENBLACK, "Metrik :" + metrikd ? "true" : "false");
+	RenderD7::DrawText(0, 22, 0.7f, DSEVENBLACK, metkkkkk);
 }
 
 void RenderD7::RSettings::Logic(u32 hDown, u32 hHeld, u32 hUp, touchPosition touch)
