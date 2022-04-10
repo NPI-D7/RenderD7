@@ -134,6 +134,19 @@ namespace RenderD7
         //static void HandleOvl();
     };
 
+    class RSettings : public RenderD7::Scene
+    {
+    private:
+        /* data */
+    public:
+        RSettings();
+        void Draw(void) const override;
+        ~RSettings();
+        void Logic(u32 hDown, u32 hHeld, u32 hUp, touchPosition touch) override;
+    };
+
+    void LoadSettings();
+
     /*class Ovl {
         public:
         virtual ~Ovl(){}
