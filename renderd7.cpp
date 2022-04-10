@@ -169,18 +169,19 @@ void RenderD7::SpriteSheetAnimation::Play(float timespeed)
     //RenderD7::SpriteSheetAnimation::Draw();
 }
 
-void RenderD7::Error::DisplayError(std::string toptext, std::string errortext)
+void RenderD7::Error::DisplayError(std::string toptext, std::string errortext, int timesec)
 {
     RenderD7::ClearTextBufs();
 	C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
 	C2D_TargetClear(Top, DSEVENBLACK);
 	C2D_TargetClear(Bottom, DSEVENBLACK);
 	RenderD7::OnScreen(Top);
-    RenderD7::DrawTextCentered(0, 0, 0.7f, DSEVENWHITE, toptext, 400);
-	RenderD7::DrawTextCentered(0, 30, 0.6f, DSEVENWHITE, errortext, 400);
+    RenderD7::DrawText(0, 0, 0.7f, DSEVENWHITE, toptext);
+	RenderD7::DrawText(0, 30, 0.6f, DSEVENWHITE, errortext);
 	C3D_FrameEnd(0);
-	int time = 60*5;
-    for (int i = 0; i < 60*5; i++) {
+	int time = 60*timesec;
+    for (int i = 0; i < 60*timesec; i++) {
+		RenderD7::DrawRect(0, 236, (int)(((float)i / (float)60*timesec) * 400.0f), 4, RenderD7::Color::Hex("#00ff00"));
 		gspWaitForVBlank();
 	}
 }
