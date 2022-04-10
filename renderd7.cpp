@@ -869,7 +869,7 @@ void RenderD7::FrameEnd()
 	{
 		overlays[i].Draw();
 	}*/
-	if (d7_hDown & KEY_Y)
+	if (d7_hHeld & KEY_L && d7_hHeld & KEY_R && d7_hDown & KEY_DDOWN)
 	{
 		RenderD7::LoadSettings();
 	}
@@ -899,7 +899,7 @@ void RenderD7::RSettings::Draw(void) const
 void RenderD7::RSettings::Logic(u32 hDown, u32 hHeld, u32 hUp, touchPosition touch)
 {
 
-	if (d7_hHeld & KEY_L && d7_hDown & KEY_R && d7_hDown & KEY_B)
+	if (d7_hDown & KEY_B)
 	{
 		RenderD7::Scene::Back();
 	}
