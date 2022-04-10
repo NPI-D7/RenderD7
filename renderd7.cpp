@@ -877,7 +877,7 @@ RenderD7::RSettings::RSettings()
 
 }
 
-RenderD7::RSettings::RSettings()
+RenderD7::RSettings::~RSettings()
 {
 
 }
@@ -885,10 +885,10 @@ RenderD7::RSettings::RSettings()
 void RenderD7::RSettings::Draw(void) const
 {
 	RenderD7::DrawRect(0, 0, 400, 30, RenderD7::Color::Hex("#111111"));
-	
+
 }
 
-void RenderD7::RSettins::Logic(u32 hDown, u32 hHeld, u32 hUp, touchPosition touch)
+void RenderD7::RSettings::Logic(u32 hDown, u32 hHeld, u32 hUp, touchPosition touch)
 {
 
 	if (d7_hDown & KEY_B)
