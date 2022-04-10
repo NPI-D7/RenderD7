@@ -177,11 +177,10 @@ void RenderD7::Error::DisplayError(std::string toptext, std::string errortext)
 	C2D_TargetClear(Bottom, DSEVENBLACK);
 	RenderD7::OnScreen(Top);
     RenderD7::DrawTextCentered(0, 0, 0.7f, DSEVENWHITE, toptext, 400);
-	RenderD7::DrawTextCentered(0, 100, 0.6f, DSEVENWHITE, errortext, 400);
+	RenderD7::DrawTextCentered(0, 30, 0.6f, DSEVENWHITE, errortext, 400);
 	C3D_FrameEnd(0);
 	int time = 60*5;
     for (int i = 0; i < 60*5; i++) {
-		RenderD7::Msg::DisplayWithProgress("", "\n\n\n" + std::to_string(i) + " / " + std::to_string(time), i, 60*5, RenderD7::Color::Hex("#00EE11"));
 		gspWaitForVBlank();
 	}
 }
