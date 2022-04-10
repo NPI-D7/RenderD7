@@ -889,7 +889,7 @@ RenderD7::RSettings::~RSettings()
 
 void RenderD7::RSettings::Draw(void) const
 {
-	std::string mrtkkkkk = "Metrik: " + metrikd ? "true" : "false";
+	std::string metkkkkk = "Metrik: " + metrikd ? "true" : "false";
 	RenderD7::OnScreen(Top);
 	RenderD7::DrawRect(0, 0, 400, 20, RenderD7::Color::Hex("#111111"));
 	RenderD7::DrawRect(0, 20, 400, 220, RenderD7::Color::Hex("#eeeeee"));
