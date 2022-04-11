@@ -4,7 +4,7 @@
 
 #define RGBA8(r, g, b, a) ((((r) & 0xFF) << 0) | (((g) & 0xFF) << 8) | (((b) & 0xFF) << 16) | (((a) & 0xFF) << 24))
 #define D7_NOTHING C2D_Color32(0, 0, 0, 0)
-#define CFGVER "0"
+#define CFGVER "1"
 Log renderd7log;
 float animtime;
 bool isndspinit = false;
@@ -20,6 +20,12 @@ int maxobj__;
 //INI::INIFile cfgfile;
 std::unique_ptr<INI::INIFile> cfgfile = nullptr;
 INI::INIStructure cfgstruct;
+
+// RD7 SuperReselution
+bool rd7_superreselution;
+u8 consoleModel = 0;
+u8 sysRegion = CFG_REGION_USA;
+//---------------------------------------
 
 std::string D_app_name;
 
@@ -56,6 +62,21 @@ C3D_RenderTarget* Bottom;
 
 #define DSEVENBLACK C2D_Color32(0, 0 ,0, 255)
 #define DSEVENWHITE C2D_Color32(255, 255, 255, 255)
+
+void screenoff()
+{
+    gspLcdInit();\
+    GSPLCD_PowerOffBacklight(GSPLCD_SCREEN_BOTH);\
+    gspLcdExit();
+}
+
+void screenon()
+{
+    gspLcdInit();\
+    GSPLCD_PowerOnBacklight(GSPLCD_SCREEN_BOTH);\
+    gspLcdExit();
+}
+
 RenderD7::SpriteSheetAnimation::SpriteSheetAnimation()
 {
     renderd7log.Write("SpriteSheetAnimation createt!");
@@ -537,6 +558,17 @@ void MetrikThread(RenderD7::Parameter param) {
 Result RenderD7::Init::Main(std::string app_name)
 {
     gfxInitDefault();
+	Result res = cfguInit();
+	if (R_SUCCEEDED(res)) {
+		CFGU_SecureInfoGetRegion(&sysRegion);
+		CFGU_GetSystemModel(&consoleModel);
+		cfguExit();
+	}
+	if (rd7_superreselution)
+	{
+		gfxSetWide(consoleModel != 3);
+	}
+	
     aptInit();
     romfsInit();
     cfguInit();
@@ -584,8 +616,9 @@ Result RenderD7::Init::Main(std::string app_name)
     mt_color = RenderD7::Color::Hex(cfgstruct["metrik-settings"]["Color"], (u8)RenderD7::Convert::StringtoFloat(cfgstruct["metrik-settings"]["ColorA"]));
     mt_txtSize = RenderD7::Convert::StringtoFloat(cfgstruct["metrik-settings"]["txtSize"]);
     mt_screen = RenderD7::Convert::StringtoInt(cfgstruct["metrik-settings"]["Screen"]);
-        
-        osSetSpeedupEnable(true);
+	rd7_superreselution = RenderD7::Convert::FloatToBool(RenderD7::Convert::StringtoFloat(cfgstruct["settings"]["super-reselution"]));
+
+    osSetSpeedupEnable(true);
 	
     C3D_Init(C3D_DEFAULT_CMDBUF_SIZE);
 	C2D_Init(size_t(maxobj__));
@@ -595,9 +628,30 @@ Result RenderD7::Init::Main(std::string app_name)
 	Bottom = C2D_CreateScreenTarget(GFX_BOTTOM, GFX_LEFT);
 	TextBuf = C2D_TextBufNew(4096);
 	Font = C2D_FontLoadSystem(CFG_REGION_USA);
+	if (rd7_superreselution)
+	{
+		gfxSetWide(consoleModel != 3);
+	}
         //RenderD7::Msg::Display("RenderD7", "RenderD7 init success!\nWaiting for MainLoop!", Top);
 	return 0;
 }
+
+void RenderD7::ToggleRD7SR()
+{
+	/ Display black screen
+	C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
+	C2D_TargetClear(Top, TRANSPARENT);
+	Gui::ScreenDraw(Top);
+	C3D_FrameEnd(0);
+	// Toggle 400px/800px mode
+	gfxSetWide(!gfxIsWide());
+}
+
+bool RenderD7::IsRD7SR()
+{
+	return gfxIsWide();
+}
+
 void RenderD7::Exit::Main()
 {
 	cfgfile->write(cfgstruct);
@@ -879,7 +933,7 @@ void RenderD7::FrameEnd()
 	{
 		overlays[i].Draw();
 	}*/
-	if (d7_hHeld & KEY_L && d7_hHeld & KEY_R && d7_hDown & KEY_Y)
+	if (d7_hHeld & KEY_R && d7_hDown & KEY_Y)
 	{
 		RenderD7::LoadSettings();
 	}
