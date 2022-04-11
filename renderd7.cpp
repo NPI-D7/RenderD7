@@ -200,7 +200,6 @@ void RenderD7::Error::DisplayError(std::string toptext, std::string errortext, i
     RenderD7::DrawText(0, 0, 0.7f, DSEVENWHITE, toptext);
 	RenderD7::DrawText(0, 30, 0.6f, DSEVENWHITE, errortext);
 	C3D_FrameEnd(0);
-	int time = 60*timesec;
     for (int i = 0; i < 60*timesec; i++) {
 		RenderD7::DrawRect(0, 236, (int)(((float)i / (float)60*timesec) * 400.0f), 4, RenderD7::Color::Hex("#00ff00"));
 		gspWaitForVBlank();
@@ -638,10 +637,10 @@ Result RenderD7::Init::Main(std::string app_name)
 
 void RenderD7::ToggleRD7SR()
 {
-	/ Display black screen
+	// Display black screen
 	C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
-	C2D_TargetClear(Top, TRANSPARENT);
-	Gui::ScreenDraw(Top);
+	C2D_TargetClear(Top, RenderD7::Color::Hex("#000000"));
+	RenderD7::OnScreen(Top);
 	C3D_FrameEnd(0);
 	// Toggle 400px/800px mode
 	gfxSetWide(!gfxIsWide());
