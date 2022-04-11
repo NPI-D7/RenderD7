@@ -629,7 +629,7 @@ Result RenderD7::Init::Main(std::string app_name)
 	Font = C2D_FontLoadSystem(CFG_REGION_USA);
 	if (rd7_superreselution)
 	{
-		gfxSetWide(consoleModel != 3);
+		if (consoleModel != 3) gfxSetWide(true);
 	}
         //RenderD7::Msg::Display("RenderD7", "RenderD7 init success!\nWaiting for MainLoop!", Top);
 	return 0;
@@ -932,7 +932,7 @@ void RenderD7::FrameEnd()
 	{
 		overlays[i].Draw();
 	}*/
-	if (d7_hHeld & KEY_R && d7_hDown & KEY_Y)
+	if (d7_hHeld & KEY_R && d7_hHeld & KEY_Y)
 	{
 		RenderD7::LoadSettings();
 	}
