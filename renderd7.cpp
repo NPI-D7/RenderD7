@@ -553,7 +553,7 @@ Result RenderD7::Init::Main(std::string app_name)
 	{
 		cfgfile = std::make_unique<INI::INIFile>(cfgpath + "/config.ini");
 		cfgfile->read(cfgstruct);
-		int version = (int)RenderD7::Convert::StringtoFloat(cfgstruct["info"]["version"]);
+		std::string version = cfgstruct["info"]["version"];
 		if (version != CFGVER) renew = true;
 	}
 	if (!FS::FileExist(cfgpath + "/config.ini") || renew)
