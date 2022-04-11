@@ -546,9 +546,17 @@ Result RenderD7::Init::Main(std::string app_name)
     std::string cfgpath = "sdmc:/RenderD7/Apps/";
     cfgpath += D_app_name;
 	mkdir("sdmc:/RenderD7/", 0777);
-        mkdir("sdmc:/RenderD7/Apps", 0777);
-        mkdir(cfgpath.c_str(), 0777);
-	if (!FS::FileExist(cfgpath + "/config.ini"))
+    mkdir("sdmc:/RenderD7/Apps", 0777);
+    mkdir(cfgpath.c_str(), 0777);
+	bool renew = false;
+	if (FS::FileExist(cfgpath + "/config.ini"))
+	{
+		cfgfile = std::make_unique<INI::INIFile>(cfgpath + "/config.ini");
+		cfgfile->read(cfgstruct);
+		int version = (int)RenderD7::Convert::StringtoFloat(cfgstruct["info"]["version"]);
+		if (versuin != CFGVER) renew = true;
+	}
+	if (!FS::FileExist(cfgpath + "/config.ini") || renew)
 	{
 		cfgfile = std::make_unique<INI::INIFile>(cfgpath+ "/config.ini");
 		cfgfile->read(cfgstruct);
@@ -598,8 +606,10 @@ void RenderD7::Exit::Main()
 	C2D_Fini();
 	C3D_Fini();
     aptExit();
+	gfxExit();
     romfsExit();
     cfguExit();
+	romfsExit();
 }
 
 void RenderD7::DrawTObjects(std::vector<RenderD7::TObject> tobjects, u32 color, u32 txtcolor, int selection, u32 selbgcolor, u32 selcolor)
