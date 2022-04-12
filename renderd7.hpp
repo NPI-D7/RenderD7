@@ -65,11 +65,11 @@ namespace RenderD7
         // Deconstruct sheet
         ~Sheet();
         /// Load a Sritesheet
-        /// path: Path to the Spritesheet (.t3x)
+        /// \param path Path to the Spritesheet (.t3x)
         Result Load(const char *path);
         /// Unload the Spritesheet
         void Free();
-        // The Spritesheet
+        /// The Spritesheet
         C2D_SpriteSheet spritesheet;
     };
     /// Image Class
@@ -77,10 +77,10 @@ namespace RenderD7
     {
         public:
         /// Load Image from Png
-        /// path: path to png file
+        /// \param path path to png file
         void LoadPng(const std::string path);
         /// Load the Image from buffer
-        /// buffer: the frame buffer
+        /// \param buffer the frame buffer
         void LoadPFromBuffer(const std::vector<u8> &buffer);
         /// Draw the Image directly
         /// \param x The x position
@@ -91,9 +91,9 @@ namespace RenderD7
         /// \brief Get The Image
         /// \return C2D_Image
         C2D_Image Get(){return this->img;}
-        /// \img this is the C2D_Image
+        /// \param img this is the C2D_Image
         C2D_Image img;
-        /// \loadet whether the image is loadet or not
+        /// \param loadet whether the image is loadet or not
         bool loadet = false;
     };
     /// Sprite Class
