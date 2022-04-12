@@ -5,9 +5,6 @@ var hierarchy =
     [ "nlohmann::detail::binary_reader< BasicJsonType, InputAdapterType, SAX >", "classnlohmann_1_1detail_1_1binary__reader.html", null ],
     [ "nlohmann::detail::binary_writer< BasicJsonType, CharType >", "classnlohmann_1_1detail_1_1binary__writer.html", null ],
     [ "nlohmann::byte_container_with_subtype< BinaryType >", "classnlohmann_1_1byte__container__with__subtype.html", null ],
-    [ "MyLibrary::Example", "classMyLibrary_1_1Example.html", [
-      [ "MyLibrary::SubclassExample", "classMyLibrary_1_1SubclassExample.html", null ]
-    ] ],
     [ "nlohmann::detail::exception", "classnlohmann_1_1detail_1_1exception.html", [
       [ "nlohmann::detail::invalid_iterator", "classnlohmann_1_1detail_1_1invalid__iterator.html", null ],
       [ "nlohmann::detail::other_error", "classnlohmann_1_1detail_1_1other__error.html", null ],
