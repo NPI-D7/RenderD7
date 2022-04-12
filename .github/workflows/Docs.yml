@@ -41,8 +41,9 @@ jobs:
           git config --global user.name "Tobi-D7"
           echo tobid7
           git stage *
+          git add/rm *
           echo staged
-          git commit -m "Documentation1"
+          git commit -a "Documentation1"
           git tag doc
           echo commited
           git push origin gh-pages
