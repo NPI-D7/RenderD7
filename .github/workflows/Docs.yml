@@ -33,8 +33,8 @@ jobs:
           cd ..
           git clone --depth 1 https://${{ secrets.TOKEN }}@github.com/NPI-D7/RenderD7.git RD7 -b gh-pages
           mkdir -p RD7
-          #rm -r RD7/*
-          mv -v RenderD7/doc RD7/
+          rm -r RD7/*
+          mv -v RenderD7/doc/html RD7/
           #rm -r doc
           cd RD7
           git config --global user.email "tobid7@outlook.de"
