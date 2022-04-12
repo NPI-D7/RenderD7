@@ -102,8 +102,14 @@ namespace RenderD7
         public:
         /// \brief Construct Sprite
         Sprite();
+        /// \brief Deconstruct Sprite
         ~Sprite();
+        /// \brief Load a Sprite From SpriteSheet
+        /// \param sheet the Sheet to load from.(RenderD7::Sheet)
+        /// \param index the number of the Sprite in the Sheet
         void FromSheet(RenderD7::Sheet *sheet, size_t index);
+        /// \brief Load a Sprite From SpriteSheet
+        /// \param img the Image to load from.(RenderD7::Image)
         void FromImage(RenderD7::Image *img);
         bool Draw();
         void SetCenter(float x, float y);
