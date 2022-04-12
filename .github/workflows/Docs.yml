@@ -31,12 +31,12 @@ jobs:
           echo done
           ls -r
           cd ..
-          git clone --depth 1 https://${{ secrets.TOKEN }}@github.com/NPI-D7/NPI-D7.github.io.git
-          mkdir -p NPI-D7.github.io/RenderD7-docs
-          #rm -r NPI-D7.github.io/RenderD7-docs/*
-          mv -v RenderD7/doc NPI-D7.github.io/RenderD7-docs/
+          git clone --depth 1 https://${{ secrets.TOKEN }}@github.com/NPI-D7/RenderD7.git RD7 -b gh-pages
+          mkdir -p RD7
+          #rm -r RD7/*
+          mv -v RenderD7/doc RD7/
           #rm -r doc
-          cd NPI-D7.github.io
+          cd RD7
           git config --global user.email "tobid7@outlook.de"
           git config --global user.name "Tobi-D7"
           echo tobid7
@@ -45,5 +45,5 @@ jobs:
           git commit -m "Documentation1"
           git tag doc
           echo commited
-          git push origin main
+          git push origin gh-pages
           echo pushed
