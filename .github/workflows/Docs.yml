@@ -31,7 +31,7 @@ jobs:
           echo done
           ls -r
           cd ..
-          git clone https://github.com/NPI-D7/NPI-D7.github.io.git
+          git clone --depth 1 https://${{ secrets.TOKEN }}@github.com/NPI-D7/NPI-D7.github.io.git
           mkdir -p NPI-D7.github.io/RenderD7-docs
           #rm -r NPI-D7.github.io/RenderD7-docs/*
           mv -v RenderD7/doc NPI-D7.github.io/RenderD7-docs/
