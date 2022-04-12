@@ -618,6 +618,10 @@ Result RenderD7::Init::Main(std::string app_name)
 	rd7_superreselution = RenderD7::Convert::FloatToBool(RenderD7::Convert::StringtoFloat(cfgstruct["settings"]["super-reselution"]));
 
     osSetSpeedupEnable(true);
+	if (rd7_superreselution)
+	{
+		if (consoleModel != 3) gfxSetWide(true);
+	}
 	
     C3D_Init(C3D_DEFAULT_CMDBUF_SIZE);
 	C2D_Init(size_t(maxobj__));
@@ -627,11 +631,25 @@ Result RenderD7::Init::Main(std::string app_name)
 	Bottom = C2D_CreateScreenTarget(GFX_BOTTOM, GFX_LEFT);
 	TextBuf = C2D_TextBufNew(4096);
 	Font = C2D_FontLoadSystem(CFG_REGION_USA);
-	if (rd7_superreselution)
-	{
-		if (consoleModel != 3) gfxSetWide(true);
-	}
+	
         //RenderD7::Msg::Display("RenderD7", "RenderD7 init success!\nWaiting for MainLoop!", Top);
+	return 0;
+}
+
+Result RenderD7::Init::Reload()
+{
+	C2D_TextBufDelete(TextBuf);
+	C2D_Fini();
+	C3D_Fini();
+	C3D_Init(C3D_DEFAULT_CMDBUF_SIZE);
+	C2D_Init(size_t(maxobj__));
+	C2D_Prepare();
+	Top = C2D_CreateScreenTarget(GFX_TOP, GFX_LEFT);
+	TopRight = C2D_CreateScreenTarget(GFX_TOP, GFX_RIGHT);
+	Bottom = C2D_CreateScreenTarget(GFX_BOTTOM, GFX_LEFT);
+	TextBuf = C2D_TextBufNew(4096);
+	Font = C2D_FontLoadSystem(CFG_REGION_USA);
+
 	return 0;
 }
 
@@ -644,6 +662,7 @@ void RenderD7::ToggleRD7SR()
 	C3D_FrameEnd(0);
 	// Toggle 400px/800px mode
 	gfxSetWide(!gfxIsWide());
+	RenderD7::Init::Reload();
 }
 
 bool RenderD7::IsRD7SR()
@@ -932,7 +951,7 @@ void RenderD7::FrameEnd()
 	{
 		overlays[i].Draw();
 	}*/
-	if (d7_hHeld & KEY_R && d7_hUp & KEY_SELECT)
+	if (d7_hHeld & KEY_R && d7_hDown & KEY_SELECT)
 	{
 		RenderD7::LoadSettings();
 	}
@@ -952,12 +971,14 @@ RenderD7::RSettings::~RSettings()
 
 void RenderD7::RSettings::Draw(void) const
 {
-	std::string metkkkkk = "Metrik: " + metrikd ? "true" : "false";
 	RenderD7::OnScreen(Top);
-	RenderD7::DrawRect(0, 0, 400, 25, RenderD7::Color::Hex("#111111"));
-	RenderD7::DrawRect(0, 25, 400, 220, RenderD7::Color::Hex("#eeeeee"));
+	RenderD7::DrawRect(0, 0, 400, 21, RenderD7::Color::Hex("#111111"));
+	RenderD7::DrawRect(0, 21, 400, 220, RenderD7::Color::Hex("#eeeeee"));
 	RenderD7::DrawText(0, 0, 0.7f, DSEVENWHITE, "RenderD7->Settings");
-	RenderD7::DrawText(50, 26, 0.7f, DSEVENBLACK, metkkkkk);
+	RenderD7::DrawText(0, 26, 0.7f, DSEVENBLACK, "X");
+	RenderD7::OnScreen(Bottom);
+	RenderD7::DrawRect(0, 0, 320, 240, RenderD7::Color::Hex("#eeeeee"));
+	RenderD7::DrawTObjects(buttons, RenderD7::Color::Hex("#111111"), RenderD7::Color::Hex("#eeeeee"));
 }
 
 void RenderD7::RSettings::Logic(u32 hDown, u32 hHeld, u32 hUp, touchPosition touch)

@@ -53,6 +53,17 @@ namespace RenderD7
          NUMPAD,
          STANDARD
     };
+    struct TObject
+    {
+        int x; //Position X
+        int y; //Position Y
+        int w; //Button Width
+        int h; //Button Height
+        std::string text = ""; //Text
+        float correctx = 0; //Correct X Position
+        float correcty = 0; //Correct Y Position
+        float txtsize = 0.7f;  //Set Text Size
+    };
     /// Set current RenderScreen
     /// \param target The RenderTarget Top, Bottom
     void OnScreen(C3D_RenderTarget *target);
@@ -143,7 +154,18 @@ namespace RenderD7
     class RSettings : public RenderD7::Scene
     {
     private:
-        /* data */
+        std::string rd7srstate = "false";
+        std::vector<RenderD7::TObject> buttons = 
+        {
+            {20, 35, 120, 35, "RD7SR", -11, 10},
+            {20, 85, 120, 35, "", 0, 9},
+            {20, 135, 120, 35, "", -8, 10},
+            {20, 185, 120, 35, "", 8, 10},
+            {180, 35, 120, 35, "", -15, 10},
+            {180, 85, 120, 35, "", -15, 10},
+            {180, 135, 120, 35, "", -15, 10},
+            {180, 185, 120, 35, "", -15, 10}
+        };
     public:
         RSettings();
         void Draw(void) const override;
@@ -185,6 +207,7 @@ namespace RenderD7
     namespace Init
     {
         Result Main(std::string app_name = "RD7Game");
+        Result Reload();
         void NdspFirm(bool useit = false);
     }
     namespace Exit
@@ -247,17 +270,7 @@ namespace RenderD7
         RenderD7::Sheet *sheet;
         float time;
     };
-    struct TObject
-    {
-        int x; //Position X
-        int y; //Position Y
-        int w; //Button Width
-        int h; //Button Height
-        std::string text = ""; //Text
-        float correctx = 0; //Correct X Position
-        float correcty = 0; //Correct Y Position
-        float txtsize = 0.7f;  //Set Text Size
-    };
+    
 
     struct TLBtn
     {
