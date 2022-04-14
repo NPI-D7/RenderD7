@@ -3,6 +3,9 @@
 #include <stdio.h>
 #include <string.h>
 
+#include <sys/stat.h>
+#include <sys/statvfs.h>
+
 void Utils_U8_To_U16(u16 *buf, const u8 *input, size_t bufsize) {
 	ssize_t units = utf8_to_utf16(buf, input, bufsize);
 
@@ -317,4 +320,40 @@ char *FS_GetFileTimestamp(const char *path) {
 		return NULL;
 
 	return timeStr;
+}
+
+FS_Path getPathInfo(const char * path, FS_ArchiveID * archive) {
+	*archive = ARCHIVE_SDMC;
+	FS_Path filePath = {0};
+	unsigned int prefixlen = 0;
+
+	if (!strncmp(path, "sdmc:/", 6)) {
+		prefixlen = 5;
+	} else if (*path != '/') {
+		//if the path is local (doesnt start with a slash), it needs to be appended to the working dir to be valid
+		char * actualPath = NULL;
+		asprintf(&actualPath, "%s%s", WORKING_DIR, path);
+		filePath = fsMakePath(PATH_ASCII, actualPath);
+		free(actualPath);
+	}
+
+	//if the filePath wasnt set above, set it
+	if (filePath.size == 0) {
+		filePath = fsMakePath(PATH_ASCII, path+prefixlen);
+	}
+
+	return filePath;
+}
+
+Result openFile(Handle* fileHandle, const char * path, bool write) {
+	FS_ArchiveID archive;
+	FS_Path filePath = getPathInfo(path, &archive);
+	u32 flags = (write ? (FS_OPEN_CREATE | FS_OPEN_WRITE) : FS_OPEN_READ);
+
+	Result ret = 0;
+	ret = makeDirs(strdup(path));
+	ret = FSUSER_OpenFileDirectly(fileHandle, archive, fsMakePath(PATH_EMPTY, ""), filePath, flags, 0);
+	if (write)	ret = FSFILE_SetSize(*fileHandle, 0); //truncate the file to remove previous contents before writing
+
+	return ret;
 }
