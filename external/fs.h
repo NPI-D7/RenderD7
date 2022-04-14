@@ -26,6 +26,7 @@ Result FS_RenameDir(FS_Archive archive, const char *old_dirname, const char *new
 Result FS_Read(FS_Archive archive, const char *path, u64 size, void *buf);
 Result FS_Write(FS_Archive archive, const char *path, const void *buf, u32 size);
 char *FS_GetFileTimestamp(const char *path);
+Result makeDirs(const char * path);
 Result openFile(Handle* fileHandle, const char * path, bool write);
 
 #endif

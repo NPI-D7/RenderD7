@@ -5,6 +5,9 @@
 
 #include <sys/stat.h>
 #include <sys/statvfs.h>
+#include <stdlib.h>
+
+#define WORKING_DIR	"/"
 
 void Utils_U8_To_U16(u16 *buf, const u8 *input, size_t bufsize) {
 	ssize_t units = utf8_to_utf16(buf, input, bufsize);
@@ -343,6 +346,30 @@ FS_Path getPathInfo(const char * path, FS_ArchiveID * archive) {
 	}
 
 	return filePath;
+}
+Result makeDirs(const char * path) {
+	Result ret = 0;
+	FS_ArchiveID archiveID;
+	FS_Path filePath = getPathInfo(path, &archiveID);
+	FS_Archive archive;
+
+	ret = FSUSER_OpenArchive(&archive, archiveID, fsMakePath(PATH_EMPTY, ""));
+
+	for (char * slashpos = strchr(path+1, '/'); slashpos != NULL; slashpos = strchr(slashpos+1, '/')) {
+		char bak = *(slashpos);
+		*(slashpos) = '\0';
+		Handle dirHandle;
+
+		ret = FSUSER_OpenDirectory(&dirHandle, archive, filePath);
+		if (R_SUCCEEDED(ret))	FSDIR_Close(dirHandle);
+		else	ret = FSUSER_CreateDirectory(archive, filePath, FS_ATTRIBUTE_DIRECTORY);
+
+		*(slashpos) = bak;
+	}
+
+	FSUSER_CloseArchive(archive);
+
+	return ret;
 }
 
 Result openFile(Handle* fileHandle, const char * path, bool write) {
