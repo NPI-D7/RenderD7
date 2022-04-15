@@ -5,6 +5,8 @@
 #include <string.h>
 #include <unistd.h>
 #include <3ds.h>
+#include <jpeglib.h>
+
 extern "C"
 {
 	#include "fs.h"
@@ -16,37 +18,71 @@ void BMP::PutPixel565(u8* dst, u8 x, u8 y, u16 v){
 	dst[(x+(47-y)*48)*3+2]=((v>>11)&0x1F)<<3;
 }
 
+u8* flipBitmap(u8* flip_bitmap, BMP::Bitmap* result){
+	int x, y;
+	if (result->bitperpixel == 24){
+		for (y = 0; y < result->height; y++){
+			for (x = 0; x < result->width; x++){
+				int idx = (x+y * result->width)*3;
+				*(u32*)(&(flip_bitmap[idx])) = ((*(u32*)&(result->pixels[(x + (result->height - y - 1) * result->width)*3]) & 0x00FFFFFF) | (*(u32*)(&(flip_bitmap[idx])) & 0xFF000000));
+			}
+		}
+	}else if(result->bitperpixel == 32){
+		for (y = 0; y < result->height; y++){
+			for (x = 0; x < result->width; x++){
+				*(u32*)(&(flip_bitmap[(x+y * result->width)<<2])) = *(u32*)&(result->pixels[(x + (result->height - y - 1) * result->width)<<2]);
+			}
+		}
+	}
+	return flip_bitmap;
+}
+
 void BMP::Save(std::string path, BMP::Bitmap *bitmap)
 {
-	//Handle fileHandle;
-	FS_OpenArchive(&sdmc_archive, ARCHIVE_SDMC);
-
-	
-	u32 bytesWritten;
 	u8 moltiplier = bitmap->bitperpixel >> 3;
-	u8* tempbuf = (u8*)malloc(0x36+(bitmap->width)*(bitmap->height)*moltiplier);
-	memset(tempbuf, 0, 0x36+(bitmap->width)*(bitmap->height)*moltiplier);
-	tempbuf[0x36+(bitmap->width)*(bitmap->height)*moltiplier]=0;
-	//FS_CreateFile(sdmc_archive, path.c_str(), (u16)(0x36+(bitmap->width)*(bitmap->height)*moltiplier))
-	//Result ret = FS_OpenFile(fileHandle, sdmc_archive, path.c_str(), (FS_OPEN_READ | FS_OPEN_WRITE), 0);
-	//if(ret) printf("error");
-	*(u16*)&tempbuf[0x0] = 0x4D42;
-	*(u32*)&tempbuf[0x2] = 0x36 + (bitmap->width)*(bitmap->height)*moltiplier;
-	*(u32*)&tempbuf[0xA] = 0x36;
-	*(u32*)&tempbuf[0xE] = 0x28;
-	*(u32*)&tempbuf[0x12] = bitmap->width;
-	*(u32*)&tempbuf[0x16] = bitmap->height;
-	if (moltiplier == 3) *(u32*)&tempbuf[0x1A] = 0x00180001;
-	else *(u32*)&tempbuf[0x1A] = 0x00200001;
-	*(u32*)&tempbuf[0x22] = (bitmap->width)*(bitmap->height)*moltiplier;
-	int i=0;
-	while (i<((bitmap->width)*(bitmap->height)*moltiplier)){
-		tempbuf[0x36+i] = bitmap->pixels[i];
-		i++;
+		int size_val = (bitmap->width)*(bitmap->height)*moltiplier;
+		u8* flip_pixels = (u8*)malloc(size_val);
+		flip_pixels = flipBitmap(flip_pixels, bitmap);
+		if (moltiplier == 4){ // 32bpp image - Need to delete alpha channel
+			u8* tmp = flip_pixels;
+			flip_pixels = (u8*)malloc((bitmap->width)*(bitmap->height)*3);
+			u32 i = 0;
+			u32 j = 0;
+			while ((i+1) < size_val){
+				flip_pixels[j++] = tmp[i];
+				flip_pixels[j++] = tmp[i+1];
+				flip_pixels[j++] = tmp[i+2];
+				i = i + 4;
+			}
+			free(tmp);
+		}
+		BMP::saveJpg((char*)path.c_str(),(u32*)flip_pixels,bitmap->width,bitmap->height);
+		free(flip_pixels);
+}
+
+void BMP::saveJpg(char *filename, u32 *pixels, u32 width, u32 height)
+{
+	FILE *outfile = fopen(filename, "wb");
+	struct jpeg_error_mgr jerr;
+	struct jpeg_compress_struct cinfo;
+	JSAMPROW row_pointer[1];
+	cinfo.err = jpeg_std_error(&jerr);
+	jpeg_create_compress(&cinfo);
+	jpeg_stdio_dest(&cinfo, outfile);
+	cinfo.image_width = width;
+	cinfo.image_height = height;
+	cinfo.input_components = 3;
+	cinfo.in_color_space = JCS_EXT_BGR;
+	jpeg_set_defaults(&cinfo);
+	cinfo.num_components = 3;
+	cinfo.dct_method = JDCT_FLOAT;
+	jpeg_set_quality(&cinfo, 100, TRUE);
+	jpeg_start_compress(&cinfo, TRUE);
+	while( cinfo.next_scanline < cinfo.image_height ){
+		row_pointer[0] = (unsigned char*)&pixels[ (cinfo.next_scanline * cinfo.image_width * cinfo.input_components) >> 2];
+		jpeg_write_scanlines( &cinfo, row_pointer, 1 );
 	}
-	//FSFILE_Write(fileHandle, &bytesWritten, 0, (u32*)tempbuf, 0x36 + (bitmap->width)*(bitmap->height)*moltiplier, 0x10001);
-	FS_Write(sdmc_archive, path.c_str(), (u32*)tempbuf, 0x36 + (bitmap->width)*(bitmap->height)*moltiplier);
-	
-	free(tempbuf);
-	FS_CloseArchive(sdmc_archive);
+	jpeg_finish_compress( &cinfo );
+	jpeg_destroy_compress( &cinfo );
+	fclose(outfile);
 }

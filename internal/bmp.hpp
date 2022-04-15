@@ -16,4 +16,5 @@ namespace BMP
     };
     void PutPixel565(u8* dst, u8 x, u8 y, u16 v);
 	void Save(std::string path, BMP::Bitmap *bitmap);
+	void saveJpg(char *filename, u32 *pixels, u32 width, u32 height);
 }
