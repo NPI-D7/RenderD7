@@ -45,7 +45,7 @@ void BMP::Save(std::string path, BMP::Bitmap *bitmap)
 		i++;
 	}
 	//FSFILE_Write(fileHandle, &bytesWritten, 0, (u32*)tempbuf, 0x36 + (bitmap->width)*(bitmap->height)*moltiplier, 0x10001);
-	FS_Write(sdmc_archive, path.c_str(), (u32*)tempbuf, 0x36 + (bitmap->width)*(bitmap->height)*moltiplier, 0x10001);
+	FS_Write(sdmc_archive, path.c_str(), (u32*)tempbuf, 0x36 + (bitmap->width)*(bitmap->height)*moltiplier);
 	
 	free(tempbuf);
 	FS_CloseArchive(sdmc_archive);
