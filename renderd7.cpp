@@ -976,7 +976,7 @@ void RenderD7::RSettings::Draw(void) const
 	RenderD7::DrawRect(0, 0, 400, 21, RenderD7::Color::Hex("#111111"));
 	RenderD7::DrawRect(0, 21, 400, 220, RenderD7::Color::Hex("#eeeeee"));
 	RenderD7::DrawText(0, 0, 0.7f, DSEVENWHITE, "RenderD7->Settings");
-	RenderD7::DrawText(0, 26, 0.7f, DSEVENBLACK, "X");
+	RenderD7::DrawText(0, 26, 0.7f, DSEVENBLACK, "RD7SR" + rd7srstate);
 	RenderD7::OnScreen(Bottom);
 	RenderD7::DrawRect(0, 0, 320, 240, RenderD7::Color::Hex("#eeeeee"));
 	RenderD7::DrawTObjects(buttons, RenderD7::Color::Hex("#111111"), RenderD7::Color::Hex("#eeeeee"));
@@ -984,7 +984,11 @@ void RenderD7::RSettings::Draw(void) const
 
 void RenderD7::RSettings::Logic(u32 hDown, u32 hHeld, u32 hUp, touchPosition touch)
 {
-
+	rd7srstate = rd7_superreselution ? "true" : "false";
+	if (RenderD7::touchTObj(d7_touch, buttons[0]))
+	{
+		RenderD7::ToggleRD7SR();
+	}
 	if (d7_hDown & KEY_B)
 	{
 		RenderD7::Scene::Back();
