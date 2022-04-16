@@ -177,12 +177,28 @@ namespace RenderD7
 
     void LoadSettings();
 
-    /*class Ovl {
+    class Ovl {
         public:
         virtual ~Ovl(){}
         virtual void Draw() const = 0;
+        virtual void Logic() = 0;
+        inline bool IsKilled() {return this->iskilled; }
+        inline void Kill() { iskilled = true; }
+        private:
+        bool iskilled = false;
     };
-    void AddOvl(RenderD7::Ovl overlay);*/
+
+    class DSP_NF : public RenderD7::Ovl
+    {
+        public:
+        DSP_NF();
+        void Draw(void) const override;
+        void Logic() override;
+        private:
+        int msgposy = 240;
+    };
+
+    void AddOvl(std::unique_ptr<RenderD7::Ovl> scene);
     namespace Color
     {
         struct rgba

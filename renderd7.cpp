@@ -10,7 +10,7 @@ float animtime;
 bool isndspinit = false;
 bool running = true;
 std::stack<std::unique_ptr<RenderD7::Scene>> RenderD7::Scene::scenes;
-//std::vector<RenderD7::Ovl> overlays;
+std::stack<std::unique_ptr<RenderD7::Ovl>> overlays;
 bool usedbgmsg = false;
 std::string dspststus = "Not Initialisized!";
 
@@ -629,6 +629,7 @@ Result RenderD7::Init::Main(std::string app_name)
 	{
 		if (consoleModel != 3) gfxSetWide(true);
 	}
+	RenderD7::AddOvl(std::make_unique<RenderD7::DSP_NF>());
 	
     C3D_Init(C3D_DEFAULT_CMDBUF_SIZE);
 	C2D_Init(size_t(maxobj__));
@@ -951,13 +952,64 @@ bool RenderD7::DrawNFRect(float p1x, float p1y, float w, float h, u32 color, flo
     return true;
 }
 
+RenderD7::DSP_NF::DSP_NF()
+{
+
+}
+
+void RenderD7::DSP_NF::Draw(void) const
+{
+	RenderD7::OnScreen(Top);
+	RenderD7::DrawRect(0, msgposy, 400, 70, RenderD7::Color::Hex("#111111"));
+	RenderD7::DrawRect(0, 0, 20, 20, RenderD7::Color::Hex("#cccccc"));
+}
+
+void RenderD7::DSP_NF::Logic()
+{
+	for (int i = 0; i < 10*60; i++)
+	{
+		msgposy--;
+		if (msgposy < 240 - 70)
+		{
+			msgposy = 240 - 70;
+		}
+	}
+	this->Kill();
+}
+
+void OvlHandler()
+{
+	//for (int i = 0; i < (int)overlays.size(); i++)
+	//{
+		/*if (!overlays[i].IsKilled())
+		{
+			overlays[i].Draw();
+			overlays[i].Logic();
+		}
+		if (overlays[i].IsKilled())
+		{
+			overlays.erase(overlays.begin() + i);
+		}*/
+		if (!overlays.empty())
+		{
+			overlays.top()->Draw();
+		}
+		if (!overlays.empty())
+		{
+			overlays.top()->Logic();
+		}
+		if (!overlays.empty())
+		{
+			if (overlays.top()->IsKilled()) overlays.pop(); 
+		}
+	//}
+	
+}
+
 void RenderD7::FrameEnd()
 {
 	if (metrikd)RenderD7::DrawMetrikOvl();
-	/*for (int i = 0; i < (int)overlays.size(); i++)
-	{
-		overlays[i].Draw();
-	}*/
+	OvlHandler();
 	if (d7_hHeld & KEY_R && d7_hDown & KEY_SELECT)
 	{
 		RenderD7::LoadSettings();
@@ -1006,10 +1058,10 @@ void RenderD7::LoadSettings(){
 	RenderD7::Scene::Load(std::make_unique<RenderD7::RSettings>());
 }
 
-/*void RenderD7::AddOvl(RenderD7::Ovl overlay)
+void RenderD7::AddOvl(std::unique_ptr<RenderD7::Ovl> overlay)
 {
-	overlays.push_back(overlay);
-}*/
+	overlays.push(std::move(overlay));
+}
 
 /*RenderD7::Console::Console()
 {
