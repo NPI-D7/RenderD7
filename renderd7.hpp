@@ -28,8 +28,6 @@
 #include "stringtool.hpp"
 #include "Clock.hpp"
 
-extern FS_Archive archive, sdmc_archive, nand_archive;
-
 #define RENDERD7VSTRING "0.7.0"
 #define CHANGELOG "0.6.2:  \n0.6.10: rewrite Threadsystem, Improve framerate\n0.6.02: Fix Code in lang.hpp\nadd Draw Text Left Function.\nadd changelog\n0.6.01: add Threading system."
 #define DEFAULT_CENTER 0.5f
@@ -243,17 +241,7 @@ namespace RenderD7
     {
         bool FileExist(const std::string& path);
     }
-    namespace FS2
-    {
-        Result OpenArchive(FS_Archive *archive, FS_ArchiveID id);
-        Result CloseArchive(FS_Archive archive);
-        bool DirExists(FS_Archive archive, const std::string &path);
-        u64 GetTotalStorage(FS_SystemMediaType mediatype);
-        u64 GetUsedStorage(FS_SystemMediaType mediatype);
-        Result GetDirList(const std::string &path, std::vector<FS_DirectoryEntry> &entries);
-        void Convert(std::vector<FS_DirectoryEntry> &entries, std::vector<RenderD7::DirContent> &converted);
-        void GetContents(std::string path, std::vector<RenderD7::DirContent> &converted);
-    }
+    
     bool IsNdspInit();
     void SetupLog(void);
     std::string GetFramerate();
