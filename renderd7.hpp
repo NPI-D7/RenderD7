@@ -16,6 +16,8 @@
 #include <sys/stat.h>
 #include <algorithm>
 #include <iostream>
+#include <filesystem>
+#include <locale>
 #include "external/lodepng.h"
 #include "external/fs.h"
 #include <codecvt>
@@ -25,6 +27,8 @@
 #include "ini.hpp"
 #include "stringtool.hpp"
 #include "Clock.hpp"
+
+extern FS_Archive archive, sdmc_archive, nand_archive;
 
 #define RENDERD7VSTRING "0.7.0"
 #define CHANGELOG "0.6.2:  \n0.6.10: rewrite Threadsystem, Improve framerate\n0.6.02: Fix Code in lang.hpp\nadd Draw Text Left Function.\nadd changelog\n0.6.01: add Threading system."
@@ -227,9 +231,28 @@ namespace RenderD7
         inline int StringtoInt(std::string inp){return std::atoi(inp.c_str());}
         inline bool FloatToBool(float inp){if(inp == 1)return true; else return false;}
     }
+
+    struct DirContent
+    {
+        std::string name;
+        std::string path;
+        bool isDir;
+    };
+
     namespace FS
     {
         bool FileExist(const std::string& path);
+    }
+    namespace FS2
+    {
+        Result OpenArchive(FS_Archive *archive, FS_ArchiveID id);
+        Result CloseArchive(FS_Archive archive);
+        bool DirExists(FS_Archive archive, const std::string &path);
+        u64 GetTotalStorage(FS_SystemMediaType mediatype);
+        u64 GetUsedStorage(FS_SystemMediaType mediatype);
+        Result GetDirList(const std::string &path, std::vector<FS_DirectoryEntry> &entries);
+        void Convert(std::vector<FS_DirectoryEntry> &entries, std::vector<RenderD7::DirContent> &converted);
+        void GetContents(std::string path, std::vector<RenderD7::DirContent> &converted);
     }
     bool IsNdspInit();
     void SetupLog(void);
@@ -303,12 +326,7 @@ namespace RenderD7
     void DrawSTObject(std::vector<RenderD7::TObject> tobject, int tobjectindex, u32 color, u32 txtcolor);
     bool touchTObj(touchPosition touch, RenderD7::TObject button);
     void DrawTLBtns(std::vector<RenderD7::TLBtn> btns, u32 color,  int selection = -1, u32 selbgcolor = RenderD7::Color::Hex("#2D98AF"), u32 selcolor = RenderD7::Color::Hex("#000000"));
-    struct DirContent
-    {
-        std::string name;
-        std::string path;
-        bool isDir;
-    };
+    
     struct Checkbox
     {
         float x, y, s;
