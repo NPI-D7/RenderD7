@@ -52,7 +52,8 @@ int mt_screen;
 //int mt_width = mt_screen ? 320 : 400;
 float mt_txtSize;
 bool metrikd = false;
-double mt_fpsgraph[320];
+//double mt_fpsgraph[320];
+std::vector<int> mt_fpsgraph;
 //-------------------------------------------
 bool currentScreen = false;
 
@@ -272,7 +273,7 @@ void frameloop()
 		last_time = osGetTime();
 	}
 	d11framerate = current_fps;
-	mt_fpsgraph[320] = current_fps;
+	//mt_fpsgraph[320] = current_fps;
 }
 float getframerate()
 {
@@ -932,7 +933,7 @@ void RenderD7::DrawMetrikOvl()
 	RenderD7::DrawText(0, 90, mt_txtSize, mt_txtcolor, "CMD: " + std::to_string(C3D_GetCmdBufUsage()*100.0f) + "%/" + std::to_string(C3D_GetCmdBufUsage()));
     for (int z = 0; z < 320; z++)
     {
-        C2D_DrawLine(z, 239 - mt_fpsgraph[z], mt_txtcolor, z + 1, 239 - mt_fpsgraph[z + 1], mt_txtcolor, 1, 1);
+        //C2D_DrawLine(z, 239 - mt_fpsgraph[z], mt_txtcolor, z + 1, 239 - mt_fpsgraph[z + 1], mt_txtcolor, 1, 1);
     }
 }
 
