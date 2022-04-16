@@ -25,6 +25,7 @@ INI::INIStructure cfgstruct;
 bool rd7_superreselution;
 u8 consoleModel = 0;
 u8 sysRegion = CFG_REGION_USA;
+bool is_citra = false;
 //---------------------------------------
 
 std::string D_app_name;
@@ -618,9 +619,13 @@ Result RenderD7::Init::Main(std::string app_name)
     mt_txtSize = RenderD7::Convert::StringtoFloat(cfgstruct["metrik-settings"]["txtSize"]);
     mt_screen = RenderD7::Convert::StringtoInt(cfgstruct["metrik-settings"]["Screen"]);
 	rd7_superreselution = RenderD7::Convert::FloatToBool(RenderD7::Convert::StringtoFloat(cfgstruct["settings"]["super-reselution"]));
-
+	//Check if citra
+	s64 citracheck = 0;
+	svcGetSystemInfo(&citracheck, 0x20000, 0);
+	is_citra = citracheck ? true : false;
+	//Speedup
     osSetSpeedupEnable(true);
-	if (rd7_superreselution)
+	if (!is_citra && rd7_superreselution)
 	{
 		if (consoleModel != 3) gfxSetWide(true);
 	}
@@ -634,7 +639,7 @@ Result RenderD7::Init::Main(std::string app_name)
 	TextBuf = C2D_TextBufNew(4096);
 	Font = C2D_FontLoadSystem(CFG_REGION_USA);
 	
-        //RenderD7::Msg::Display("RenderD7", "RenderD7 init success!\nWaiting for MainLoop!", Top);
+    //RenderD7::Msg::Display("RenderD7", "RenderD7 init success!\nWaiting for MainLoop!", Top);
 	return 0;
 }
 
