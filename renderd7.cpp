@@ -138,8 +138,7 @@ void RenderD7::Msg::Display(std::string titletxt, std::string subtext, C3D_Rende
 	RenderD7::DrawRect(0, 0, 400, 26, RenderD7::Color::Hex("#333333", 200));
     RenderD7::DrawText(5, 2, 0.7f, DSEVENWHITE, titletxt);
 	RenderD7::DrawText(5, 30, 0.6f, DSEVENWHITE, subtext);
-	
-	RenderD7::FrameEnd();
+
 }
 void RenderD7::Msg::DisplayWithProgress(std::string titletext, std::string subtext, float current, float total, u32 prgbarcolor)
 {
@@ -161,7 +160,6 @@ void RenderD7::Msg::DisplayWithProgress(std::string titletext, std::string subte
 	RenderD7::OnScreen(Bottom);
 	RenderD7::DrawRect(0, 0, 320, 240, RenderD7::Color::Hex("#111111"));
 
-	RenderD7::FrameEnd();
 }
 void RenderD7::SetupLog()
 {
@@ -205,7 +203,6 @@ void RenderD7::Error::DisplayError(std::string toptext, std::string errortext, i
 	RenderD7::OnScreen(Top);
     RenderD7::DrawText(0, 0, 0.7f, DSEVENWHITE, toptext);
 	RenderD7::DrawText(0, 30, 0.6f, DSEVENWHITE, errortext);
-	RenderD7::FrameEnd();
     for (int i = 0; i < 60*timesec; i++) {
 		RenderD7::DrawRect(0, 236, (int)(((float)i / (float)60*timesec) * 400.0f), 4, RenderD7::Color::Hex("#00ff00"));
 		gspWaitForVBlank();
@@ -939,24 +936,23 @@ void RenderD7::DrawMetrikOvl()
         RenderD7::OnScreen(Bottom);
 		break;
     }
+	std::string __C = RENDERD7VSTRING;
+	std::string info = "RenderD7 " + __C + " Debug Overlay";
+	float infoy = 240 - RenderD7::GetTextHeight(mt_txtSize, info);
 	std::string fps = "FPS: " + RenderD7::GetFramerate();
 	std::string cpu = "CPU: " + std::to_string(C3D_GetProcessingTime()*6.0f).substr(0, 4) + "%/" + std::to_string(C3D_GetProcessingTime()).substr(0, 4) + "ms";
 	std::string gpu = "GPU: " + std::to_string(C3D_GetDrawingTime()*6.0f).substr(0, 4) + "%/" + std::to_string(C3D_GetDrawingTime()).substr(0, 4) + "ms";
 	std::string cmd = "CMD: " + std::to_string(C3D_GetCmdBufUsage()*100.0f).substr(0, 4) + "%/" + std::to_string(C3D_GetCmdBufUsage()).substr(0, 4) + "ms";
-	std::string lram = "Linear Free RAM: " + std::to_string(linearSpaceFree()/1024/1024).substr(0, 6) + "mb";
-	std::string vram = "Free VRAM: " + std::to_string(vramSpaceFree()).substr(0, 4) + "kb";
 	RenderD7::DrawRect(0, 0, RenderD7::GetTextWidth(mt_txtSize, fps), RenderD7::GetTextHeight(mt_txtSize, fps), mt_color);
 	RenderD7::DrawRect(0, 50, RenderD7::GetTextWidth(mt_txtSize, cpu), RenderD7::GetTextHeight(mt_txtSize, cpu), mt_color);
 	RenderD7::DrawRect(0, 70, RenderD7::GetTextWidth(mt_txtSize, gpu), RenderD7::GetTextHeight(mt_txtSize, gpu), mt_color);
 	RenderD7::DrawRect(0, 90, RenderD7::GetTextWidth(mt_txtSize, cmd), RenderD7::GetTextHeight(mt_txtSize, cmd), mt_color);
-	RenderD7::DrawRect(0, 110, RenderD7::GetTextWidth(mt_txtSize, vram), RenderD7::GetTextHeight(mt_txtSize, vram), mt_color);
-	RenderD7::DrawRect(0, 130, RenderD7::GetTextWidth(mt_txtSize, lram), RenderD7::GetTextHeight(mt_txtSize, lram), mt_color);
+	RenderD7::DrawRect(0, infoy, RenderD7::GetTextWidth(mt_txtSize, info), RenderD7::GetTextHeight(mt_txtSize, info), mt_color);
 	RenderD7::DrawText(0, 0, mt_txtSize, mt_txtcolor, fps);
     RenderD7::DrawText(0, 50, mt_txtSize, mt_txtcolor, cpu);
     RenderD7::DrawText(0, 70, mt_txtSize, mt_txtcolor, gpu);
 	RenderD7::DrawText(0, 90, mt_txtSize, mt_txtcolor, cmd);
-	RenderD7::DrawText(0, 110, mt_txtSize, mt_txtcolor, vram);
-	RenderD7::DrawText(0, 130, mt_txtSize, mt_txtcolor, lram);
+	RenderD7::DrawText(0, infoy, mt_txtSize, mt_txtcolor, info);
 	
     /*for (int z = 0; z < (int)mt_fpsgraph.size(); z++)
     {
