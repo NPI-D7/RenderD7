@@ -49,6 +49,7 @@ float d11framerate = 0;
 u32 mt_color;
 u32 mt_txtcolor;
 
+bool shouldbe_disabled = false;
 int mt_screen;
 //int mt_width = mt_screen ? 320 : 400;
 float mt_txtSize;
@@ -124,6 +125,7 @@ void RenderD7::Exit::NdspFirm()
 }
 void RenderD7::Msg::Display(std::string titletxt, std::string subtext, C3D_RenderTarget *target)
 {
+	shouldbe_disabled = true;
 	C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
 	C2D_TargetClear(Top, DSEVENBLACK);
 	C2D_TargetClear(Bottom, DSEVENBLACK);
@@ -137,10 +139,11 @@ void RenderD7::Msg::Display(std::string titletxt, std::string subtext, C3D_Rende
     RenderD7::DrawText(5, 2, 0.7f, DSEVENWHITE, titletxt);
 	RenderD7::DrawText(5, 30, 0.6f, DSEVENWHITE, subtext);
 	
-	C3D_FrameEnd(0);
+	RenderD7::FrameEnd();
 }
 void RenderD7::Msg::DisplayWithProgress(std::string titletext, std::string subtext, float current, float total, u32 prgbarcolor)
 {
+	shouldbe_disabled = true;
 	RenderD7::ClearTextBufs();
 	C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
 	C2D_TargetClear(Top, DSEVENBLACK);
@@ -158,7 +161,7 @@ void RenderD7::Msg::DisplayWithProgress(std::string titletext, std::string subte
 	RenderD7::OnScreen(Bottom);
 	RenderD7::DrawRect(0, 0, 320, 240, RenderD7::Color::Hex("#111111"));
 
-	C3D_FrameEnd(0);
+	RenderD7::FrameEnd();
 }
 void RenderD7::SetupLog()
 {
@@ -194,6 +197,7 @@ void RenderD7::SpriteSheetAnimation::Play(float timespeed)
 
 void RenderD7::Error::DisplayError(std::string toptext, std::string errortext, int timesec)
 {
+	shouldbe_disabled = true;
     RenderD7::ClearTextBufs();
 	C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
 	C2D_TargetClear(Top, DSEVENBLACK);
@@ -201,7 +205,7 @@ void RenderD7::Error::DisplayError(std::string toptext, std::string errortext, i
 	RenderD7::OnScreen(Top);
     RenderD7::DrawText(0, 0, 0.7f, DSEVENWHITE, toptext);
 	RenderD7::DrawText(0, 30, 0.6f, DSEVENWHITE, errortext);
-	C3D_FrameEnd(0);
+	RenderD7::FrameEnd();
     for (int i = 0; i < 60*timesec; i++) {
 		RenderD7::DrawRect(0, 236, (int)(((float)i / (float)60*timesec) * 400.0f), 4, RenderD7::Color::Hex("#00ff00"));
 		gspWaitForVBlank();
@@ -209,6 +213,7 @@ void RenderD7::Error::DisplayError(std::string toptext, std::string errortext, i
 }
 void RenderD7::Error::DisplayFatalError(std::string toptext, std::string errortext)
 {
+	shouldbe_disabled = true;
 	bool error___ = true;
 	RenderD7::ClearTextBufs();
 	C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
@@ -218,7 +223,7 @@ void RenderD7::Error::DisplayFatalError(std::string toptext, std::string errorte
     RenderD7::DrawTextCentered(0, 0, 0.7f, DSEVENWHITE, toptext, 400);
 	RenderD7::DrawTextCentered(0, 100, 0.6f, DSEVENWHITE, errortext, 400);
 	RenderD7::DrawTextCentered(0, 200, 0.6f, DSEVENWHITE, "Press Start to Exit!", 400);
-	C3D_FrameEnd(0);
+	RenderD7::FrameEnd();
     while (error___)
 	{
 		if(d7_hDown & KEY_START)
@@ -303,8 +308,7 @@ bool RenderD7::MainLoop()
     frameloop();
         RenderD7::Scene::doDraw();
         RenderD7::Scene::doLogic(d7_hDown, d7_hHeld, d7_hUp, d7_touch);
-        
-	//if (metrikd)RenderD7::DrawMetrikOvl();
+    
     return running;
 }
 
