@@ -138,7 +138,8 @@ void RenderD7::Msg::Display(std::string titletxt, std::string subtext, C3D_Rende
 	RenderD7::DrawRect(0, 0, 400, 26, RenderD7::Color::Hex("#333333", 200));
     RenderD7::DrawText(5, 2, 0.7f, DSEVENWHITE, titletxt);
 	RenderD7::DrawText(5, 30, 0.6f, DSEVENWHITE, subtext);
-
+	C3D_FrameEnd(0);
+	shouldbe_disabled = false;
 }
 void RenderD7::Msg::DisplayWithProgress(std::string titletext, std::string subtext, float current, float total, u32 prgbarcolor)
 {
@@ -159,7 +160,8 @@ void RenderD7::Msg::DisplayWithProgress(std::string titletext, std::string subte
 	RenderD7::DrawTextCentered(5, 124, 0.7f, RenderD7::Color::Hex("#111111"), str, 390); 
 	RenderD7::OnScreen(Bottom);
 	RenderD7::DrawRect(0, 0, 320, 240, RenderD7::Color::Hex("#111111"));
-
+	C3D_FrameEnd(0);
+	shouldbe_disabled = false;
 }
 void RenderD7::SetupLog()
 {
@@ -203,10 +205,12 @@ void RenderD7::Error::DisplayError(std::string toptext, std::string errortext, i
 	RenderD7::OnScreen(Top);
     RenderD7::DrawText(0, 0, 0.7f, DSEVENWHITE, toptext);
 	RenderD7::DrawText(0, 30, 0.6f, DSEVENWHITE, errortext);
+	C3D_FrameEnd(0);
     for (int i = 0; i < 60*timesec; i++) {
 		RenderD7::DrawRect(0, 236, (int)(((float)i / (float)60*timesec) * 400.0f), 4, RenderD7::Color::Hex("#00ff00"));
 		gspWaitForVBlank();
 	}
+	shouldbe_disabled = false;
 }
 void RenderD7::Error::DisplayFatalError(std::string toptext, std::string errortext)
 {
@@ -220,14 +224,15 @@ void RenderD7::Error::DisplayFatalError(std::string toptext, std::string errorte
     RenderD7::DrawTextCentered(0, 0, 0.7f, DSEVENWHITE, toptext, 400);
 	RenderD7::DrawTextCentered(0, 100, 0.6f, DSEVENWHITE, errortext, 400);
 	RenderD7::DrawTextCentered(0, 200, 0.6f, DSEVENWHITE, "Press Start to Exit!", 400);
-	RenderD7::FrameEnd();
+	C3D_FrameEnd(0);
     while (error___)
 	{
 		if(d7_hDown & KEY_START)
 		{
 			RenderD7::ExitApp();
 		}
-        }
+    }
+	shouldbe_disabled = false;
 }
 u32 RenderD7::Color::Hex(const std::string color, u8 a)
 {
@@ -1026,8 +1031,8 @@ void OvlHandler()
 
 void RenderD7::FrameEnd()
 {
-	if (metrikd)RenderD7::DrawMetrikOvl();
-	OvlHandler();
+	if (metrikd && !shouldbe_disabled)RenderD7::DrawMetrikOvl();
+	//OvlHandler();
 	if (d7_hHeld & KEY_R && d7_hDown & KEY_SELECT)
 	{
 		RenderD7::LoadSettings();
