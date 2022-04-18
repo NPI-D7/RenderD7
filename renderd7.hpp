@@ -338,6 +338,8 @@ namespace RenderD7
         u32 outcol, incol, chcol;
     };
     void DrawCheckbox(Checkbox box);
+    std::string FormatString(std::string fmt_str, ...);
+    std::string GetTimeStr(void);
     /*class Console
     {
          public:
