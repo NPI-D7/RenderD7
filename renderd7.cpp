@@ -64,7 +64,7 @@ bool metrikd = false;
 std::vector<int> mt_fpsgraph(320);
 
 //Metrik-CSV
-std::string csvpc
+std::string csvpc;
 bool mt_dumpcsv = false; //Logs the Fps and stuff to csv. It saves every second to not loose performence.
 bool mt_csvloop = false; //Saves In Every Frame but slows down performens. mt_dumpcsv must be enabled.
 std::ofstream mt_csv;
