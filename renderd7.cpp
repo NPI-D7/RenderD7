@@ -1136,14 +1136,31 @@ void RenderD7::RSettings::Draw(void) const
 	RenderD7::DrawRect(0, 0, 400, 21, RenderD7::Color::Hex("#111111"));
 	RenderD7::DrawRect(0, 21, 400, 220, RenderD7::Color::Hex("#eeeeee"));
 	RenderD7::DrawText(0, 0, 0.7f, DSEVENWHITE, "RenderD7->Settings");
+	RenderD7::DrawTextLeft(400, 0, 0.7f, RenderD7::Color::Hex("#ffffff"), RENDERD7VSTRING);
 	RenderD7::DrawText(0, 30, 0.7f, DSEVENBLACK, "RD7SR: " + rd7srstate);
 	RenderD7::DrawText(0, 50, 0.7f, DSEVENBLACK, "Metrik to Csv: " + csvstate);
 	RenderD7::DrawText(0, 70, 0.7f, DSEVENBLACK, "Metrik to Csv-Loop: " + csvlstate);
+	RenderD7::DrawText(0, 90, 0.7f, DSEVENBLACK, "Force FPS: " + fpsstate);
+	RenderD7::DrawText(0, 110, 0.7f, DSEVENBLACK, "Metrik BG RGB: " + mtcolstate);
+	RenderD7::DrawText(0, 130, 0.7f, DSEVENBLACK, "Metrik Text RGB: " + mttxtcolstate);
+	RenderD7::DrawText(0, 150, 0.7f, DSEVENBLACK, "Metrik Alpha: " + mtcola);
+	RenderD7::DrawText(0, 170, 0.7f, DSEVENBLACK, "Metrik Text Alpha: " + mttxtcola);
 	RenderD7::OnScreen(Bottom);
+	std::string verc = "Config Version: ";
+	verc += CFGVER;
 	RenderD7::DrawRect(0, 0, 320, 240, RenderD7::Color::Hex("#eeeeee"));
+	RenderD7::DrawText(0, 0, 0.7f, RenderD7::Color::Hex("#111111"), verc);
 	RenderD7::DrawTObjects(buttons, RenderD7::Color::Hex("#111111"), RenderD7::Color::Hex("#eeeeee"));
 }
-
+std::string Kbd(int lenght, SwkbdType tp)
+{
+	RenderD7::FrameEnd();
+	SwkbdState state;
+	char temp[lenght + 1] = { 0 };
+	swkbdInit(&state, SwkbdType::SWKBD_TYPE_NUMPAD, 2, lenght);
+	SwkbdButton ret = swkbdInputText(&state, temp, sizeof(temp));
+	return (ret == SWKBD_BUTTON_CONFIRM ? temp : "60");
+}
 void RenderD7::RSettings::Logic(u32 hDown, u32 hHeld, u32 hUp, touchPosition touch)
 {
 	rd7srstate = rd7_superreselution ? "true" : "false";
@@ -1173,6 +1190,10 @@ void RenderD7::RSettings::Logic(u32 hDown, u32 hHeld, u32 hUp, touchPosition tou
 	if (d7_hDown & KEY_TOUCH && RenderD7::touchTObj(d7_touch, buttons[2]))
 	{
 		mt_csvloop = mt_csvloop ? false : true;
+	}
+	if (d7_hDown & KEY_TOUCH && RenderD7::touchTObj(d7_touch, buttons[3]))
+	{
+		cfgstruct["settings"]["forceFrameRate"] = Kbd(2, SWKBD_TYPE_NUMPAD);
 	}
 	if (d7_hDown & KEY_B)
 	{

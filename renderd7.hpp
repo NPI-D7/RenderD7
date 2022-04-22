@@ -164,16 +164,23 @@ namespace RenderD7
         std::string rd7srstate = "false";
         std::string csvstate = "false";
         std::string csvlstate = "false";
+        std::string fpsstate = "60";
+        std::string mtcolstate = "#000000";
+        std::string mttxtcolstate = "#ffffff";
+        std::string mtcola = "255";
+        std::string mttxtcola = "255";
+
+        
         std::vector<RenderD7::TObject> buttons = 
         {
             {20, 35, 120, 35, "RD7SR", -11, 10},
-            {20, 85, 120, 35, "MT_CSV", 0, 9},
-            {20, 135, 120, 35, "MT_CSV-L", -8, 10},
-            {20, 185, 120, 35, "FPS", 8, 10},
-            {180, 35, 120, 35, "MTCOL", -15, 10},
-            {180, 85, 120, 35, "MTTEXT", -15, 10},
-            {180, 135, 120, 35, "MTA", -15, 10},
-            {180, 185, 120, 35, "MTTXTA", -15, 10}
+            {20, 85, 120, 35, "MT_CSV", -15, 9},
+            {20, 135, 120, 35, "MT_CSV-L", -19, 10},
+            {20, 185, 120, 35, "FPS", 6, 10},
+            {180, 35, 120, 35, "MTCOL", -10, 10},
+            {180, 85, 120, 35, "MTTEXT", -13, 10},
+            {180, 135, 120, 35, "MTA", 2, 10},
+            {180, 185, 120, 35, "MTTXTA", -13, 10}
         };
     public:
         RSettings();
