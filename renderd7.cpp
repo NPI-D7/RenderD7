@@ -4,7 +4,7 @@
 
 #define RGBA8(r, g, b, a) ((((r) & 0xFF) << 0) | (((g) & 0xFF) << 8) | (((b) & 0xFF) << 16) | (((a) & 0xFF) << 24))
 #define D7_NOTHING C2D_Color32(0, 0, 0, 0)
-#define CFGVER "1"
+#define CFGVER "2"
 Log renderd7log;
 float animtime;
 bool isndspinit = false;
@@ -50,6 +50,11 @@ float d11framerate = 0;
 u32 mt_color;
 u32 mt_txtcolor;
 
+std::string mt_fps;
+std::string mt_cpu;
+std::string mt_gpu;
+std::string mt_cmd;
+
 bool shouldbe_disabled = false;
 int mt_screen;
 //int mt_width = mt_screen ? 320 : 400;
@@ -57,6 +62,12 @@ float mt_txtSize;
 bool metrikd = false;
 //double mt_fpsgraph[320];
 std::vector<int> mt_fpsgraph(320);
+
+//Metrik-CSV
+bool mt_dumpcsv = false; //Logs the Fps and stuff to csv. It saves every second to not loose performence.
+bool mt_csvloop = false; //Saves In Every Frame but slows down performens. mt_dumpcsv must be enabled.
+std::ofstream mt_csv;
+std::string mt_cname;
 //-------------------------------------------
 bool currentScreen = false;
 
@@ -66,6 +77,16 @@ C3D_RenderTarget* Bottom;
 
 #define DSEVENBLACK C2D_Color32(0, 0 ,0, 255)
 #define DSEVENWHITE C2D_Color32(255, 255, 255, 255)
+
+std::string Date(void)
+{
+	time_t unixTime;
+	struct tm timeStruct;
+	time(&unixTime);
+	localtime_r(&unixTime, &timeStruct);
+	return format("%04i-%02i-%02i %02i:%02i:%02i", timeStruct.tm_year + 1900, timeStruct.tm_mon + 1, timeStruct.tm_mday,
+		timeStruct.tm_hour, timeStruct.tm_min, timeStruct.tm_sec);
+}
 
 void screenoff()
 {
@@ -615,6 +636,8 @@ Result RenderD7::Init::Main(std::string app_name)
         cfgstruct["metrik-settings"]["ColorA"] = "255";
         cfgstruct["metrik-settings"]["Color"] = "#000000";
         cfgstruct["metrik-settings"]["txtSize"] = "0.7f";
+		cfgstruct["metrik-settings"]["dumpcsv"] = "0";
+		cfgstruct["metrik-settings"]["dumpcsvloop"] = "0";
 		cfgfile->write(cfgstruct);
 	}
 	cfgfile = std::make_unique<INI::INIFile>(cfgpath+ "/config.ini");
@@ -627,6 +650,8 @@ Result RenderD7::Init::Main(std::string app_name)
     mt_txtSize = RenderD7::Convert::StringtoFloat(cfgstruct["metrik-settings"]["txtSize"]);
     mt_screen = RenderD7::Convert::StringtoInt(cfgstruct["metrik-settings"]["Screen"]);
 	rd7_superreselution = RenderD7::Convert::FloatToBool(RenderD7::Convert::StringtoFloat(cfgstruct["settings"]["super-reselution"]));
+	mt_dumpcsv = RenderD7::Convert::FloatToBool(RenderD7::Convert::StringtoFloat(cfgstruct["metrik-settings"]["dumpcsv"]));
+	mt_csvloop = RenderD7::Convert::FloatToBool(RenderD7::Convert::StringtoFloat(cfgstruct["metrik-settings"]["dumpcsvloop"]));
 	//Check if citra
 	s64 citracheck = 0;
 	svcGetSystemInfo(&citracheck, 0x20000, 0);
@@ -636,6 +661,16 @@ Result RenderD7::Init::Main(std::string app_name)
 	if (!is_citra && rd7_superreselution)
 	{
 		if (consoleModel != 3) gfxSetWide(true);
+	}
+
+	if (mt_dumpcsv)
+	{
+		mt_cname = cfgpath + Date() + ".csv";
+		FILE* logfile = fopen((mt_cname.c_str()), "w");
+		fclose(logfile);
+		mt_csv.open((mt_cname), std::ofstream::app);
+		mt_csv << "FPS,CPU,GPU,CMD\n";
+		mt_csv.close();
 	}
 	RenderD7::AddOvl(std::make_unique<RenderD7::DSP_NF>());
 	
@@ -945,10 +980,10 @@ void RenderD7::DrawMetrikOvl()
 	std::string __C = RENDERD7VSTRING;
 	std::string info = "RenderD7 " + __C + " Debug Overlay";
 	float infoy = 240 - RenderD7::GetTextHeight(mt_txtSize, info);
-	std::string fps = "FPS: " + RenderD7::GetFramerate();
-	std::string cpu = "CPU: " + std::to_string(C3D_GetProcessingTime()*6.0f).substr(0, 4) + "%/" + std::to_string(C3D_GetProcessingTime()).substr(0, 4) + "ms";
-	std::string gpu = "GPU: " + std::to_string(C3D_GetDrawingTime()*6.0f).substr(0, 4) + "%/" + std::to_string(C3D_GetDrawingTime()).substr(0, 4) + "ms";
-	std::string cmd = "CMD: " + std::to_string(C3D_GetCmdBufUsage()*100.0f).substr(0, 4) + "%/" + std::to_string(C3D_GetCmdBufUsage()).substr(0, 4) + "ms";
+	mt_fps = "FPS: " + RenderD7::GetFramerate();
+	mt_cpu = "CPU: " + std::to_string(C3D_GetProcessingTime()*6.0f).substr(0, 4) + "%/" + std::to_string(C3D_GetProcessingTime()).substr(0, 4) + "ms";
+	mt_gpu = "GPU: " + std::to_string(C3D_GetDrawingTime()*6.0f).substr(0, 4) + "%/" + std::to_string(C3D_GetDrawingTime()).substr(0, 4) + "ms";
+	mt_cmd = "CMD: " + std::to_string(C3D_GetCmdBufUsage()*100.0f).substr(0, 4) + "%/" + std::to_string(C3D_GetCmdBufUsage()).substr(0, 4) + "ms";
 	RenderD7::DrawRect(0, 0, RenderD7::GetTextWidth(mt_txtSize, fps), RenderD7::GetTextHeight(mt_txtSize, fps), mt_color);
 	RenderD7::DrawRect(0, 50, RenderD7::GetTextWidth(mt_txtSize, cpu), RenderD7::GetTextHeight(mt_txtSize, cpu), mt_color);
 	RenderD7::DrawRect(0, 70, RenderD7::GetTextWidth(mt_txtSize, gpu), RenderD7::GetTextHeight(mt_txtSize, gpu), mt_color);
@@ -1029,7 +1064,7 @@ void OvlHandler()
 	//}
 	
 }
-
+int lp = 0;
 void RenderD7::FrameEnd()
 {
 	if (metrikd && !shouldbe_disabled)RenderD7::DrawMetrikOvl();
@@ -1038,6 +1073,19 @@ void RenderD7::FrameEnd()
 	{
 		RenderD7::LoadSettings();
 	}*/
+	if (mt_dumpcsv && lp == 60)
+	{
+		std::string _mt_fps = RenderD7::GetFramerate();
+		std::string _mt_cpu = std::to_string(C3D_GetProcessingTime()).substr(0, 4);
+		std::string _mt_gpu = std::to_string(C3D_GetDrawingTime()).substr(0, 4);
+		std::string _mt_cmd = std::to_string(C3D_GetCmdBufUsage()).substr(0, 4);
+		mt_csv.open((mt_cname), std::ofstream::app);
+		std::string fmt_ = _mt_fps + "," + _mt_cpu + "," + _mt_gpu + "," + _mt_cmd + "\n";
+		mt_csv << fmt_;
+		mt_csv.close();
+		lp = 0;
+	}
+	lp++;
 	
 	C3D_FrameEnd(0);
 }
@@ -1059,7 +1107,9 @@ void RenderD7::RSettings::Draw(void) const
 	RenderD7::DrawRect(0, 0, 400, 21, RenderD7::Color::Hex("#111111"));
 	RenderD7::DrawRect(0, 21, 400, 220, RenderD7::Color::Hex("#eeeeee"));
 	RenderD7::DrawText(0, 0, 0.7f, DSEVENWHITE, "RenderD7->Settings");
-	RenderD7::DrawText(0, 26, 0.7f, DSEVENBLACK, "RD7SR" + rd7srstate);
+	RenderD7::DrawText(0, 30, 0.7f, DSEVENBLACK, "RD7SR: " + rd7srstate);
+	RenderD7::DrawText(0, 50, 0.7f, DSEVENBLACK, "Metrik to Csv: " + csvstate);
+	RenderD7::DrawText(0, 70, 0.7f, DSEVENBLACK, "Metrik to Csv-Loop: " + csvlsstate);
 	RenderD7::OnScreen(Bottom);
 	RenderD7::DrawRect(0, 0, 320, 240, RenderD7::Color::Hex("#eeeeee"));
 	RenderD7::DrawTObjects(buttons, RenderD7::Color::Hex("#111111"), RenderD7::Color::Hex("#eeeeee"));
@@ -1068,9 +1118,28 @@ void RenderD7::RSettings::Draw(void) const
 void RenderD7::RSettings::Logic(u32 hDown, u32 hHeld, u32 hUp, touchPosition touch)
 {
 	rd7srstate = rd7_superreselution ? "true" : "false";
+	csvstate = mt_dumpcsv ? "true" : "false";
+	csvlsstate = mt_csvloop ? "true" : "false";
 	if (RenderD7::touchTObj(d7_touch, buttons[0]))
 	{
 		RenderD7::ToggleRD7SR();
+	}
+	if (RenderD7::touchTObj(d7_touch, buttons[1]))
+	{
+		mt_dumpcsv = mt_dumpcsv ? false : true;
+		if (mt_dumpcsv)
+		{
+			mt_cname = cfgpath + Date() + ".csv";
+			FILE* logfile = fopen((mt_cname.c_str()), "w");
+			fclose(logfile);
+			mt_csv.open((mt_cname), std::ofstream::app);
+			mt_csv << "FPS,CPU,GPU,CMD\n";
+			mt_csv.close();
+		}
+	}
+	if (RenderD7::touchTObj(d7_touch, buttons[2]))
+	{
+		mt_csvloop = mt_csvloop ? false : true;
 	}
 	if (d7_hDown & KEY_B)
 	{

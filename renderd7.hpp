@@ -28,7 +28,7 @@
 #include "stringtool.hpp"
 #include "Clock.hpp"
 
-#define RENDERD7VSTRING "0.7.0"
+#define RENDERD7VSTRING "0.7.1"
 #define CHANGELOG "0.6.2:  \n0.6.10: rewrite Threadsystem, Improve framerate\n0.6.02: Fix Code in lang.hpp\nadd Draw Text Left Function.\nadd changelog\n0.6.01: add Threading system."
 #define DEFAULT_CENTER 0.5f
 
@@ -157,11 +157,13 @@ namespace RenderD7
     {
     private:
         std::string rd7srstate = "false";
+        std::string csvstate = "false";
+        std::string csvlstate = "false";
         std::vector<RenderD7::TObject> buttons = 
         {
             {20, 35, 120, 35, "RD7SR", -11, 10},
-            {20, 85, 120, 35, "", 0, 9},
-            {20, 135, 120, 35, "", -8, 10},
+            {20, 85, 120, 35, "MT_CSV", 0, 9},
+            {20, 135, 120, 35, "MT_CSV-L", -8, 10},
             {20, 185, 120, 35, "", 8, 10},
             {180, 35, 120, 35, "", -15, 10},
             {180, 85, 120, 35, "", -15, 10},
