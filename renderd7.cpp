@@ -684,7 +684,7 @@ Result RenderD7::Init::Main(std::string app_name)
 		mt_cname = csvpc + Date() + ".csv";
 		FILE* logfile = fopen((mt_cname.c_str()), "w");
 		fclose(logfile);
-		mt_csv.open((mt_cname), std::ofstream::app);
+		mt_csv.open((mt_cname), std::ofstream::out);
 		mt_csv << "FPS,CPU,GPU,CMD\n";
 		mt_csv.close();
 	}
@@ -1095,7 +1095,7 @@ void RenderD7::FrameEnd()
 		std::string _mt_cpu = std::to_string(C3D_GetProcessingTime()).substr(0, 4);
 		std::string _mt_gpu = std::to_string(C3D_GetDrawingTime()).substr(0, 4);
 		std::string _mt_cmd = std::to_string(C3D_GetCmdBufUsage()).substr(0, 4);
-		mt_csv.open((mt_cname), std::ofstream::app);
+		mt_csv.open((mt_cname), std::ofstream::out);
 		std::string fmt_ = _mt_fps + "," + _mt_cpu + "," + _mt_gpu + "," + _mt_cmd + "\n";
 		mt_csv << fmt_;
 		mt_csv.close();
@@ -1148,7 +1148,7 @@ void RenderD7::RSettings::Logic(u32 hDown, u32 hHeld, u32 hUp, touchPosition tou
 			mt_cname = csvpc + Date() + ".csv";
 			FILE* logfile = fopen((mt_cname.c_str()), "w");
 			fclose(logfile);
-			mt_csv.open((mt_cname), std::ofstream::app);
+			mt_csv.open((mt_cname), std::ofstream::out);
 			mt_csv << "FPS,CPU,GPU,CMD\n";
 			mt_csv.close();
 		}
