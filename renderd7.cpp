@@ -96,7 +96,7 @@ std::string Date(void)
 	struct tm timeStruct;
 	time(&unixTime);
 	localtime_r(&unixTime, &timeStruct);
-	return _FMT_("%04i-%02i-%02i_%02i:%02i:%02i", timeStruct.tm_year + 1900, timeStruct.tm_mon + 1, timeStruct.tm_mday,
+	return _FMT_("%04i-%02i-%02i_%02i-%02i-%02i", timeStruct.tm_year + 1900, timeStruct.tm_mon + 1, timeStruct.tm_mday,
 		timeStruct.tm_hour, timeStruct.tm_min, timeStruct.tm_sec);
 }
 
@@ -686,40 +686,17 @@ Result RenderD7::Init::Main(std::string app_name)
 	{
 		if (consoleModel != 3) gfxSetWide(true);
 	}
-	consoleInit(GFX_BOTTOM, NULL);
+	//consoleInit(GFX_BOTTOM, NULL);
 	if (mt_dumpcsv)
 	{
 		mt_cname = csvpc;
 		mt_cname += "/";
 		mt_cname += Date();
 		mt_cname += ".csv";
-		/*std::stringstream strss;
-		strss << "sdmc:/" << csvpc << "/" << Date() << ".csv";
-		mt_cname = strss.str();*/
-		//mt_cname = "sdmc:/test.csv";
-		//Handle fileh;
-		std::cout << mt_cname << std::endl;
-		Result ret = FS_OpenArchive(&sdmc_archive, ARCHIVE_SDMC);
-		if (R_FAILED(ret))
-		{
-			std::cout <<"Failed Init sd!\n";
-		}
-		std::string moddedname = mt_cname;
-		moddedname.erase(0, 5);
-		std::cout << moddedname << std::endl;
 		
-
-		ret = FS_CreateFile(sdmc_archive, moddedname.c_str(), 0);
-		if (R_FAILED(ret))
-		{
-			std::cout <<"Failed To Create File!\n";
-		}
-		//FILE* logfile = fopen((mt_cname.c_str()), "w");
-		//fclose(logfile);
-		if ((access(mt_cname.c_str(), F_OK) == 0))
-		{
-			std::cout << "File Exist!" << std::endl;
-		}
+		FILE* logfile = fopen((mt_cname.c_str()), "w");
+		fclose(logfile);
+		
 		mt_csv.open((mt_cname), std::ofstream::app);
 		mt_csv << "FPS,CPU,GPU,CMD\n";
 		mt_csv.close();
@@ -1179,13 +1156,13 @@ void RenderD7::RSettings::Logic(u32 hDown, u32 hHeld, u32 hUp, touchPosition tou
 	if (d7_hDown & KEY_TOUCH && RenderD7::touchTObj(d7_touch, buttons[1]))
 	{
 		mt_dumpcsv = mt_dumpcsv ? false : true;
+		cfgstruct["metrik-settings"]["dumpcsv"] = mt_dumpcsv ? "1" : "0";
 		if (mt_dumpcsv)
 		{
 			mt_cname = csvpc;
 			mt_cname += "/";
 			mt_cname += Date();
 			mt_cname += ".csv";
-			//mt_cname = csvpc + Date() + ".csv";
 			FILE* logfile = fopen((mt_cname.c_str()), "w");
 			fclose(logfile);
 			mt_csv.open((mt_cname), std::ofstream::app);
