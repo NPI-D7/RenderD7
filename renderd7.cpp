@@ -984,15 +984,15 @@ void RenderD7::DrawMetrikOvl()
 	mt_cpu = "CPU: " + std::to_string(C3D_GetProcessingTime()*6.0f).substr(0, 4) + "%/" + std::to_string(C3D_GetProcessingTime()).substr(0, 4) + "ms";
 	mt_gpu = "GPU: " + std::to_string(C3D_GetDrawingTime()*6.0f).substr(0, 4) + "%/" + std::to_string(C3D_GetDrawingTime()).substr(0, 4) + "ms";
 	mt_cmd = "CMD: " + std::to_string(C3D_GetCmdBufUsage()*100.0f).substr(0, 4) + "%/" + std::to_string(C3D_GetCmdBufUsage()).substr(0, 4) + "ms";
-	RenderD7::DrawRect(0, 0, RenderD7::GetTextWidth(mt_txtSize, fps), RenderD7::GetTextHeight(mt_txtSize, fps), mt_color);
-	RenderD7::DrawRect(0, 50, RenderD7::GetTextWidth(mt_txtSize, cpu), RenderD7::GetTextHeight(mt_txtSize, cpu), mt_color);
-	RenderD7::DrawRect(0, 70, RenderD7::GetTextWidth(mt_txtSize, gpu), RenderD7::GetTextHeight(mt_txtSize, gpu), mt_color);
-	RenderD7::DrawRect(0, 90, RenderD7::GetTextWidth(mt_txtSize, cmd), RenderD7::GetTextHeight(mt_txtSize, cmd), mt_color);
+	RenderD7::DrawRect(0, 0, RenderD7::GetTextWidth(mt_txtSize, mt_fps), RenderD7::GetTextHeight(mt_txtSize, mt_fps), mt_color);
+	RenderD7::DrawRect(0, 50, RenderD7::GetTextWidth(mt_txtSize, mt_cpu), RenderD7::GetTextHeight(mt_txtSize, mt_cpu), mt_color);
+	RenderD7::DrawRect(0, 70, RenderD7::GetTextWidth(mt_txtSize, mt_gpu), RenderD7::GetTextHeight(mt_txtSize, mt_gpu), mt_color);
+	RenderD7::DrawRect(0, 90, RenderD7::GetTextWidth(mt_txtSize, mt_cmd), RenderD7::GetTextHeight(mt_txtSize, mt_cmd), mt_color);
 	RenderD7::DrawRect(0, infoy, RenderD7::GetTextWidth(mt_txtSize, info), RenderD7::GetTextHeight(mt_txtSize, info), mt_color);
-	RenderD7::DrawText(0, 0, mt_txtSize, mt_txtcolor, fps);
-    RenderD7::DrawText(0, 50, mt_txtSize, mt_txtcolor, cpu);
-    RenderD7::DrawText(0, 70, mt_txtSize, mt_txtcolor, gpu);
-	RenderD7::DrawText(0, 90, mt_txtSize, mt_txtcolor, cmd);
+	RenderD7::DrawText(0, 0, mt_txtSize, mt_txtcolor, mt_fps);
+    RenderD7::DrawText(0, 50, mt_txtSize, mt_txtcolor, mt_cpu);
+    RenderD7::DrawText(0, 70, mt_txtSize, mt_txtcolor, mt_gpu);
+	RenderD7::DrawText(0, 90, mt_txtSize, mt_txtcolor, mt_cmd);
 	RenderD7::DrawText(0, infoy, mt_txtSize, mt_txtcolor, info);
 	
     /*for (int z = 0; z < (int)mt_fpsgraph.size(); z++)
@@ -1119,7 +1119,7 @@ void RenderD7::RSettings::Logic(u32 hDown, u32 hHeld, u32 hUp, touchPosition tou
 {
 	rd7srstate = rd7_superreselution ? "true" : "false";
 	csvstate = mt_dumpcsv ? "true" : "false";
-	csvlsstate = mt_csvloop ? "true" : "false";
+	csvlstate = mt_csvloop ? "true" : "false";
 	if (RenderD7::touchTObj(d7_touch, buttons[0]))
 	{
 		RenderD7::ToggleRD7SR();
