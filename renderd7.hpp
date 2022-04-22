@@ -28,8 +28,8 @@
 #include "stringtool.hpp"
 #include "Clock.hpp"
 
-#define RENDERD7VSTRING "0.7.1"
-#define CHANGELOG "0.6.2:  \n0.6.10: rewrite Threadsystem, Improve framerate\n0.6.02: Fix Code in lang.hpp\nadd Draw Text Left Function.\nadd changelog\n0.6.01: add Threading system."
+#define RENDERD7VSTRING "0.7.2"
+#define CHANGELOG "0.7.2: Implement MT to csv file saving. Add RGB2HEX. \n0.7.1: Add the New Overlay Handler. Its Just in code and does nothing yet. \n0.7.0: Made Big Progress In the MT Ovl but it still crashes On a Scnd C3D_FrameEnd(). Implement 800px but doesn't work that good. \n0.6.2: Fix Crash when exiting trouth Home Menu.  \n0.6.10: rewrite Threadsystem, Improve framerate\n0.6.02: Fix Code in lang.hpp\nadd Draw Text Left Function.\nadd changelog\n0.6.01: add Threading system."
 #define DEFAULT_CENTER 0.5f
 
 extern C3D_RenderTarget* Top;
@@ -164,11 +164,11 @@ namespace RenderD7
             {20, 35, 120, 35, "RD7SR", -11, 10},
             {20, 85, 120, 35, "MT_CSV", 0, 9},
             {20, 135, 120, 35, "MT_CSV-L", -8, 10},
-            {20, 185, 120, 35, "", 8, 10},
-            {180, 35, 120, 35, "", -15, 10},
-            {180, 85, 120, 35, "", -15, 10},
-            {180, 135, 120, 35, "", -15, 10},
-            {180, 185, 120, 35, "", -15, 10}
+            {20, 185, 120, 35, "FPS", 8, 10},
+            {180, 35, 120, 35, "MTCOL", -15, 10},
+            {180, 85, 120, 35, "MTTEXT", -15, 10},
+            {180, 135, 120, 35, "MTA", -15, 10},
+            {180, 185, 120, 35, "MTTXTA", -15, 10}
         };
     public:
         RSettings();
@@ -214,6 +214,7 @@ namespace RenderD7
             
             u8 m_r, m_g ,m_b, m_a;
         };
+        std::string RGB2Hex(int r, int g, int b)
         u32 Hex(const std::string color, u8 a = 255);
     }
     int GetRandomInt(int b, int e);

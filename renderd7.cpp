@@ -279,6 +279,14 @@ u32 RenderD7::Color::Hex(const std::string color, u8 a)
 	return RGBA8(r, g, b, a);
 }
 
+std::string RenderD7::RGB2Hex(int r, int g, int b)
+{
+  	std::stringstream ss;
+  	ss << "#";
+  	ss << std::hex << (r << 16 | g << 8 | b );
+  	return ss.str();
+}
+
 void RenderD7::Scene::doDraw() {
 	if(!RenderD7::Scene::scenes.empty())
 		RenderD7::Scene::scenes.top()->Draw();
@@ -1150,7 +1158,7 @@ void RenderD7::RSettings::Logic(u32 hDown, u32 hHeld, u32 hUp, touchPosition tou
 			mt_cname = csvpc + Date() + ".csv";
 			FILE* logfile = fopen((mt_cname.c_str()), "w");
 			fclose(logfile);
-			mt_csv.open((mt_cname), std::ofstream::out);
+			mt_csv.open((mt_cname), std::ofstream::app);
 			mt_csv << "FPS,CPU,GPU,CMD\n";
 			mt_csv.close();
 		}
