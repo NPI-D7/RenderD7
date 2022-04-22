@@ -689,11 +689,14 @@ Result RenderD7::Init::Main(std::string app_name)
 
 	if (mt_dumpcsv)
 	{
-		//mt_cname = csvpc + "/" + Date() + ".csv";
+		mt_cname = csvpc;
+		mt_cname += "/";
+		mt_cname += Date();
+		mt_cname += ".csv";
 		/*std::stringstream strss;
 		strss << "sdmc:/" << csvpc << "/" << Date() << ".csv";
 		mt_cname = strss.str();*/
-		mt_cname = "sdmc:/test.csv";
+		//mt_cname = "sdmc:/test.csv";
 		std::cout << mt_cname << std::endl;
 		FILE* logfile = fopen((mt_cname.c_str()), "w");
 		fclose(logfile);
@@ -1158,7 +1161,11 @@ void RenderD7::RSettings::Logic(u32 hDown, u32 hHeld, u32 hUp, touchPosition tou
 		mt_dumpcsv = mt_dumpcsv ? false : true;
 		if (mt_dumpcsv)
 		{
-			mt_cname = csvpc + Date() + ".csv";
+			mt_cname = csvpc;
+			mt_cname += "/";
+			mt_cname += Date();
+			mt_cname += ".csv";
+			//mt_cname = csvpc + Date() + ".csv";
 			FILE* logfile = fopen((mt_cname.c_str()), "w");
 			fclose(logfile);
 			mt_csv.open((mt_cname), std::ofstream::app);
