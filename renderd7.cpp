@@ -690,10 +690,10 @@ Result RenderD7::Init::Main(std::string app_name)
 	if (mt_dumpcsv)
 	{
 		//mt_cname = csvpc + "/" + Date() + ".csv";
-		std::stringstream strss;
+		/*std::stringstream strss;
 		strss << "sdmc:/" << csvpc << "/" << Date() << ".csv";
-		mt_cname = strss.str();
-		//mt_cname = "sdmc:/" + Date() + ".csv";
+		mt_cname = strss.str();*/
+		mt_cname = "sdmc:/test.csv";
 		std::cout << mt_cname << std::endl;
 		FILE* logfile = fopen((mt_cname.c_str()), "w");
 		fclose(logfile);
