@@ -214,7 +214,7 @@ namespace RenderD7
             
             u8 m_r, m_g ,m_b, m_a;
         };
-        std::string RGB2Hex(int r, int g, int b)
+        std::string RGB2Hex(int r, int g, int b);
         u32 Hex(const std::string color, u8 a = 255);
     }
     int GetRandomInt(int b, int e);
