@@ -681,7 +681,8 @@ Result RenderD7::Init::Main(std::string app_name)
 
 	if (mt_dumpcsv)
 	{
-		mt_cname = csvpc + Date() + ".csv";
+		//mt_cname = csvpc + Date() + ".csv";
+		mt_cname = "sdmc:/0test.csv";
 		FILE* logfile = fopen((mt_cname.c_str()), "w");
 		fclose(logfile);
 		mt_csv.open((mt_cname), std::ofstream::out);
