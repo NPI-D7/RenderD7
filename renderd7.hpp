@@ -19,7 +19,7 @@
 #include <filesystem>
 #include <locale>
 #include "external/lodepng.h"
-#include "external/fs.h"
+
 #include <codecvt>
 #include "lang.hpp"
 #include "parameter.hpp"
@@ -27,6 +27,11 @@
 #include "ini.hpp"
 #include "stringtool.hpp"
 #include "Clock.hpp"
+
+extern "C"
+{
+    #include "external/fs.h"
+}
 
 #define RENDERD7VSTRING "0.7.2"
 #define CHANGELOG "0.7.2: Implement MT to csv file saving. Add RGB2HEX. \n0.7.1: Add the New Overlay Handler. Its Just in code and does nothing yet. \n0.7.0: Made Big Progress In the MT Ovl but it still crashes On a Scnd C3D_FrameEnd(). Implement 800px but doesn't work that good. \n0.6.2: Fix Crash when exiting trouth Home Menu.  \n0.6.10: rewrite Threadsystem, Improve framerate\n0.6.02: Fix Code in lang.hpp\nadd Draw Text Left Function.\nadd changelog\n0.6.01: add Threading system."
@@ -343,11 +348,11 @@ namespace RenderD7
     void DrawCheckbox(Checkbox box);
     std::string FormatString(std::string fmt_str, ...);
     std::string GetTimeStr(void);
-    /*class Console
+    class Console
     {
          public:
            Console();
-           Console(int x, int y, int w, int h, int a = 255);
+           Console(int x, int y, int w, int h, u8 a = 255);
            Console(int x, int y, int w, int h, RenderD7::Color::rgba col);
            Console(int x, int y, int w, int h, std::string name, RenderD7::Color::rgba col = {255, 255, 255, 255}, RenderD7::Color::rgba barcol = {0, 0, 0, 255}, RenderD7::Color::rgba outlinecol = {222, 222, 222, 255});
            void On(C3D_RenderTarget *t_cscreen);
@@ -363,7 +368,7 @@ namespace RenderD7
            RenderD7::Color::rgba color = {255, 255, 255, 255};
            RenderD7::Color::rgba outlinecol = {222, 222, 222, 255};
            RenderD7::Color::rgba barcolor = {0, 0, 0, 255};
-    };*/
+    };
 
     bool NameIsEndingWith(const std::string &name, const std::vector<std::string> &extensions);
     void GetDirContentsExt(std::vector<RenderD7::DirContent> &dircontent, const std::vector<std::string> &extensions);

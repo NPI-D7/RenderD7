@@ -96,7 +96,7 @@ std::string Date(void)
 	struct tm timeStruct;
 	time(&unixTime);
 	localtime_r(&unixTime, &timeStruct);
-	return _FMT_("%04i-%02i-%02i %02i:%02i:%02i", timeStruct.tm_year + 1900, timeStruct.tm_mon + 1, timeStruct.tm_mday,
+	return _FMT_("%04i-%02i-%02i_%02i:%02i:%02i", timeStruct.tm_year + 1900, timeStruct.tm_mon + 1, timeStruct.tm_mday,
 		timeStruct.tm_hour, timeStruct.tm_min, timeStruct.tm_sec);
 }
 
@@ -686,7 +686,7 @@ Result RenderD7::Init::Main(std::string app_name)
 	{
 		if (consoleModel != 3) gfxSetWide(true);
 	}
-
+	consoleInit(GFX_BOTTOM, NULL);
 	if (mt_dumpcsv)
 	{
 		mt_cname = csvpc;
@@ -697,9 +697,29 @@ Result RenderD7::Init::Main(std::string app_name)
 		strss << "sdmc:/" << csvpc << "/" << Date() << ".csv";
 		mt_cname = strss.str();*/
 		//mt_cname = "sdmc:/test.csv";
+		//Handle fileh;
 		std::cout << mt_cname << std::endl;
-		FILE* logfile = fopen((mt_cname.c_str()), "w");
-		fclose(logfile);
+		Result ret = FS_OpenArchive(&sdmc_archive, ARCHIVE_SDMC);
+		if (R_FAILED(ret))
+		{
+			std::cout <<"Failed Init sd!\n";
+		}
+		std::string moddedname = mt_cname;
+		moddedname.erase(0, 5);
+		std::cout << moddedname << std::endl;
+		
+
+		ret = FS_CreateFile(sdmc_archive, moddedname.c_str(), 0);
+		if (R_FAILED(ret))
+		{
+			std::cout <<"Failed To Create File!\n";
+		}
+		//FILE* logfile = fopen((mt_cname.c_str()), "w");
+		//fclose(logfile);
+		if ((access(mt_cname.c_str(), F_OK) == 0))
+		{
+			std::cout << "File Exist!" << std::endl;
+		}
 		mt_csv.open((mt_cname), std::ofstream::app);
 		mt_csv << "FPS,CPU,GPU,CMD\n";
 		mt_csv.close();
@@ -1194,7 +1214,7 @@ void RenderD7::AddOvl(std::unique_ptr<RenderD7::Ovl> overlay)
 	overlays.push(std::move(overlay));
 }
 
-/*RenderD7::Console::Console()
+RenderD7::Console::Console()
 {
     this->x = 0;
     this->y = 0;
@@ -1243,7 +1263,7 @@ bool RenderD7::Console::Update()
      bool dr_sc = true;
      return dr_sc;
 }
-*/
+
 
 std::string RenderD7::FormatString(std::string fmt_str, ...)
 {
