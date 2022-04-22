@@ -20,6 +20,7 @@ int maxobj__;
 //INI::INIFile cfgfile;
 std::unique_ptr<INI::INIFile> cfgfile = nullptr;
 INI::INIStructure cfgstruct;
+std::string cfgpath;
 
 // RD7 SuperReselution
 bool rd7_superreselution;
@@ -584,7 +585,7 @@ Result RenderD7::Init::Main(std::string app_name)
     if (cobj___){maxobj__ = cobj___;}
     if (!cobj___){maxobj__ = C2D_DEFAULT_MAX_OBJECTS;}
     D_app_name = app_name;
-    std::string cfgpath = "sdmc:/RenderD7/Apps/";
+    cfgpath = "sdmc:/RenderD7/Apps/";
     cfgpath += D_app_name;
 	mkdir("sdmc:/RenderD7/", 0777);
     mkdir("sdmc:/RenderD7/Apps", 0777);
