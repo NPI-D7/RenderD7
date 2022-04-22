@@ -690,7 +690,10 @@ Result RenderD7::Init::Main(std::string app_name)
 	if (mt_dumpcsv)
 	{
 		//mt_cname = csvpc + "/" + Date() + ".csv";
-		mt_cname = "sdmc:/" + Date() + ".csv";
+		std::stringstream strss;
+		strss << "sdmc:/" << csvpc << "/" << Date() << ".csv";
+		mt_cname = strss.str();
+		//mt_cname = "sdmc:/" + Date() + ".csv";
 		std::cout << mt_cname << std::endl;
 		FILE* logfile = fopen((mt_cname.c_str()), "w");
 		fclose(logfile);
@@ -738,7 +741,7 @@ void RenderD7::ToggleRD7SR()
 	RenderD7::OnScreen(Top);
 	C3D_FrameEnd(0);
 	// Toggle 400px/800px mode
-	gfxSetWide(!gfxIsWide());
+	gfxSetWide(gfxIsWide() ? false : true);
 	RenderD7::Init::Reload();
 }
 
@@ -1146,11 +1149,11 @@ void RenderD7::RSettings::Logic(u32 hDown, u32 hHeld, u32 hUp, touchPosition tou
 	rd7srstate = rd7_superreselution ? "true" : "false";
 	csvstate = mt_dumpcsv ? "true" : "false";
 	csvlstate = mt_csvloop ? "true" : "false";
-	if (RenderD7::touchTObj(d7_touch, buttons[0]))
+	if (d7_hDown & KEY_TOUCH && RenderD7::touchTObj(d7_touch, buttons[0]))
 	{
 		RenderD7::ToggleRD7SR();
 	}
-	if (RenderD7::touchTObj(d7_touch, buttons[1]))
+	if (d7_hDown & KEY_TOUCH && RenderD7::touchTObj(d7_touch, buttons[1]))
 	{
 		mt_dumpcsv = mt_dumpcsv ? false : true;
 		if (mt_dumpcsv)
@@ -1163,7 +1166,7 @@ void RenderD7::RSettings::Logic(u32 hDown, u32 hHeld, u32 hUp, touchPosition tou
 			mt_csv.close();
 		}
 	}
-	if (RenderD7::touchTObj(d7_touch, buttons[2]))
+	if (d7_hDown & KEY_TOUCH && RenderD7::touchTObj(d7_touch, buttons[2]))
 	{
 		mt_csvloop = mt_csvloop ? false : true;
 	}
