@@ -1033,22 +1033,23 @@ void RenderD7::FrameEnd()
 {
 	if (metrikd && !shouldbe_disabled)RenderD7::DrawMetrikOvl();
 	//OvlHandler();
-	if (d7_hHeld & KEY_R && d7_hDown & KEY_SELECT)
+	/*if (d7_hHeld & KEY_R && d7_hDown & KEY_SELECT)
 	{
 		RenderD7::LoadSettings();
-	}
+	}*/
 	
 	C3D_FrameEnd(0);
 }
 
 RenderD7::RSettings::RSettings()
 {
-
+	cfgfile = std::make_unique<INI::INIFile>(cfgpath+ "/config.ini");
+	cfgfile->read(cfgstruct);
 }
 
 RenderD7::RSettings::~RSettings()
 {
-
+	cfgfile->write(cfgstruct);
 }
 
 void RenderD7::RSettings::Draw(void) const
@@ -1072,6 +1073,7 @@ void RenderD7::RSettings::Logic(u32 hDown, u32 hHeld, u32 hUp, touchPosition tou
 	}
 	if (d7_hDown & KEY_B)
 	{
+		cfgfile->write(cfgstruct);
 		RenderD7::Scene::Back();
 	}
 	
