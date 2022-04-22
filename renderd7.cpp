@@ -64,6 +64,7 @@ bool metrikd = false;
 std::vector<int> mt_fpsgraph(320);
 
 //Metrik-CSV
+std::string csvpc
 bool mt_dumpcsv = false; //Logs the Fps and stuff to csv. It saves every second to not loose performence.
 bool mt_csvloop = false; //Saves In Every Frame but slows down performens. mt_dumpcsv must be enabled.
 std::ofstream mt_csv;
@@ -619,9 +620,13 @@ Result RenderD7::Init::Main(std::string app_name)
     D_app_name = app_name;
     cfgpath = "sdmc:/RenderD7/Apps/";
     cfgpath += D_app_name;
+	csvpc = "sdmc:/RenderD7/Apps/";
+	csvpc += D_app_name;
+	csvpc += "/mt";
 	mkdir("sdmc:/RenderD7/", 0777);
     mkdir("sdmc:/RenderD7/Apps", 0777);
     mkdir(cfgpath.c_str(), 0777);
+	mkdir(csvpc.c_str(), 0777);
 	bool renew = false;
 	if (FS::FileExist(cfgpath + "/config.ini"))
 	{
@@ -676,7 +681,7 @@ Result RenderD7::Init::Main(std::string app_name)
 
 	if (mt_dumpcsv)
 	{
-		mt_cname = cfgpath + Date() + ".csv";
+		mt_cname = csvpc + Date() + ".csv";
 		FILE* logfile = fopen((mt_cname.c_str()), "w");
 		fclose(logfile);
 		mt_csv.open((mt_cname), std::ofstream::app);
@@ -1140,7 +1145,7 @@ void RenderD7::RSettings::Logic(u32 hDown, u32 hHeld, u32 hUp, touchPosition tou
 		mt_dumpcsv = mt_dumpcsv ? false : true;
 		if (mt_dumpcsv)
 		{
-			mt_cname = cfgpath + Date() + ".csv";
+			mt_cname = csvpc + Date() + ".csv";
 			FILE* logfile = fopen((mt_cname.c_str()), "w");
 			fclose(logfile);
 			mt_csv.open((mt_cname), std::ofstream::app);
