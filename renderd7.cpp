@@ -78,13 +78,24 @@ C3D_RenderTarget* Bottom;
 #define DSEVENBLACK C2D_Color32(0, 0 ,0, 255)
 #define DSEVENWHITE C2D_Color32(255, 255, 255, 255)
 
+std::string _FMT_(const std::string& fmt_str, ...)
+{
+	va_list ap;
+	char* fp = NULL;
+	va_start(ap, fmt_str);
+	vasprintf(&fp, fmt_str.c_str(), ap);
+	va_end(ap);
+	std::unique_ptr<char, decltype(free)*> formatted(fp, free);
+	return std::string(formatted.get());
+}
+
 std::string Date(void)
 {
 	time_t unixTime;
 	struct tm timeStruct;
 	time(&unixTime);
 	localtime_r(&unixTime, &timeStruct);
-	return format("%04i-%02i-%02i %02i:%02i:%02i", timeStruct.tm_year + 1900, timeStruct.tm_mon + 1, timeStruct.tm_mday,
+	return _FMT_("%04i-%02i-%02i %02i:%02i:%02i", timeStruct.tm_year + 1900, timeStruct.tm_mon + 1, timeStruct.tm_mday,
 		timeStruct.tm_hour, timeStruct.tm_min, timeStruct.tm_sec);
 }
 
@@ -1109,7 +1120,7 @@ void RenderD7::RSettings::Draw(void) const
 	RenderD7::DrawText(0, 0, 0.7f, DSEVENWHITE, "RenderD7->Settings");
 	RenderD7::DrawText(0, 30, 0.7f, DSEVENBLACK, "RD7SR: " + rd7srstate);
 	RenderD7::DrawText(0, 50, 0.7f, DSEVENBLACK, "Metrik to Csv: " + csvstate);
-	RenderD7::DrawText(0, 70, 0.7f, DSEVENBLACK, "Metrik to Csv-Loop: " + csvlsstate);
+	RenderD7::DrawText(0, 70, 0.7f, DSEVENBLACK, "Metrik to Csv-Loop: " + csvlstate);
 	RenderD7::OnScreen(Bottom);
 	RenderD7::DrawRect(0, 0, 320, 240, RenderD7::Color::Hex("#eeeeee"));
 	RenderD7::DrawTObjects(buttons, RenderD7::Color::Hex("#111111"), RenderD7::Color::Hex("#eeeeee"));
