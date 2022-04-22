@@ -279,7 +279,7 @@ u32 RenderD7::Color::Hex(const std::string color, u8 a)
 	return RGBA8(r, g, b, a);
 }
 
-std::string RenderD7::RGB2Hex(int r, int g, int b)
+std::string RenderD7::Color::RGB2Hex(int r, int g, int b)
 {
   	std::stringstream ss;
   	ss << "#";
