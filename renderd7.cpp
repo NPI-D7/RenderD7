@@ -1166,6 +1166,7 @@ void RenderD7::RSettings::Logic(u32 hDown, u32 hHeld, u32 hUp, touchPosition tou
 	rd7srstate = rd7_superreselution ? "true" : "false";
 	csvstate = mt_dumpcsv ? "true" : "false";
 	csvlstate = mt_csvloop ? "true" : "false";
+	fpsstate = d11framerate;
 	if (d7_hDown & KEY_TOUCH && RenderD7::touchTObj(d7_touch, buttons[0]))
 	{
 		RenderD7::ToggleRD7SR();
