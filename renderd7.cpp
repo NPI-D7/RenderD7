@@ -950,6 +950,11 @@ void RenderD7::Image::LoadPFromBuffer(const std::vector<u8> &buffer)
 	}
 }
 
+void RenderD7::Image::FromSheet(RenderD7::Sheet sheet, size_t index)
+{
+	
+}
+
 bool RenderD7::DrawImage(C2D_Image img, float x, float y, float scaleX, float scaleY)
 {
 	return C2D_DrawImageAt(img, x, y, 0.5f, nullptr, scaleX, scaleY);

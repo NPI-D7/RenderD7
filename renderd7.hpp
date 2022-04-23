@@ -109,6 +109,8 @@ namespace RenderD7
         /// \brief Get The Image
         /// \return C2D_Image
         C2D_Image Get(){return this->img;}
+
+        void FromSheet(RenderD7::Sheet sheet, size_t index);
         /// \param img this is the C2D_Image
         C2D_Image img;
         /// \param loadet whether the image is loadet or not
