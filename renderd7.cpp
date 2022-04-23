@@ -972,7 +972,7 @@ static bool C3DTexToC2DImage(C2D_Image *texture, u32 width, u32 height, u8 *buf)
     // RGBA -> ABGR
     for (u32 row = 0; row < subtex->width; row++) {
         for (u32 col = 0; col < subtex->height; col++) {
-            u32 z = (row + col * subtex->width) * BYTES_PER_PIXEL;
+            u32 z = (row + col * subtex->width) * 4;
             
             u8 r = *(u8 *)(buf + z);
             u8 g = *(u8 *)(buf + z + 1);
@@ -999,9 +999,9 @@ static bool C3DTexToC2DImage(C2D_Image *texture, u32 width, u32 height, u8 *buf)
     
     for (u32 x = 0; x < subtex->width; x++) {
         for (u32 y = 0; y < subtex->height; y++) {
-            u32 dst_pos = ((((y >> 3) * (w_pow2 >> 3) + (x >> 3)) << 6) + ((x & 1) | ((y & 1) << 1) | ((x & 2) << 1) | ((y & 2) << 2) | ((x & 4) << 2) | ((y & 4) << 3))) * BYTES_PER_PIXEL;
-            u32 src_pos = (y * subtex->width + x) * BYTES_PER_PIXEL;
-            std::memcpy(&(static_cast<u8 *>(tex->data))[dst_pos], &(static_cast<u8 *>(buf))[src_pos], BYTES_PER_PIXEL);
+            u32 dst_pos = ((((y >> 3) * (w_pow2 >> 3) + (x >> 3)) << 6) + ((x & 1) | ((y & 1) << 1) | ((x & 2) << 1) | ((y & 2) << 2) | ((x & 4) << 2) | ((y & 4) << 3))) * 4;
+            u32 src_pos = (y * subtex->width + x) * 4;
+            std::memcpy(&(static_cast<u8 *>(tex->data))[dst_pos], &(static_cast<u8 *>(buf))[src_pos], 4);
         }
     }
     
