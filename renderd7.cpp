@@ -1162,8 +1162,11 @@ std::string Kbd(int lenght, SwkbdType tp)
 	RenderD7::FrameEnd();
 	SwkbdState state;
 	char temp[lenght + 1] = { 0 };
+	
 	swkbdInit(&state, SwkbdType::SWKBD_TYPE_NUMPAD, 2, lenght);
+	swkbdSetValidation(&state, SWKBD_NOTBLANK_NOTEMPTY, SWKBD_FILTER_PROFANITY, 0);
 	SwkbdButton ret = swkbdInputText(&state, temp, sizeof(temp));
+	temp[maxLength] = '\0';
 	return (ret == SWKBD_BUTTON_CONFIRM ? temp : "60");
 }
 void RenderD7::RSettings::Logic(u32 hDown, u32 hHeld, u32 hUp, touchPosition touch)
