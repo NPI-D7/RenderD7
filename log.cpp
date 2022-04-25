@@ -19,7 +19,7 @@ std::string Log::logDate(void)
 	struct tm timeStruct;
 	time(&unixTime);
 	localtime_r(&unixTime, &timeStruct);
-	return format("%04i-%02i-%02i %02i:%02i:%02i", timeStruct.tm_year + 1900, timeStruct.tm_mon + 1, timeStruct.tm_mday,
+	return format("%04i-%02i-%02i_%02i-%02i-%02i", timeStruct.tm_year + 1900, timeStruct.tm_mon + 1, timeStruct.tm_mday,
 		timeStruct.tm_hour, timeStruct.tm_min, timeStruct.tm_sec);
 }
 
