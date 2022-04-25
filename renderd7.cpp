@@ -1213,10 +1213,10 @@ void RenderD7::RSettings::Draw(void) const
 	RenderD7::DrawText(0, 50, 0.7f, DSEVENBLACK, "Metrik to Csv: " + csvstate);
 	RenderD7::DrawText(0, 70, 0.7f, DSEVENBLACK, "Metrik Overlay: " + mtovlstate);
 	RenderD7::DrawText(0, 90, 0.7f, DSEVENBLACK, "Force FPS: " + fpsstate);
-	RenderD7::DrawText(0, 110, 0.7f, DSEVENBLACK, "Metrik BG RGB: " + mtcolstate);
-	RenderD7::DrawText(0, 130, 0.7f, DSEVENBLACK, "Metrik Text RGB: " + mttxtcolstate);
+	RenderD7::DrawText(0, 110, 0.7f, DSEVENBLACK, "Metrik Screen: " + mtscreenstate);
+	/*RenderD7::DrawText(0, 130, 0.7f, DSEVENBLACK, "Metrik Text RGB: " + mttxtcolstate);
 	RenderD7::DrawText(0, 150, 0.7f, DSEVENBLACK, "Metrik Alpha: " + mtcola);
-	RenderD7::DrawText(0, 170, 0.7f, DSEVENBLACK, "Metrik Text Alpha: " + mttxtcola);
+	RenderD7::DrawText(0, 170, 0.7f, DSEVENBLACK, "Metrik Text Alpha: " + mttxtcola);*/
 	RenderD7::OnScreen(Bottom);
 	std::string verc = "Config Version: ";
 	verc += CFGVER;
@@ -1241,10 +1241,12 @@ void RenderD7::RSettings::Logic(u32 hDown, u32 hHeld, u32 hUp, touchPosition tou
 	rd7srstate = rd7_superreselution ? "true" : "false";
 	csvstate = mt_dumpcsv ? "true" : "false";
 	mtovlstate = metrikd ? "true" : "false";
-	fpsstate = d11framerate;
+	fpsstate = cfgstruct["settings"]["forceFrameRate"];
+	mtscreenstate = mt_screen ? "Top" : "Bottom";
 	if (d7_hDown & KEY_TOUCH && RenderD7::touchTObj(d7_touch, buttons[0]))
 	{
 		RenderD7::ToggleRD7SR();
+		cfgstruct["settings"]["super-reselution"] = rd7_superreselution ? "1" : "0";
 	}
 	if (d7_hDown & KEY_TOUCH && RenderD7::touchTObj(d7_touch, buttons[1]))
 	{
@@ -1266,6 +1268,7 @@ void RenderD7::RSettings::Logic(u32 hDown, u32 hHeld, u32 hUp, touchPosition tou
 	if (d7_hDown & KEY_TOUCH && RenderD7::touchTObj(d7_touch, buttons[2]))
 	{
 		metrikd = metrikd ? false : true;
+		cfgstruct["metril-settings"]["enableoverlay"] = metrikd ? "1" : "0";
 	}
 	if (d7_hDown & KEY_TOUCH && RenderD7::touchTObj(d7_touch, buttons[3]))
 	{
