@@ -165,7 +165,7 @@ namespace RenderD7
     private:
         std::string rd7srstate = "false";
         std::string csvstate = "false";
-        std::string csvlstate = "false";
+        std::string mtovlstate = "false";
         std::string fpsstate = "60";
         std::string mtcolstate = "#000000";
         std::string mttxtcolstate = "#ffffff";
@@ -177,7 +177,7 @@ namespace RenderD7
         {
             {20, 35, 120, 35, "RD7SR", -11, 10},
             {20, 85, 120, 35, "MT_CSV", -15, 9},
-            {20, 135, 120, 35, "MT_CSV-L", -19, 10},
+            {20, 135, 120, 35, "MT_OVL", -19, 10},
             {20, 185, 120, 35, "FPS", 6, 10},
             {180, 35, 120, 35, "MTCOL", -10, 10},
             {180, 85, 120, 35, "MTTEXT", -13, 10},

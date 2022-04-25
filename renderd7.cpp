@@ -742,6 +742,7 @@ void RenderD7::ToggleRD7SR()
 	C3D_FrameEnd(0);
 	// Toggle 400px/800px mode
 	gfxSetWide(gfxIsWide() ? false : true);
+	rd7_superreselution = gfxIsWide();
 	RenderD7::Init::Reload();
 }
 
@@ -1210,7 +1211,7 @@ void RenderD7::RSettings::Draw(void) const
 	RenderD7::DrawTextLeft(400, 0, 0.7f, RenderD7::Color::Hex("#ffffff"), RENDERD7VSTRING);
 	RenderD7::DrawText(0, 30, 0.7f, DSEVENBLACK, "RD7SR: " + rd7srstate);
 	RenderD7::DrawText(0, 50, 0.7f, DSEVENBLACK, "Metrik to Csv: " + csvstate);
-	RenderD7::DrawText(0, 70, 0.7f, DSEVENBLACK, "Metrik to Csv-Loop: " + csvlstate);
+	RenderD7::DrawText(0, 70, 0.7f, DSEVENBLACK, "Metrik Overlay: " + mtovlstate);
 	RenderD7::DrawText(0, 90, 0.7f, DSEVENBLACK, "Force FPS: " + fpsstate);
 	RenderD7::DrawText(0, 110, 0.7f, DSEVENBLACK, "Metrik BG RGB: " + mtcolstate);
 	RenderD7::DrawText(0, 130, 0.7f, DSEVENBLACK, "Metrik Text RGB: " + mttxtcolstate);
@@ -1239,7 +1240,7 @@ void RenderD7::RSettings::Logic(u32 hDown, u32 hHeld, u32 hUp, touchPosition tou
 {
 	rd7srstate = rd7_superreselution ? "true" : "false";
 	csvstate = mt_dumpcsv ? "true" : "false";
-	csvlstate = mt_csvloop ? "true" : "false";
+	mtovlstate = metrikd ? "true" : "false";
 	fpsstate = d11framerate;
 	if (d7_hDown & KEY_TOUCH && RenderD7::touchTObj(d7_touch, buttons[0]))
 	{
@@ -1264,7 +1265,7 @@ void RenderD7::RSettings::Logic(u32 hDown, u32 hHeld, u32 hUp, touchPosition tou
 	}
 	if (d7_hDown & KEY_TOUCH && RenderD7::touchTObj(d7_touch, buttons[2]))
 	{
-		mt_csvloop = mt_csvloop ? false : true;
+		metrikd = metrikd ? false : true;
 	}
 	if (d7_hDown & KEY_TOUCH && RenderD7::touchTObj(d7_touch, buttons[3]))
 	{
