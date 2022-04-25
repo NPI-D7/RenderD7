@@ -28,6 +28,7 @@ u8 consoleModel = 0;
 u8 sysRegion = CFG_REGION_USA;
 bool is_citra = false;
 //---------------------------------------
+bool rd7settings = false;
 
 std::string D_app_name;
 
@@ -803,7 +804,7 @@ void RenderD7::DrawTLBtns(std::vector<RenderD7::TLBtn> btns, u32 color, int sele
 
 void RenderD7::ExitApp()
 {
-	running = false;
+	if (!rd7settings) running = false;
 }
 
 bool RenderD7::touchTObj(touchPosition touch, RenderD7::TObject button)
@@ -1195,6 +1196,7 @@ RenderD7::RSettings::RSettings()
 {
 	cfgfile = std::make_unique<INI::INIFile>(cfgpath+ "/config.ini");
 	cfgfile->read(cfgstruct);
+	rd7settings = true;
 }
 
 RenderD7::RSettings::~RSettings()
@@ -1274,9 +1276,15 @@ void RenderD7::RSettings::Logic(u32 hDown, u32 hHeld, u32 hUp, touchPosition tou
 	{
 		cfgstruct["settings"]["forceFrameRate"] = Kbd(2, SWKBD_TYPE_NUMPAD);
 	}
+	if (d7_hDown & KEY_TOUCH && RenderD7::touchTObj(d7_touch, buttons[4]))
+	{
+		mt_screen = mt_screen ? 0 : 1;
+		cfgstruct["settings"]["forceFrameRate"] = mt_screen ? "1" : "0";
+	}
 	if (d7_hDown & KEY_B)
 	{
 		cfgfile->write(cfgstruct);
+		rd7settings = false;
 		RenderD7::Scene::Back();
 	}
 	
