@@ -1244,7 +1244,7 @@ void RenderD7::RSettings::Logic(u32 hDown, u32 hHeld, u32 hUp, touchPosition tou
 	csvstate = mt_dumpcsv ? "true" : "false";
 	mtovlstate = metrikd ? "true" : "false";
 	fpsstate = cfgstruct["settings"]["forceFrameRate"];
-	mtscreenstate = mt_screen ? "Top" : "Bottom";
+	mtscreenstate = mt_screen ? "Bottom" : "Top";
 	if (d7_hDown & KEY_TOUCH && RenderD7::touchTObj(d7_touch, buttons[0]))
 	{
 		RenderD7::ToggleRD7SR();
@@ -1279,7 +1279,7 @@ void RenderD7::RSettings::Logic(u32 hDown, u32 hHeld, u32 hUp, touchPosition tou
 	if (d7_hDown & KEY_TOUCH && RenderD7::touchTObj(d7_touch, buttons[4]))
 	{
 		mt_screen = mt_screen ? 0 : 1;
-		cfgstruct["settings"]["forceFrameRate"] = mt_screen ? "1" : "0";
+		cfgstruct["metrik-settings"]["screen"] = mt_screen ? "1" : "0";
 	}
 	if (d7_hDown & KEY_B)
 	{
