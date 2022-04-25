@@ -1270,7 +1270,7 @@ void RenderD7::RSettings::Logic(u32 hDown, u32 hHeld, u32 hUp, touchPosition tou
 	if (d7_hDown & KEY_TOUCH && RenderD7::touchTObj(d7_touch, buttons[2]))
 	{
 		metrikd = metrikd ? false : true;
-		cfgstruct["metril-settings"]["enableoverlay"] = metrikd ? "1" : "0";
+		cfgstruct["metrik-settings"]["enableoverlay"] = metrikd ? "1" : "0";
 	}
 	if (d7_hDown & KEY_TOUCH && RenderD7::touchTObj(d7_touch, buttons[3]) && !metrikd)
 	{
