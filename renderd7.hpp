@@ -33,7 +33,7 @@ extern "C"
     #include "external/fs.h"
 }
 
-#define RENDERD7VSTRING "0.7.2"
+#define RENDERD7VSTRING "0.7.3"
 #define CHANGELOG "0.7.2: Implement MT to csv file saving. Add RGB2HEX. \n0.7.1: Add the New Overlay Handler. Its Just in code and does nothing yet. \n0.7.0: Made Big Progress In the MT Ovl but it still crashes On a Scnd C3D_FrameEnd(). Implement 800px but doesn't work that good. \n0.6.2: Fix Crash when exiting trouth Home Menu.  \n0.6.10: rewrite Threadsystem, Improve framerate\n0.6.02: Fix Code in lang.hpp\nadd Draw Text Left Function.\nadd changelog\n0.6.01: add Threading system."
 #define DEFAULT_CENTER 0.5f
 
@@ -179,7 +179,7 @@ namespace RenderD7
             {20, 85, 120, 35, "MT_CSV", -15, 9},
             {20, 135, 120, 35, "MT_OVL", -19, 10},
             {20, 185, 120, 35, "FPS", 6, 10},
-            {180, 35, 120, 35, "MTSCREEN", -21, 10},
+            {180, 35, 120, 35, "MTSCREEN", -26, 10},
             {180, 85, 120, 35, "", -13, 10},
             {180, 135, 120, 35, "", 2, 10},
             {180, 185, 120, 35, "", -13, 10}

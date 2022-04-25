@@ -1245,7 +1245,7 @@ void RenderD7::RSettings::Logic(u32 hDown, u32 hHeld, u32 hUp, touchPosition tou
 	mtovlstate = metrikd ? "true" : "false";
 	fpsstate = cfgstruct["settings"]["forceFrameRate"];
 	mtscreenstate = mt_screen ? "Bottom" : "Top";
-	if (d7_hDown & KEY_TOUCH && RenderD7::touchTObj(d7_touch, buttons[0]))
+	if (d7_hDown & KEY_TOUCH && RenderD7::touchTObj(d7_touch, buttons[0]) && !metrikd)
 	{
 		RenderD7::ToggleRD7SR();
 		cfgstruct["settings"]["super-reselution"] = rd7_superreselution ? "1" : "0";
@@ -1272,7 +1272,7 @@ void RenderD7::RSettings::Logic(u32 hDown, u32 hHeld, u32 hUp, touchPosition tou
 		metrikd = metrikd ? false : true;
 		cfgstruct["metril-settings"]["enableoverlay"] = metrikd ? "1" : "0";
 	}
-	if (d7_hDown & KEY_TOUCH && RenderD7::touchTObj(d7_touch, buttons[3]))
+	if (d7_hDown & KEY_TOUCH && RenderD7::touchTObj(d7_touch, buttons[3]) && !metrikd)
 	{
 		cfgstruct["settings"]["forceFrameRate"] = Kbd(2, SWKBD_TYPE_NUMPAD);
 	}
