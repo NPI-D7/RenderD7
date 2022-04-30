@@ -243,12 +243,14 @@ namespace RenderD7
     {
         Result Main(std::string app_name = "RD7Game");
         Result Reload();
+        void Graphics();
         void NdspFirm(bool useit = false);
     }
     namespace Exit
     {
         void Main();
         void NdspFirm();
+        void Graphics();
     }
     namespace Msg
     {

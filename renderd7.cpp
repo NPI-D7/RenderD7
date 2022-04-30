@@ -607,6 +607,26 @@ void MetrikThread(RenderD7::Parameter param) {
         RenderD7::Thread::sleep(1000 * 1); // wait; also, this is needed to allow for concurrency (refer to the documentation for m3d::Thread::sleep())
     }
 }
+
+void RenderD7::Init::Graphics()
+{
+	C3D_Init(C3D_DEFAULT_CMDBUF_SIZE);
+	C2D_Init(size_t(maxobj__));
+	C2D_Prepare();
+	Top = C2D_CreateScreenTarget(GFX_TOP, GFX_LEFT);
+	TopRight = C2D_CreateScreenTarget(GFX_TOP, GFX_RIGHT);
+	Bottom = C2D_CreateScreenTarget(GFX_BOTTOM, GFX_LEFT);
+	TextBuf = C2D_TextBufNew(4096);
+	Font = C2D_FontLoadSystem(CFG_REGION_USA);
+}
+
+void RenderD7::Exit::Graphics()
+{
+	C2D_TextBufDelete(TextBuf);
+	C2D_Fini();
+	C3D_Fini();
+}
+
 Result RenderD7::Init::Main(std::string app_name)
 {
     gfxInitDefault();
