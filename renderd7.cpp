@@ -80,6 +80,12 @@ C3D_RenderTarget* Bottom;
 #define DSEVENBLACK C2D_Color32(0, 0 ,0, 255)
 #define DSEVENWHITE C2D_Color32(255, 255, 255, 255)
 
+//Screen Fade
+bool fadeout = false, fadein = false, fadeout2 = false, fadein2 = false;
+int fadealpha = 0;
+int fadecolor = 0;
+
+
 std::string _FMT_(const std::string& fmt_str, ...)
 {
 	va_list ap;
@@ -298,7 +304,7 @@ void RenderD7::Scene::doLogic(u32 hDown, u32 hHeld, u32 hUp, touchPosition touch
 		RenderD7::Scene::scenes.top()->Logic(hDown, hHeld, hUp, touch);
 }
 
-void RenderD7::Scene::Load(std::unique_ptr<Scene> scene)
+void RenderD7::Scene::Load(std::unique_ptr<Scene> scene, bool fade)
 { 
 	Scene::scenes.push(std::move(scene));
 }

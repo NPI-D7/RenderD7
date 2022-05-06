@@ -153,7 +153,7 @@ namespace RenderD7
     	virtual void Logic(u32 hDown, u32 hHeld, u32 hUp, touchPosition touch) = 0;
     	virtual void Draw() const = 0;
         //virtual void Ovl() const = 0;
-        static void Load(std::unique_ptr<Scene> scene);
+        static void Load(std::unique_ptr<Scene> scene, bool fade = false);
         static void Back();
         static void doDraw();
         static void doLogic(u32 hDown, u32 hHeld, u32 hUp, touchPosition touch);
