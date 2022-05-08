@@ -839,6 +839,12 @@ bool RenderD7::touchTObj(touchPosition touch, RenderD7::TObject button)
     else	return false;
 }
 
+bool RenderD7::touchTLBtn(touchPosition touch, RenderD7::TLBtn button)
+{
+   if (touch.px >= button.x && touch.px <= (button.x + button.w) && touch.py >= button.y && touch.py <= (button.y + button.h))	return true;
+    else	return false;
+}
+
 int RenderD7::GetRandomInt(int b, int e)
 {
 	std::default_random_engine generator;
