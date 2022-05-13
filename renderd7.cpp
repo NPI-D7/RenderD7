@@ -155,6 +155,7 @@ void RenderD7::Init::NdspFirm(bool useit)
         {
 			dspststus = "Not found: dspfirm.cdc";
             renderd7log.Write("RenderD7: SoundEngine Error! ndspfirm not found!");
+			RenderD7::AddOvl(std::make_unique<RenderD7::DSP_NF>());
         }
     }
 }
@@ -740,7 +741,6 @@ Result RenderD7::Init::Main(std::string app_name)
 		mt_csv << "FPS,CPU,GPU,CMD\n";
 		mt_csv.close();
 	}
-	RenderD7::AddOvl(std::make_unique<RenderD7::DSP_NF>());
 	
     C3D_Init(C3D_DEFAULT_CMDBUF_SIZE);
 	C2D_Init(size_t(maxobj__));
@@ -774,6 +774,8 @@ Result RenderD7::Init::Reload()
 
 void RenderD7::ToggleRD7SR()
 {
+	shouldbe_disabled = true;
+	cnttttt = 0;
 	// Display black screen
 	C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
 	C2D_TargetClear(Top, RenderD7::Color::Hex("#000000"));
