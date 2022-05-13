@@ -57,6 +57,7 @@ std::string mt_gpu;
 std::string mt_cmd;
 
 bool shouldbe_disabled = false;
+int cnttttt = 0;
 int mt_screen;
 //int mt_width = mt_screen ? 320 : 400;
 float mt_txtSize;
@@ -167,6 +168,7 @@ void RenderD7::Exit::NdspFirm()
 void RenderD7::Msg::Display(std::string titletxt, std::string subtext, C3D_RenderTarget *target)
 {
 	shouldbe_disabled = true;
+	cnttttt = 0;
 	C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
 	C2D_TargetClear(Top, DSEVENBLACK);
 	C2D_TargetClear(Bottom, DSEVENBLACK);
@@ -180,11 +182,11 @@ void RenderD7::Msg::Display(std::string titletxt, std::string subtext, C3D_Rende
     RenderD7::DrawText(5, 2, 0.7f, DSEVENWHITE, titletxt);
 	RenderD7::DrawText(5, 30, 0.6f, DSEVENWHITE, subtext);
 	C3D_FrameEnd(0);
-	shouldbe_disabled = false;
 }
 void RenderD7::Msg::DisplayWithProgress(std::string titletext, std::string subtext, float current, float total, u32 prgbarcolor)
 {
 	shouldbe_disabled = true;
+	cnttttt = 0;
 	RenderD7::ClearTextBufs();
 	C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
 	C2D_TargetClear(Top, DSEVENBLACK);
@@ -202,7 +204,6 @@ void RenderD7::Msg::DisplayWithProgress(std::string titletext, std::string subte
 	RenderD7::OnScreen(Bottom);
 	RenderD7::DrawRect(0, 0, 320, 240, RenderD7::Color::Hex("#111111"));
 	C3D_FrameEnd(0);
-	shouldbe_disabled = false;
 }
 void RenderD7::SetupLog()
 {
@@ -239,6 +240,7 @@ void RenderD7::SpriteSheetAnimation::Play(float timespeed)
 void RenderD7::Error::DisplayError(std::string toptext, std::string errortext, int timesec)
 {
 	shouldbe_disabled = true;
+	cnttttt = 0;
     RenderD7::ClearTextBufs();
 	C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
 	C2D_TargetClear(Top, DSEVENBLACK);
@@ -250,12 +252,17 @@ void RenderD7::Error::DisplayError(std::string toptext, std::string errortext, i
     for (int i = 0; i < 60*timesec; i++) {
 		RenderD7::DrawRect(0, 236, (int)(((float)i / (float)60*timesec) * 400.0f), 4, RenderD7::Color::Hex("#00ff00"));
 		gspWaitForVBlank();
+		if (i == 60*timesec) shouldbe_disabled = false;
+		{
+			/* code */
+		}
+		
 	}
-	shouldbe_disabled = false;
 }
 void RenderD7::Error::DisplayFatalError(std::string toptext, std::string errortext)
 {
 	shouldbe_disabled = true;
+	cnttttt = 0;
 	bool error___ = true;
 	RenderD7::ClearTextBufs();
 	C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
@@ -273,7 +280,6 @@ void RenderD7::Error::DisplayFatalError(std::string toptext, std::string errorte
 			RenderD7::ExitApp();
 		}
     }
-	shouldbe_disabled = false;
 }
 u32 RenderD7::Color::Hex(const std::string color, u8 a)
 {
@@ -360,7 +366,13 @@ bool RenderD7::MainLoop()
     frameloop();
     RenderD7::Scene::doDraw();
     RenderD7::Scene::doLogic(d7_hDown, d7_hHeld, d7_hUp, d7_touch);
-    
+    cnttttt++;
+	if (cnttttt > 90)
+	{
+		shouldbe_disabled = false;
+		cnttttt = 0;
+	}
+	
     return running;
 }
 
@@ -1154,55 +1166,44 @@ void RenderD7::DSP_NF::Draw(void) const
 {
 	RenderD7::OnScreen(Top);
 	RenderD7::DrawRect(0, msgposy, 400, 70, RenderD7::Color::Hex("#111111"));
-	RenderD7::DrawRect(0, 0, 20, 20, RenderD7::Color::Hex("#cccccc"));
+	RenderD7::DrawRect(0, msgposy, 400, 25, RenderD7::Color::Hex("#222222"));
+	RenderD7::DrawText(2, msgposy+5, 0.7f, RenderD7::Color::Hex("#ffffff"), "Warning! Code: 00027");
+	RenderD7::DrawText(2, msgposy+30, 0.6f, RenderD7::Color::Hex("#ffffff"), "You cant use Sound effects because the file\n<<sdmc:/3ds/dspfirm.cdc>> was not found!");
 }
 
 void RenderD7::DSP_NF::Logic()
 {
-	for (int i = 0; i < 10*60; i++)
+	this->delay++;
+	if (msgposy > 170 && delay < 5*60) msgposy--;
+	
+	if (delay >= 5*60)
 	{
-		msgposy--;
-		if (msgposy < 240 - 70)
-		{
-			msgposy = 240 - 70;
-		}
+		msgposy++;
+		if(msgposy > 400) this->Kill();
 	}
-	this->Kill();
 }
 
 void OvlHandler()
 {
-	//for (int i = 0; i < (int)overlays.size(); i++)
-	//{
-		/*if (!overlays[i].IsKilled())
-		{
-			overlays[i].Draw();
-			overlays[i].Logic();
-		}
-		if (overlays[i].IsKilled())
-		{
-			overlays.erase(overlays.begin() + i);
-		}*/
-		if (!overlays.empty())
-		{
-			overlays.top()->Draw();
-		}
-		if (!overlays.empty())
-		{
-			overlays.top()->Logic();
-		}
-		if (!overlays.empty())
-		{
-			if (overlays.top()->IsKilled()) overlays.pop(); 
-		}
-	//}
+	if (!overlays.empty())
+	{
+		overlays.top()->Draw();
+	}
+	if (!overlays.empty())
+	{
+		overlays.top()->Logic();
+	}
+	if (!overlays.empty())
+	{
+		if (overlays.top()->IsKilled()) overlays.pop(); 
+	}
 	
 }
 int lp = 0;
 void RenderD7::FrameEnd()
 {
 	if (metrikd && !shouldbe_disabled)RenderD7::DrawMetrikOvl();
-	//OvlHandler();
+	if (!shouldbe_disabled) OvlHandler();
 	/*if (d7_hHeld & KEY_R && d7_hDown & KEY_SELECT)
 	{
 		RenderD7::LoadSettings();
@@ -1312,6 +1313,10 @@ void RenderD7::RSettings::Logic(u32 hDown, u32 hHeld, u32 hUp, touchPosition tou
 	{
 		mt_screen = mt_screen ? 0 : 1;
 		cfgstruct["metrik-settings"]["screen"] = mt_screen ? "1" : "0";
+	}
+	if (d7_hDown & KEY_TOUCH && RenderD7::touchTObj(d7_touch, buttons[5]))
+	{
+		RenderD7::AddOvl(std::make_unique<RenderD7::DSP_NF>());
 	}
 	if (d7_hDown & KEY_B)
 	{
