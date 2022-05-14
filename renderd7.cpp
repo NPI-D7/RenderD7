@@ -261,10 +261,7 @@ void RenderD7::Error::DisplayError(std::string toptext, std::string errortext, i
     for (int i = 0; i < 60*timesec; i++) {
 		RenderD7::DrawRect(0, 236, (int)(((float)i / (float)60*timesec) * 400.0f), 4, RenderD7::Color::Hex("#00ff00"));
 		gspWaitForVBlank();
-		if (i == 60*timesec) shouldbe_disabled = false;
-		{
-			/* code */
-		}
+		
 		
 	}
 }
