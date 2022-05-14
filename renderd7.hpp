@@ -19,6 +19,7 @@
 #include <filesystem>
 #include <locale>
 #include "external/lodepng.h"
+#include <time.h>
 
 #include <codecvt>
 #include "lang.hpp"
@@ -51,6 +52,7 @@ extern std::string dspststus;
 /// RenderD7
 namespace RenderD7
 {
+    float GetDeltaTime();
     enum kbd{
          SWKBD,
          BKBD

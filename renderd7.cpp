@@ -81,6 +81,8 @@ C3D_RenderTarget* Bottom;
 #define DSEVENBLACK C2D_Color32(0, 0 ,0, 255)
 #define DSEVENWHITE C2D_Color32(255, 255, 255, 255)
 
+u64 delta_time;
+
 //Screen Fade
 bool fadeout = false, fadein = false, fadeout2 = false, fadein2 = false;
 int fadealpha = 0;
@@ -130,6 +132,12 @@ RenderD7::SpriteSheetAnimation::~SpriteSheetAnimation()
 {
     //
 }
+
+float RenderD7::GetDeltaTime()
+{
+	return delta_time;
+}
+
 bool RenderD7::DrawImageFromSheet(RenderD7::Sheet* sheet, size_t index, float x, float y, float scaleX, float scaleY)
 {
     if (sheet->spritesheet != nullptr)
@@ -330,7 +338,7 @@ void RenderD7::OnScreen(C3D_RenderTarget *target)
 void frameloop()
 {
 	frames++;
-	u64 delta_time = osGetTime() - last_time;
+	delta_time = osGetTime() - last_time;
 	if (delta_time >= 1000) {
 		current_fps = frames/(delta_time/1000.0f)+1;
 		frames = 0;
@@ -1175,12 +1183,12 @@ void RenderD7::DSP_NF::Draw(void) const
 
 void RenderD7::DSP_NF::Logic()
 {
-	this->delay++;
-	if (msgposy > 170 && delay < 5*60) msgposy--;
+	this->delay++/*=(int)RenderD7::GetDeltaTime()*/;
+	if (msgposy > 170 && delay < 5*60) msgposy--/*=(int)RenderD7::GetDeltaTime()*/;
 	
 	if (delay >= 5*60)
 	{
-		msgposy++;
+		msgposy++/*=(int)RenderD7::GetDeltaTime*/;
 		if(msgposy > 400) this->Kill();
 	}
 }
