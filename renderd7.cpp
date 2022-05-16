@@ -1177,8 +1177,8 @@ void RenderD7::DSP_NF::Draw(void) const
 	RenderD7::OnScreen(Top);
 	RenderD7::DrawRect(0, msgposy, 400, 70, RenderD7::Color::Hex("#111111"));
 	RenderD7::DrawRect(0, msgposy, 400, 25, RenderD7::Color::Hex("#222222"));
-	RenderD7::DrawText(2, msgposy+5, 0.7f, RenderD7::Color::Hex("#ffffff"), "Warning! Code: 00027");
-	RenderD7::DrawText(2, msgposy+30, 0.6f, RenderD7::Color::Hex("#ffffff"), "You cant use Sound effects because the file\n<<sdmc:/3ds/dspfirm.cdc>> was not found!");
+	RenderD7::DrawText(2, msgposy+3, 0.7f, RenderD7::Color::Hex("#ffffff"), "Warning! Code: 00027");
+	RenderD7::DrawText(2, msgposy+30, 0.6f, RenderD7::Color::Hex("#ffffff"), "You can't use Sound effects because the file\n<<sdmc:/3ds/dspfirm.cdc>> was not found!");
 }
 
 void RenderD7::DSP_NF::Logic()
