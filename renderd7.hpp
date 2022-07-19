@@ -96,6 +96,9 @@ namespace RenderD7
     class Image
     {
         public:
+        ~Image();
+
+        void Unload();
         /// Load Image from Png
         /// \param path path to png file
         void LoadPng(const std::string path);

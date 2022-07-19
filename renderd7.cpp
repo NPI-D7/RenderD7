@@ -970,6 +970,16 @@ void RenderD7::Image::LoadPng(const std::string path)
 	loadet = true;
 }
 
+RenderD7::Image::~Image()
+{
+	C3D_TexDelete(img.tex);
+}
+
+void RenderD7::Image::Unload()
+{
+	C3D_TexDelete(img.tex);
+}
+
 void RenderD7::Image::LoadPFromBuffer(const std::vector<u8> &buffer)
 {
 	std::vector<u8> ImageBuffer;
