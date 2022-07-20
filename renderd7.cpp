@@ -1421,68 +1421,72 @@ std::string RenderD7::GetTimeStr(void)
 	struct tm* timeStruct = gmtime((const time_t*)&unixTime);
 	return RenderD7::FormatString("%02i:%02i:%02i", timeStruct->tm_hour, timeStruct->tm_min, timeStruct->tm_sec);
 }
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
 
-unsigned Bitmap_to_C3D(C2D_Image img, const std::vector<unsigned char>& bmp) {
-  	static const unsigned MINHEADER = 54; //minimum BMP header size
+unsigned Image_to_C3D(C2D_Image img, const std::vector<unsigned char>& bmp) {
+  	stbi_uc *image = NULL;
+	int width = 0, height = 0;
 
-  	if(bmp.size() < MINHEADER) return -1;
-  	if(bmp[0] != 'B' || bmp[1] != 'M') return 1; //It's not a BMP file if it doesn't start with marker 'BM'
-  	unsigned pixeloffset = bmp[10] + 256 * bmp[11]; //where the pixel data starts
-  	//read width and height from BMP header
-  	unsigned w = bmp[18] + bmp[19] * 256;
-  	unsigned h = bmp[22] + bmp[23] * 256;
-  	//read number of channels from BMP header
-  	if(bmp[28] != 24 && bmp[28] != 32) return 2; //only 24-bit and 32-bit BMPs are supported.
-  	unsigned numChannels = bmp[28] / 8;
+	image = stbi_load_from_memory(bmp.data(), 4, &width, &height, NULL, STBI_ORDER_BGR);
 
-  	//The amount of scanline bytes is width of image times channels, with extra bytes added if needed
-  	//to make it a multiple of 4 bytes.
-  	unsigned scanlineBytes = w * numChannels;
-  	if(scanlineBytes % 4 != 0) scanlineBytes = (scanlineBytes / 4) * 4 + 4;
+	for (u32 row = 0; row < (u32)width; row++) {
+		for (u32 col = 0; col < (u32)height; col++) {
+			u32 z = (row + col * (u32)width) * 4;
 
-  	unsigned dataSize = scanlineBytes * h;
-  	if(bmp.size() < dataSize + pixeloffset) return 3; //BMP file too small to contain all pixels
+			u8 r = *(u8 *)(image + z);
+			u8 g = *(u8 *)(image + z + 1);
+			u8 b = *(u8 *)(image + z + 2);
+			u8 a = *(u8 *)(image + z + 3);
 
-  	img.tex = new C3D_Tex;
-	img.subtex = new Tex3DS_SubTexture({(u16)w, (u16)h, 0.0f, 1.0f, w / 1024.0f, 1.0f - (h / 1024.0f)});
-	C3D_TexInit(img.tex, 1024, 1024, GPU_RGBA8);
-	C3D_TexSetFilter(img.tex, GPU_LINEAR, GPU_LINEAR);
-	img.tex->border = 0xFFFFFFFF;
-	C3D_TexSetWrap(img.tex, GPU_CLAMP_TO_BORDER, GPU_CLAMP_TO_BORDER);
-  	/*
-  	There are 3 differences between BMP and the raw image buffer for LodePNG:
-  	-it's upside down
-  	-it's in BGR instead of RGB format (or BRGA instead of RGBA)
-  	-each scanline has padding bytes to make it a multiple of 4 if needed
-  	The 2D for loop below does all these 3 conversions at once.
-  	*/
-  	for(unsigned y = 0; y < h; y++)
-  	for(unsigned x = 0; x < w; x++) {
-  	  //pixel start byte position in the BMP
-  	  unsigned bmpos = pixeloffset + (h - y - 1) * scanlineBytes + numChannels * x;
-  	  //pixel start byte position in the new raw image
-  	  unsigned newpos = 4 * y * w + 4 * x;
-  	  if(numChannels == 3) {
-  	    ((u8*)img.tex->data)[newpos + 3] = bmp[bmpos + 2]; //R
-  	    ((u8*)img.tex->data)[newpos + 2] = bmp[bmpos + 1]; //G
-  	    ((u8*)img.tex->data)[newpos + 1] = bmp[bmpos + 0]; //B
-  	    ((u8*)img.tex->data)[newpos + 0] = 255;            //A
-  	  } else {
-  	    ((u8*)img.tex->data)[newpos + 3] = bmp[bmpos + 2]; //R
-  	    ((u8*)img.tex->data)[newpos + 2] = bmp[bmpos + 1]; //G
-  	    ((u8*)img.tex->data)[newpos + 1] = bmp[bmpos + 0]; //B
-  	    ((u8*)img.tex->data)[newpos + 0] = bmp[bmpos + 3]; //A
-  	  }
-  	}
-  	return 0;
+			*(image + z) = a;
+			*(image + z + 1) = b;
+			*(image + z + 2) = g;
+			*(image + z + 3) = r;
+		}
+	}
+
+	
+	C2D_Image* images;
+	bool error =  C3DTexToC2DImage(images, (u32)width, (u32)height, (u8*)image);
+	img.tex = images->tex;
+	img.subtex = images->subtex;
+  	return error;
 }
 
 void RenderD7::Image::LoadFromBitmap(BMP bitmap)
 {
-	unsigned error = Bitmap_to_C3D(this->img, bitmap.DATA());
+	unsigned error = Image_to_C3D(this->img, bitmap.DATA());
 
   if(error) {
     std::cout << "BMP decoding error " << error << std::endl;
-    RenderD7::DrawText(0, 0, 2.0f, RenderD7::Color::Hex("#000000"), "Error : " + std::to_string(error));
+    RenderD7::AddOvl(std::make_unique<RenderD7::Toast>("Bmp - Error", "Code: " + std::to_string(error)));
   }
+}
+
+RenderD7::Toast::Toast(std::string head, std::string msg)
+{
+	this->head = head;
+	this->msg = msg;
+}
+
+void RenderD7::Toast::Draw(void) const
+{
+	RenderD7::OnScreen(Top);
+	RenderD7::DrawRect(0, msgposy, 400, 70, RenderD7::Color::Hex("#111111"));
+	RenderD7::DrawRect(0, msgposy, 400, 25, RenderD7::Color::Hex("#222222"));
+	RenderD7::DrawText(2, msgposy+3, 0.7f, RenderD7::Color::Hex("#ffffff"), head);
+	RenderD7::DrawText(2, msgposy+30, 0.6f, RenderD7::Color::Hex("#ffffff"), msg);
+}
+
+void RenderD7::Toast::Logic()
+{
+	this->delay++/*=(int)RenderD7::GetDeltaTime()*/;
+	if (msgposy > 170 && delay < 5*60) msgposy--/*=(int)RenderD7::GetDeltaTime()*/;
+	
+	if (delay >= 5*60)
+	{
+		msgposy++/*=(int)RenderD7::GetDeltaTime*/;
+		if(msgposy > 400) this->Kill();
+	}
 }

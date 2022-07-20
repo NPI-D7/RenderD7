@@ -222,6 +222,18 @@ namespace RenderD7
         int delay = 0;
     };
 
+    class Toast : public RenderD7::Ovl
+    {
+        public:
+        Toast(std::string head, std::string msg);
+        void Draw(void) const override;
+        void Logic() override;
+        private:
+        std::string head, msg;
+        int msgposy = 240;
+        int delay = 0;
+    };
+
     void AddOvl(std::unique_ptr<RenderD7::Ovl> scene);
     namespace Color
     {
