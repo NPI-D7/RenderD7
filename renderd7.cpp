@@ -1425,33 +1425,11 @@ std::string RenderD7::GetTimeStr(void)
 #include "stb_image.h"
 
 unsigned Image_to_C3D(C2D_Image img, const std::vector<unsigned char>& bmp) {
-  	stbi_uc *image = NULL;
-	int width = 0, height = 0;
-
-	image = stbi_load_from_memory(bmp.data(), 4, &width, &height, NULL, STBI_ORDER_BGR);
-
-	for (u32 row = 0; row < (u32)width; row++) {
-		for (u32 col = 0; col < (u32)height; col++) {
-			u32 z = (row + col * (u32)width) * 4;
-
-			u8 r = *(u8 *)(image + z);
-			u8 g = *(u8 *)(image + z + 1);
-			u8 b = *(u8 *)(image + z + 2);
-			u8 a = *(u8 *)(image + z + 3);
-
-			*(image + z) = a;
-			*(image + z + 1) = b;
-			*(image + z + 2) = g;
-			*(image + z + 3) = r;
-		}
-	}
-
-	
 	C2D_Image* images;
-	bool error =  C3DTexToC2DImage(images, (u32)width, (u32)height, (u8*)image);
+  	C3DTexToC2DImage(images, 1024, 1024, (u8*)bmp.data());
 	img.tex = images->tex;
 	img.subtex = images->subtex;
-  	return error;
+  	return false;
 }
 
 void RenderD7::Image::LoadFromBitmap(BMP bitmap)
