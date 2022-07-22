@@ -1144,8 +1144,8 @@ void RenderD7::DrawMetrikOvl()
 	std::string info = "RenderD7 " + __C + " Debug Overlay";
 	float infoy = 240 - RenderD7::GetTextHeight(mt_txtSize, info);
 	mt_fps = "FPS: " + RenderD7::GetFramerate();
-	mt_cpu = "CPU: " + std::to_string(C3D_GetProcessingTime()*6.0f).substr(0, 4) + "%/" + std::to_string(C3D_GetProcessingTime()).substr(0, 4) + "ms";
-	mt_gpu = "GPU: " + std::to_string(C3D_GetDrawingTime()*6.0f).substr(0, 4) + "%/" + std::to_string(C3D_GetDrawingTime()).substr(0, 4) + "ms";
+	mt_cpu = "CPU: " + std::to_string(C3D_GetProcessingTime()*(d11framerate/10)).substr(0, 4) + "%/" + std::to_string(C3D_GetProcessingTime()).substr(0, 4) + "ms";
+	mt_gpu = "GPU: " + std::to_string(C3D_GetDrawingTime()*(d11framerate/10)).substr(0, 4) + "%/" + std::to_string(C3D_GetDrawingTime()).substr(0, 4) + "ms";
 	mt_cmd = "CMD: " + std::to_string(C3D_GetCmdBufUsage()*100.0f).substr(0, 4) + "%/" + std::to_string(C3D_GetCmdBufUsage()).substr(0, 4) + "ms";
 	RenderD7::DrawRect(0, 0, RenderD7::GetTextWidth(mt_txtSize, mt_fps), RenderD7::GetTextHeight(mt_txtSize, mt_fps), mt_color);
 	RenderD7::DrawRect(0, 50, RenderD7::GetTextWidth(mt_txtSize, mt_cpu), RenderD7::GetTextHeight(mt_txtSize, mt_cpu), mt_color);
@@ -1325,6 +1325,7 @@ void RenderD7::RSettings::Logic(u32 hDown, u32 hHeld, u32 hUp, touchPosition tou
 	if (d7_hDown & KEY_TOUCH && RenderD7::touchTObj(d7_touch, buttons[3]) && !metrikd)
 	{
 		cfgstruct["settings"]["forceFrameRate"] = Kbd(2, SWKBD_TYPE_NUMPAD);
+		C3D_FrameRate(RenderD7::Convert::StringtoFloat(cfgstruct["settings"]["forceFrameRate"]));
 	}
 	if (d7_hDown & KEY_TOUCH && RenderD7::touchTObj(d7_touch, buttons[4]))
 	{

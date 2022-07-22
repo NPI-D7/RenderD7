@@ -241,7 +241,7 @@ struct BMP {
         uint32_t channels = bmp_info_header.bit_count / 8;
         for (uint32_t y = y0; y < y0 + h; ++y) {
             for (uint32_t x = x0; x < x0 + w; ++x) {
-                if (!(x + w > (uint32_t)bmp_info_header.width) || this->bmp_info_header.height - y - h < (uint32_t)0) {
+                if ((x + w < (uint32_t)bmp_info_header.width) || this->bmp_info_header.height - y - h > 0) {
                 
                     data[channels * (y * bmp_info_header.width + x) + 0] = B;
                     data[channels * (y * bmp_info_header.width + x) + 1] = G;
