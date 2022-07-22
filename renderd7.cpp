@@ -1256,28 +1256,59 @@ RenderD7::RSettings::~RSettings()
 
 void RenderD7::RSettings::Draw(void) const
 {
-	RenderD7::OnScreen(Top);
-	RenderD7::DrawRect(0, 0, 400, 21, RenderD7::Color::Hex("#111111"));
-	RenderD7::DrawRect(0, 21, 400, 220, RenderD7::Color::Hex("#eeeeee"));
-	RenderD7::DrawText(0, 0, 0.7f, DSEVENWHITE, "RenderD7->Settings");
-	RenderD7::DrawTextLeft(400, 0, 0.7f, RenderD7::Color::Hex("#ffffff"), RENDERD7VSTRING);
-	RenderD7::DrawText(0, 30, 0.7f, DSEVENBLACK, "RD7SR: " + rd7srstate);
-	RenderD7::DrawText(0, 50, 0.7f, DSEVENBLACK, "Metrik to Csv: " + csvstate);
-	RenderD7::DrawText(0, 70, 0.7f, DSEVENBLACK, "Metrik Overlay: " + mtovlstate);
-	RenderD7::DrawText(0, 90, 0.7f, DSEVENBLACK, "Force FPS: " + fpsstate);
-	RenderD7::DrawText(0, 110, 0.7f, DSEVENBLACK, "Metrik Screen: " + mtscreenstate);
-	/*RenderD7::DrawText(0, 130, 0.7f, DSEVENBLACK, "Metrik Text RGB: " + mttxtcolstate);
-	RenderD7::DrawText(0, 150, 0.7f, DSEVENBLACK, "Metrik Alpha: " + mtcola);
-	RenderD7::DrawText(0, 170, 0.7f, DSEVENBLACK, "Metrik Text Alpha: " + mttxtcola);*/
-	RenderD7::OnScreen(Bottom);
-	std::string verc = "Config Version: ";
-	verc += CFGVER;
-	RenderD7::DrawRect(0, 0, 320, 240, RenderD7::Color::Hex("#eeeeee"));
-	RenderD7::DrawText(0, 0, 0.7f, RenderD7::Color::Hex("#111111"), verc);
-	RenderD7::DrawTObjects(buttons, RenderD7::Color::Hex("#111111"), RenderD7::Color::Hex("#eeeeee"));
+	if (m_state == RSETTINGS)
+	{
+		RenderD7::OnScreen(Top);
+		RenderD7::DrawRect(0, 0, 400, 21, RenderD7::Color::Hex("#111111"));
+		RenderD7::DrawRect(0, 21, 400, 220, RenderD7::Color::Hex("#eeeeee"));
+		RenderD7::DrawText(0, 0, 0.7f, DSEVENWHITE, "RenderD7->Settings");
+		RenderD7::DrawTextLeft(400, 0, 0.7f, RenderD7::Color::Hex("#ffffff"), RENDERD7VSTRING);
+		RenderD7::DrawText(0, 30, 0.7f, DSEVENBLACK, "RD7SR: " + rd7srstate);
+		RenderD7::DrawText(0, 50, 0.7f, DSEVENBLACK, "Metrik to Csv: " + csvstate);
+		RenderD7::DrawText(0, 70, 0.7f, DSEVENBLACK, "Metrik Overlay: " + mtovlstate);
+		RenderD7::DrawText(0, 90, 0.7f, DSEVENBLACK, "Force FPS: " + fpsstate);
+		RenderD7::DrawText(0, 110, 0.7f, DSEVENBLACK, "Metrik Screen: " + mtscreenstate);
+		/*RenderD7::DrawText(0, 130, 0.7f, DSEVENBLACK, "Metrik Text RGB: " + mttxtcolstate);
+		RenderD7::DrawText(0, 150, 0.7f, DSEVENBLACK, "Metrik Alpha: " + mtcola);
+		RenderD7::DrawText(0, 170, 0.7f, DSEVENBLACK, "Metrik Text Alpha: " + mttxtcola);*/
+		RenderD7::OnScreen(Bottom);
+		std::string verc = "Config Version: ";
+		verc += CFGVER;
+		RenderD7::DrawRect(0, 0, 320, 240, RenderD7::Color::Hex("#eeeeee"));
+		RenderD7::DrawText(0, 0, 0.7f, RenderD7::Color::Hex("#111111"), verc);
+		RenderD7::DrawTObjects(buttons, RenderD7::Color::Hex("#111111"), RenderD7::Color::Hex("#eeeeee"));
+
+	}
+	else if (m_state == RINFO)
+	{
+		std::string rd7ver = RENDERD7VSTRING;
+		std::string rd7cfgver = CFGVER;
+		std::string citras = is_citra ? "true" : "false";
+		RenderD7::OnScreen(Top);
+		RenderD7::DrawRect(0, 0, 400, 21, RenderD7::Color::Hex("#111111"));
+		RenderD7::DrawRect(0, 21, 400, 220, RenderD7::Color::Hex("#eeeeee"));
+		RenderD7::DrawText(0, 0, 0.7f, DSEVENWHITE, "RenderD7->Info");
+		RenderD7::DrawTextLeft(400, 0, 0.7f, RenderD7::Color::Hex("#ffffff"), RENDERD7VSTRING);
+		RenderD7::DrawText(0, 30, 0.7f, DSEVENBLACK, "App: " + D_app_name);
+		RenderD7::DrawText(0, 50, 0.7f, DSEVENBLACK, "RenderD7: " + rd7ver);
+		RenderD7::DrawText(0, 70, 0.7f, DSEVENBLACK, "Config-Version: " + rd7cfgver);
+		RenderD7::DrawText(0, 90, 0.7f, DSEVENBLACK, "Citra: " + citras);
+		RenderD7::DrawText(0, 110, 0.7f, DSEVENBLACK, "C2D_MAX_OBJ: " + std::to_string(maxobj__));
+		/*RenderD7::DrawText(0, 130, 0.7f, DSEVENBLACK, "Metrik Text RGB: " + mttxtcolstate);
+		RenderD7::DrawText(0, 150, 0.7f, DSEVENBLACK, "Metrik Alpha: " + mtcola);
+		RenderD7::DrawText(0, 170, 0.7f, DSEVENBLACK, "Metrik Text Alpha: " + mttxtcola);*/
+		RenderD7::OnScreen(Bottom);
+		std::string verc = "Config Version: ";
+		verc += CFGVER;
+		RenderD7::DrawRect(0, 0, 320, 240, RenderD7::Color::Hex("#eeeeee"));
+		RenderD7::DrawText(0, 0, 0.7f, RenderD7::Color::Hex("#111111"), verc);
+		RenderD7::DrawTObjects(buttons, RenderD7::Color::Hex("#111111"), RenderD7::Color::Hex("#eeeeee"));
+
+	}
 }
-std::string Kbd(int lenght, SwkbdType tp)
+std::string RenderD7::Kbd(int lenght, SwkbdType tp)
 {
+	shouldbe_disabled = true;
 	RenderD7::FrameEnd();
 	SwkbdState state;
 	char temp[lenght + 1] = { 0 };
@@ -1290,6 +1321,7 @@ std::string Kbd(int lenght, SwkbdType tp)
 }
 void RenderD7::RSettings::Logic(u32 hDown, u32 hHeld, u32 hUp, touchPosition touch)
 {
+	if (m_state == RSETTINGS) {
 	rd7srstate = rd7_superreselution ? "true" : "false";
 	csvstate = mt_dumpcsv ? "true" : "false";
 	mtovlstate = metrikd ? "true" : "false";
@@ -1336,11 +1368,24 @@ void RenderD7::RSettings::Logic(u32 hDown, u32 hHeld, u32 hUp, touchPosition tou
 	{
 		RenderD7::AddOvl(std::make_unique<RenderD7::DSP_NF>());
 	}
+	if (d7_hDown & KEY_TOUCH && RenderD7::touchTObj(d7_touch, buttons[6]))
+	{
+		m_state = RINFO;
+	}
 	if (d7_hDown & KEY_B)
 	{
 		cfgfile->write(cfgstruct);
 		rd7settings = false;
 		RenderD7::Scene::Back();
+	}
+	
+	}
+	if (m_state == RINFO)
+	{
+		if (d7_hDown & KEY_B)
+		{
+			m_state = RSETTINGS;
+		}
 	}
 	
 }

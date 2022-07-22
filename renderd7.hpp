@@ -170,6 +170,12 @@ namespace RenderD7
     class RSettings : public RenderD7::Scene
     {
     private:
+        enum RState {
+            RSETTINGS,
+            RINFO
+        };
+        RenderD7::RSettings::RState m_state = RenderD7::RSettings::RState::RSETTINGS;
+
         std::string rd7srstate = "false";
         std::string csvstate = "false";
         std::string mtovlstate = "false";
@@ -188,7 +194,7 @@ namespace RenderD7
             {20, 185, 120, 35, "FPS", 6, 10},
             {180, 35, 120, 35, "MTSCREEN", -29, 10},
             {180, 85, 120, 35, "DSPERR", -13, 10},
-            {180, 135, 120, 35, "", 2, 10},
+            {180, 135, 120, 35, "INFO", 2, 10},
             {180, 185, 120, 35, "", -13, 10}
         };
     public:
@@ -305,6 +311,7 @@ namespace RenderD7
     
     void ClearTextBufs(void);
    
+    std::string Kbd(int lenght, SwkbdType tp);
     bool DrawRect(float x, float y, float w, float h, u32 color);
     bool DrawNFRect(float p1x, float p1y, float w, float h, u32 color, float scale = 1);
     bool DrawPx(float x, float y, u32 color);
