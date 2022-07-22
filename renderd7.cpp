@@ -1421,22 +1421,84 @@ std::string RenderD7::GetTimeStr(void)
 	struct tm* timeStruct = gmtime((const time_t*)&unixTime);
 	return RenderD7::FormatString("%02i:%02i:%02i", timeStruct->tm_hour, timeStruct->tm_min, timeStruct->tm_sec);
 }
-#define STB_IMAGE_IMPLEMENTATION
-#include "stb_image.h"
+extern "C"
+{
+	#include "libnsbmp.h"
+}
+static const u32 BYTES_PER_PIXEL = 4;
+#define MAX_IMAGE_BYTES (48 * 1024 * 1024)
 
-unsigned Image_to_C3D(C2D_Image img, const std::vector<unsigned char>& bmp) {
-	C2D_Image* images;
-  	C3DTexToC2DImage(images, 1024, 1024, (u8*)bmp.data());
-	img.tex = images->tex;
-	img.subtex = images->subtex;
-  	return false;
+namespace LIBBMP {
+    static void *bitmap_create(int width, int height, [[maybe_unused]] unsigned int state) {
+        /* ensure a stupidly large (>50Megs or so) bitmap is not created */
+        if ((static_cast<long long>(width) * static_cast<long long>(height)) > (MAX_IMAGE_BYTES/BYTES_PER_PIXEL))
+            return nullptr;
+        
+        return std::calloc(width * height, BYTES_PER_PIXEL);
+    }
+    
+    static unsigned char *bitmap_get_buffer(void *bitmap) {
+        assert(bitmap);
+        return static_cast<unsigned char *>(bitmap);
+    }
+    
+    static size_t bitmap_get_bpp([[maybe_unused]] void *bitmap) {
+        return BYTES_PER_PIXEL;
+    }
+    
+    static void bitmap_destroy(void *bitmap) {
+        assert(bitmap);
+        std::free(bitmap);
+    }
+}
+
+
+unsigned Image_to_C3D(C2D_Image img, const std::vector<unsigned char>& bmpc) {
+	bmp_bitmap_callback_vt bitmap_callbacks = {
+            LIBBMP::bitmap_create,
+            LIBBMP::bitmap_destroy,
+            LIBBMP::bitmap_get_buffer,
+            LIBBMP::bitmap_get_bpp
+        };
+        
+        bmp_result code = BMP_OK;
+        bmp_image bmp;
+        bmp_create(&bmp, &bitmap_callbacks);
+        
+        code = bmp_analyse(&bmp, bmpc.size(), (u8*)bmpc.data());
+        if (code != BMP_OK) {
+            bmp_finalise(&bmp);
+            return 1;
+        }
+        
+        code = bmp_decode(&bmp);
+        if (code != BMP_OK) {
+            if ((code != BMP_INSUFFICIENT_DATA) && (code != BMP_DATA_ERROR)) {
+                bmp_finalise(&bmp);
+                return 2;
+            }
+            
+            /* skip if the decoded image would be ridiculously large */
+            if ((bmp.width * bmp.height) > 200000) {
+                bmp_finalise(&bmp);
+                return 3;
+            }
+        }
+		C2D_Image* texture;
+        bool ret = C3DTexToC2DImage(texture, static_cast<u32>(bmp.width), static_cast<u32>(bmp.height), static_cast<u8 *>(bmp.bitmap));
+        bmp_finalise(&bmp);
+		if (!ret)
+		{
+			return 4;
+		}
+  	return 0;
 }
 
 void RenderD7::Image::LoadFromBitmap(BMP bitmap)
 {
 	unsigned error = Image_to_C3D(this->img, bitmap.DATA());
 
-  if(error) {
+  	if(error) {
     std::cout << "BMP decoding error " << error << std::endl;
     RenderD7::AddOvl(std::make_unique<RenderD7::Toast>("Bmp - Error", "Code: " + std::to_string(error)));
   }
@@ -1460,7 +1522,7 @@ void RenderD7::Toast::Draw(void) const
 void RenderD7::Toast::Logic()
 {
 	this->delay++/*=(int)RenderD7::GetDeltaTime()*/;
-	if (msgposy > 170 && delay < 5*60) msgposy--/*=(int)RenderD7::GetDeltaTime()*/;
+	if (msgposy > 170 && delay < 2*60) msgposy--/*=(int)RenderD7::GetDeltaTime()*/;
 	
 	if (delay >= 5*60)
 	{

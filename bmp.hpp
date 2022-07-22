@@ -241,7 +241,7 @@ struct BMP {
         uint32_t channels = bmp_info_header.bit_count / 8;
         for (uint32_t y = y0; y < y0 + h; ++y) {
             for (uint32_t x = x0; x < x0 + w; ++x) {
-                if (!(x + w > (uint32_t)bmp_info_header.width) || !(y + h > (uint32_t)-1)) {
+                if (!(x + w > (uint32_t)bmp_info_header.width) || this->bmp_info_header.height - y - h < (uint32_t)0) {
                 
                     data[channels * (y * bmp_info_header.width + x) + 0] = B;
                     data[channels * (y * bmp_info_header.width + x) + 1] = G;
@@ -549,6 +549,21 @@ struct BMP {
         }
     }
 
+    void set_pixel_df(uint32_t x0, uint32_t y0, uint8_t B, uint8_t G, uint8_t R, uint8_t A) {
+        uint32_t y1 = this->bmp_info_header.height - y0;
+        if (x0 >= (uint32_t)bmp_info_header.width || y1 <= (uint32_t)bmp_info_header.width || x0 < 0 || y0 > 0) {
+            return;//throw std::runtime_error("The point is outside the image boundaries!");
+        }
+        
+        uint32_t channels = bmp_info_header.bit_count / 8;
+        data[channels * (y0 * bmp_info_header.width + x0) + 0] = B;
+        data[channels * (y0 * bmp_info_header.width + x0) + 1] = G;
+        data[channels * (y0 * bmp_info_header.width + x0) + 2] = R;
+        if (channels == 4) {
+            data[channels * (y0 * bmp_info_header.width + x0) + 3] = A;
+        }
+    }
+
     void draw_rectangle(uint32_t x0, uint32_t y0, uint32_t w, uint32_t h,
                         uint8_t B, uint8_t G, uint8_t R, uint8_t A, uint8_t line_w) {
         if (x0 + w > (uint32_t)bmp_info_header.width || y0 + h > (uint32_t)bmp_info_header.height) {
@@ -559,6 +574,18 @@ struct BMP {
         fill_region(x0, (y0 + h - line_w), w, line_w, B, G, R, A);                              // bottom line
         fill_region((x0 + w - line_w), (y0 + line_w), line_w, (h - (2 * line_w)), B, G, R, A);  // right line
         fill_region(x0, (y0 + line_w), line_w, (h - (2 * line_w)), B, G, R, A);                 // left line
+    }
+
+     void draw_rectangle_df(uint32_t x0, uint32_t y0, uint32_t w, uint32_t h,
+                        uint8_t B, uint8_t G, uint8_t R, uint8_t A, uint8_t line_w) {
+        if (x0 + w > (uint32_t)bmp_info_header.width || y0 + h > (uint32_t)bmp_info_header.height) {
+            return;//throw std::runtime_error("The rectangle does not fit in the image!");
+        }
+
+        fill_region_df(x0, y0, w, line_w, B, G, R, A);                                             // top line
+        fill_region_df(x0, (y0 + h - line_w), w, line_w, B, G, R, A);                              // bottom line
+        fill_region_df((x0 + w - line_w), (y0 + line_w), line_w, (h - (2 * line_w)), B, G, R, A);  // right line
+        fill_region_df(x0, (y0 + line_w), line_w, (h - (2 * line_w)), B, G, R, A);                 // left line
     }
 
 private:
