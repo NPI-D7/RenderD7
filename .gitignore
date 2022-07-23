@@ -1,4 +1,4 @@
 release/
 debug/
 lib/
-*.xz
+*.bz2
