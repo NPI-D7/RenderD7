@@ -1801,7 +1801,7 @@ void RenderD7::BitmapPrinter::Benchmark()
 			{
 				alldtt += hdttt[i];
 			}
-			float allfps = 0;
+			int allfps = 0;
 			for (size_t f = 0; f < fpscountc.size(); f++)
 			{
 				allfps += fpscountc[f];
@@ -1836,6 +1836,7 @@ void RenderD7::BitmapPrinter::Benchmark()
 		timer+= 1*dtt;
 		float hdtt = C3D_GetProcessingTime();
 		hdttt.push_back(hdtt);
+		fpscountc.push_back(fps);
 		if(mhdtt < hdtt)
 		{
 			mhdtt = C3D_GetProcessingTime();
