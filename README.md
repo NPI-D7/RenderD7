@@ -5,11 +5,9 @@ first run this
 `sudo su`
 then this
 ```
-git clone https://github.com/NPI-D7/RenderD7.git
-cd RenderD7
-export DEVKITARM=/opt/devkitpro/devkitARM/
-export DEVKITPRO=/opt/devkitpro/
-make install
+curl -L https://github.com/NPI-D7/RenderD7/releases/download/v0.8.0-pre1/renderd7-0.8.0.tar.bz2 -o renderd7-0.8.0.tar.bz2
+mkdir -p /opt/devkitpro/libctru
+bzip2 -cd renderd7-0.8.0.tar.bz2 | tar -xf - -C /opt/devkitpro/libctru
 ```
 Make sure that `-lrenderd7` is before `-lcitro2d`, `-lcitro3d`, `-lctru`.
 
