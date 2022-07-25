@@ -433,10 +433,20 @@ namespace RenderD7
         void SavePng(std::string name);
 
         void CreateScreen(C3D_RenderTarget *target);
-        void DrawScreen(int framerate);
+        void DrawScreenDirectF(int framerate);
+        void DrawScreenDirect();
+        void DrawScreenF(int framerate);
+        void DrawScreen();
+        void UpdateScreenF(int framerate);
+        void UpdateScreen();
         void Clear(u8 b = 0, u8 g = 0, u8 r = 0, u8 a = 255);
         void ClearBlank();
         RenderD7::Image GetImage();
+        /// Test to Find out The Best Settings for BitmapPrinter
+        void Benchmark();
+        /// Setup the Benchmark
+        /// \param framerate The Fps of the ScreenUpdates
+        void SetupBenchmark(int framerate);
         private:
         int frame = 0;
         RenderD7::Image renderframe;
@@ -444,5 +454,21 @@ namespace RenderD7
         C3D_RenderTarget* targetr;
         BMP bitmap = NULL;
         BMP blank = NULL;
+        //Benchmark Stuff;
+        bool benchmark = false;
+        bool setupbenchmark;
+        float frametime = 0;
+        uint64_t lastTime = 0;
+        float dtt = 0.f;
+        float timer = 0;
+        float mhdtt = 0;
+
+        float fpsClock = 0.f;
+	    int frameCounter = 0, fps = 0;
+
+        std::vector<float> hdttt;
+        std::vector<int> fpscountc;
+        int renderedframes = 0;
+        int testfps = 60;
     };
 } /// RenderD7
