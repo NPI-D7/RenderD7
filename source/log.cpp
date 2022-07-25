@@ -30,7 +30,8 @@ Log::Log()
 
 void Log::Init(const char *filename)
 {
-    std::string name = "sdmc:/" + Log::logDate() + filename + ".txt";
+	std::string fn = filename;
+    std::string name = "sdmc:/" + fn + ".txt";
 	this->filename = name.c_str();
 	if ((access(name.c_str(), F_OK) == 0))
 	{
