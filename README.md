@@ -1,4 +1,4 @@
-# RenderD7
+# RenderD7 <img alt="LOGO" src="https://github.com/NPI-D7/RenderD7/blob/main/logo.png" height="30">
 RenderD7 is now LibRenderD7.
 ### Installation (Ubuntu)
 first run this
