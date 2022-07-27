@@ -654,7 +654,7 @@ void RenderD7::Exit::Graphics()
 Result RenderD7::Init::Main(std::string app_name)
 {
     gfxInitDefault();
-	consoleInit(GFX_TOP, NULL);
+	//consoleInit(GFX_TOP, NULL);
 	Result res = cfguInit();
 	if (R_SUCCEEDED(res)) {
 		CFGU_SecureInfoGetRegion(&sysRegion);
