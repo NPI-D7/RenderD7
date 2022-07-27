@@ -30,12 +30,13 @@ Log::Log()
 
 void Log::Init(const char *filename)
 {
+	printf("%s\n", filename);
 	std::string fn = filename;
-    std::string name = "sdmc:/" + fn + ".txt";
+    std::string name = fn + ".txt";
 	this->filename = name.c_str();
 	if ((access(name.c_str(), F_OK) == 0))
 	{
-
+		
 	}
 	else 
 	{
@@ -46,6 +47,7 @@ void Log::Init(const char *filename)
 
 void Log::Write(std::string debug_text)
 {
+	printf("%s\n", debug_text.c_str());
 	std::ofstream logFile;
 	logFile.open((this->filename), std::ofstream::app);
 	std::string writeDebug = "[";

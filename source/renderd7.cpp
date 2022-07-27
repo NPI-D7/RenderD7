@@ -216,7 +216,7 @@ void RenderD7::Msg::DisplayWithProgress(std::string titletext, std::string subte
 }
 void RenderD7::SetupLog()
 {
-    renderd7log.Init("sdmc:/RenderD7.log");
+    renderd7log.Init("RenderD7/RenderD7.log");
 }
 void RenderD7::SpriteSheetAnimation::Setup(RenderD7::Sheet *sheet, size_t imagecount, size_t startimage, float frame_begin, float frame_finish)
 {
@@ -654,20 +654,23 @@ void RenderD7::Exit::Graphics()
 Result RenderD7::Init::Main(std::string app_name)
 {
     gfxInitDefault();
+	consoleInit(GFX_TOP, NULL);
 	Result res = cfguInit();
 	if (R_SUCCEEDED(res)) {
 		CFGU_SecureInfoGetRegion(&sysRegion);
 		CFGU_GetSystemModel(&consoleModel);
 		cfguExit();
 	}
+	printf("cfgu\n");
 	if (rd7_superreselution)
 	{
 		gfxSetWide(consoleModel != 3);
 	}
-	
+	printf("rd7sr\n");
     aptInit();
     romfsInit();
     cfguInit();
+	printf("stuff\n");
     if (cobj___){maxobj__ = cobj___;}
     if (!cobj___){maxobj__ = C2D_DEFAULT_MAX_OBJECTS;}
     D_app_name = app_name;
@@ -681,6 +684,7 @@ Result RenderD7::Init::Main(std::string app_name)
     mkdir(cfgpath.c_str(), 0777);
 	mkdir(csvpc.c_str(), 0777);
 	bool renew = false;
+	printf("folderset\n");
 	if (FS::FileExist(cfgpath + "/config.ini"))
 	{
 		cfgfile = std::make_unique<INI::INIFile>(cfgpath + "/config.ini");
@@ -688,10 +692,14 @@ Result RenderD7::Init::Main(std::string app_name)
 		std::string version = cfgstruct["info"]["version"];
 		if (version != CFGVER) renew = true;
 	}
+	printf("vercheck\n");
+	renderd7log.Write("Point At: " + std::to_string(__LINE__) + " : " + GetFileName<std::string>(__FILE__));
 	if (!FS::FileExist(cfgpath + "/config.ini") || renew)
 	{
 		cfgfile = std::make_unique<INI::INIFile>(cfgpath+ "/config.ini");
+		renderd7log.Write("Point At: " + std::to_string(__LINE__) + " : " + GetFileName<std::string>(__FILE__));
 		cfgfile->read(cfgstruct);
+		renderd7log.Write("Point At: " + std::to_string(__LINE__) + " : " + GetFileName<std::string>(__FILE__));
 		cfgstruct["info"]["version"] = CFGVER;
 		cfgstruct["info"]["renderd7ver"] = RENDERD7VSTRING;
 		cfgstruct["settings"]["doscreentimeout"] = "0";
@@ -699,6 +707,7 @@ Result RenderD7::Init::Main(std::string app_name)
 		cfgstruct["settings"]["forceFrameRate"] = "60";
 		cfgstruct["settings"]["super-reselution"] = "0";
 		cfgstruct["settings"]["renderer"] = "c3d_c2d";
+		renderd7log.Write("Point At: " + std::to_string(__LINE__) + " : " + GetFileName<std::string>(__FILE__));
 		cfgstruct["metrik-settings"]["enableoverlay"] = "0";
 		cfgstruct["metrik-settings"]["Screen"] = "0";
 		cfgstruct["metrik-settings"]["txtColor"] = "#ffffff";
@@ -710,6 +719,9 @@ Result RenderD7::Init::Main(std::string app_name)
 		cfgstruct["metrik-settings"]["dumpcsvloop"] = "0";
 		cfgfile->write(cfgstruct);
 	}
+	if (renew)
+		printf("renew\n");
+	renderd7log.Write("Point At: " + std::to_string(__LINE__) + " : " + GetFileName<std::string>(__FILE__));
 	cfgfile = std::make_unique<INI::INIFile>(cfgpath+ "/config.ini");
 	cfgfile->read(cfgstruct);
 	std::string Fps = cfgstruct["settings"]["forceFrameRate"];
@@ -722,16 +734,20 @@ Result RenderD7::Init::Main(std::string app_name)
 	rd7_superreselution = RenderD7::Convert::FloatToBool(RenderD7::Convert::StringtoFloat(cfgstruct["settings"]["super-reselution"]));
 	mt_dumpcsv = RenderD7::Convert::FloatToBool(RenderD7::Convert::StringtoFloat(cfgstruct["metrik-settings"]["dumpcsv"]));
 	mt_csvloop = RenderD7::Convert::FloatToBool(RenderD7::Convert::StringtoFloat(cfgstruct["metrik-settings"]["dumpcsvloop"]));
+	printf("read\n");
 	//Check if citra
 	s64 citracheck = 0;
 	svcGetSystemInfo(&citracheck, 0x20000, 0);
 	is_citra = citracheck ? true : false;
+	printf("citra\n");
 	//Speedup
     osSetSpeedupEnable(true);
+	printf("boost\n");
 	if (!is_citra && rd7_superreselution)
 	{
 		if (consoleModel != 3) gfxSetWide(true);
 	}
+	printf("rd7sr\n");
 	//consoleInit(GFX_BOTTOM, NULL);
 	if (mt_dumpcsv)
 	{
@@ -747,16 +763,16 @@ Result RenderD7::Init::Main(std::string app_name)
 		mt_csv << "FPS,CPU,GPU,CMD\n";
 		mt_csv.close();
 	}
-	
+	printf("csv\n");
     C3D_Init(C3D_DEFAULT_CMDBUF_SIZE);
-	C2D_Init(size_t(maxobj__));
+	C2D_Init(C2D_DEFAULT_MAX_OBJECTS);
 	C2D_Prepare();
 	Top = C2D_CreateScreenTarget(GFX_TOP, GFX_LEFT);
 	TopRight = C2D_CreateScreenTarget(GFX_TOP, GFX_RIGHT);
 	Bottom = C2D_CreateScreenTarget(GFX_BOTTOM, GFX_LEFT);
 	TextBuf = C2D_TextBufNew(4096);
 	Font = C2D_FontLoadSystem(CFG_REGION_USA);
-	
+	printf("Graphical Interface\n");
     //RenderD7::Msg::Display("RenderD7", "RenderD7 init success!\nWaiting for MainLoop!", Top);
 	return 0;
 }
@@ -1585,7 +1601,7 @@ void RenderD7::Toast::Logic()
 RenderD7::BitmapPrinter::BitmapPrinter(int w, int h)
 {
 	bitmap = BMP(w, h, true);
-	renderframe.LoadPFromBuffer(BitmapConverter::ConvertData(bitmap.DATA()));
+	//renderframe.LoadPFromBuffer(BitmapConverter::ConvertData(bitmap.DATA()));
 	blank = BMP(w, h, true);
 }
 
@@ -1681,7 +1697,7 @@ void RenderD7::BitmapPrinter::CreateScreen(C3D_RenderTarget *target)
 		bitmap = BMP(320, 240, true);
 		blank = BMP(320, 240, true);
 	}
-	renderframe.LoadPFromBuffer(BitmapConverter::ConvertData(bitmap.DATA()));
+	//renderframe.LoadPFromBuffer(BitmapConverter::ConvertData(bitmap.DATA()));
 	
 }
 void RenderD7::BitmapPrinter::DrawScreenDirectF(int framerate)

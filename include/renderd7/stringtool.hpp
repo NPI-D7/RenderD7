@@ -1,3 +1,4 @@
+
 template<class T>
 T GetFileName(T const & path, T const & delims = "/\\")
 {
