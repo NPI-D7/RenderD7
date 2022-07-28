@@ -960,6 +960,7 @@ void RenderD7::Image::LoadPng(const std::string path)
 	if (loadet)
 	{
 		C3D_TexDelete(this->img.tex);
+		loadet = false;
 	}
 	lodepng::decode(ImageBuffer, width, height, path);
 
@@ -989,12 +990,14 @@ void RenderD7::Image::LoadPng(const std::string path)
 
 RenderD7::Image::~Image()
 {
-	C3D_TexDelete(img.tex);
+	if(loadet) C3D_TexDelete(img.tex);
+	loadet = false;
 }
 
 void RenderD7::Image::Unload()
 {
-	C3D_TexDelete(img.tex);
+	if(loadet) C3D_TexDelete(img.tex);
+	loadet = false;
 }
 
 void RenderD7::Image::LoadPFromBuffer(const std::vector<u8> &buffer)
@@ -1003,6 +1006,7 @@ void RenderD7::Image::LoadPFromBuffer(const std::vector<u8> &buffer)
 	if (loadet)
 	{
 		C3D_TexDelete(this->img.tex);
+		loadet = false;
 	}
 	unsigned width, height;
 	lodepng::decode(ImageBuffer, width, height, buffer);
@@ -1108,7 +1112,8 @@ bool RenderD7::DrawImage(C2D_Image img, float x, float y, float scaleX, float sc
 
 bool RenderD7::Image::Draw(float x, float y, float scaleX, float scaleY)
 {
-	return C2D_DrawImageAt(this->img, x, y, 0.5f, nullptr, scaleX, scaleY);
+	if(loadet) return C2D_DrawImageAt(this->img, x, y, 0.5f, nullptr, scaleX, scaleY);
+	return false;
 }
 bool RenderD7::FS::FileExist(const std::string& path)
 {
@@ -1333,7 +1338,7 @@ std::string RenderD7::Kbd(int lenght, SwkbdType tp)
 	SwkbdState state;
 	char temp[lenght + 1] = { 0 };
 	
-	swkbdInit(&state, SwkbdType::SWKBD_TYPE_NUMPAD, 2, lenght);
+	swkbdInit(&state, tp, 2, lenght);
 	swkbdSetValidation(&state, SWKBD_NOTBLANK_NOTEMPTY, SWKBD_FILTER_PROFANITY, 0);
 	SwkbdButton ret = swkbdInputText(&state, temp, sizeof(temp));
 	temp[lenght] = '\0';
@@ -1563,8 +1568,13 @@ unsigned Image_to_C3D(C2D_Image img, const std::vector<unsigned char>& bmpc) {
 
 void RenderD7::Image::LoadFromBitmap(BMP bitmap)
 {
+	loadet = false;
 	unsigned error = Image_to_C3D(this->img, bitmap.DATA());
-
+	if (error == 0)
+	{
+		this->loadet = true;
+	}
+	
   	if(error) {
     std::cout << "BMP decoding error " << error << std::endl;
     RenderD7::AddOvl(std::make_unique<RenderD7::Toast>("Bmp - Error", "Code: " + std::to_string(error)));
@@ -1600,14 +1610,15 @@ void RenderD7::Toast::Logic()
 
 RenderD7::BitmapPrinter::BitmapPrinter(int w, int h)
 {
-	bitmap = BMP(w, h, true);
+	BMP newmap(w, h, true);
+	bitmap = newmap;
 	//renderframe.LoadPFromBuffer(BitmapConverter::ConvertData(bitmap.DATA()));
-	blank = BMP(w, h, true);
+	blank = newmap;
 }
 
 RenderD7::BitmapPrinter::~BitmapPrinter()
 {
-
+	if(this->renderframe.loadet) this->renderframe.Unload();
 }
 
 bool RenderD7::BitmapPrinter::DecodeFile(std::string file)
@@ -1697,7 +1708,7 @@ void RenderD7::BitmapPrinter::CreateScreen(C3D_RenderTarget *target)
 		bitmap = BMP(320, 240, true);
 		blank = BMP(320, 240, true);
 	}
-	//renderframe.LoadPFromBuffer(BitmapConverter::ConvertData(bitmap.DATA()));
+	renderframe.LoadPFromBuffer(BitmapConverter::ConvertData(bitmap.DATA()));
 	
 }
 void RenderD7::BitmapPrinter::DrawScreenDirectF(int framerate)
@@ -1706,12 +1717,12 @@ void RenderD7::BitmapPrinter::DrawScreenDirectF(int framerate)
 	{
 		if(frame == (60/framerate)){
 			RenderD7::OnScreen(targetr);
-			renderframe.Unload();
+			if(renderframe.loadet) renderframe.Unload();
 			renderframe.LoadFromBitmap(bitmap);
 			frame = 0;
 		}
 		
-		renderframe.Draw(0, 0);
+		if(renderframe.loadet) renderframe.Draw(0, 0);
 		frame++;
 	}
 }
@@ -1721,9 +1732,9 @@ void RenderD7::BitmapPrinter::DrawScreenDirect()
 	if (isscreen)
 	{
 		RenderD7::OnScreen(targetr);
-		renderframe.Unload();
+		if(renderframe.loadet) renderframe.Unload();
 		renderframe.LoadFromBitmap(bitmap);
-		renderframe.Draw(0, 0);
+		if(renderframe.loadet) renderframe.Draw(0, 0);
 	}	
 }
 
@@ -1761,7 +1772,7 @@ void RenderD7::BitmapPrinter::DrawScreenF(int framerate)
 			frame = 0;
 		}
 		
-		renderframe.Draw(0, 0);
+		if(renderframe.loadet) renderframe.Draw(0, 0);
 		frame++;
 	}
 }
@@ -1770,7 +1781,7 @@ void RenderD7::BitmapPrinter::DrawScreen()
 	if (isscreen)
 	{
 		RenderD7::OnScreen(targetr);
-		renderframe.Draw(0, 0);
+		if(renderframe.loadet) renderframe.Draw(0, 0);
 	}
 }
 void RenderD7::BitmapPrinter::UpdateScreenF(int framerate)
@@ -1778,7 +1789,7 @@ void RenderD7::BitmapPrinter::UpdateScreenF(int framerate)
 	if (isscreen)
 	{
 		if(frame == (60/framerate)){
-			renderframe.Unload();
+			if(renderframe.loadet) renderframe.Unload();
 			renderframe.LoadFromBitmap(bitmap);
 			frame = 0;
 		}
@@ -1789,7 +1800,7 @@ void RenderD7::BitmapPrinter::UpdateScreen()
 {
 	if (isscreen)
 	{
-		renderframe.Unload();
+		if(renderframe.loadet) renderframe.Unload();
 		renderframe.LoadFromBitmap(bitmap);
 	}	
 }
@@ -1804,7 +1815,7 @@ void RenderD7::BitmapPrinter::Benchmark()
 		renderedframes = 0;
 		timer = 0;
 		setupbenchmark = false;
-		lastTime = svcGetSystemTick();
+		lastTime = svcGetSystemTick(); 
 	}
 	if(benchmark)
 	{
@@ -1813,21 +1824,33 @@ void RenderD7::BitmapPrinter::Benchmark()
 			std::string renderedf = std::to_string(renderedframes);
 			std::string avgdtt = std::to_string(mhdtt);
 			float alldtt = 0;
-			for (size_t i = 0; i < hdttt.size(); i++)
+			for (size_t i = 1; i < hdttt.size(); i++)
 			{
 				alldtt += hdttt[i];
 			}
+			float alldtt2 = 0;
+			for (size_t i = 1; i < hdttt2.size(); i++)
+			{
+				alldtt2 += hdttt2[i];
+			}
+			float alldtt3 = 0;
+			for (size_t i = 1; i < hdttt3.size(); i++)
+			{
+				alldtt3 += hdttt3[i];
+			}
 			int allfps = 0;
-			for (size_t f = 0; f < fpscountc.size(); f++)
+			for (size_t f = 1; f < fpscountc.size(); f++)
 			{
 				allfps += fpscountc[f];
 			}
 			
 			
-			std::string avgcpu = std::to_string((alldtt/(float)hdttt.size()));
-			std::string avgfps = std::to_string((allfps/(int)fpscountc.size()));
+			std::string avgcpu = std::to_string((alldtt/(float)hdttt.size()-1));
+			std::string avgcpu2 = std::to_string(((alldtt2/(float)hdttt2.size()-1)*1000));
+			std::string avgcpu3 = std::to_string(((alldtt3/(float)hdttt3.size()-1)*1000));
+			std::string avgfps = std::to_string((allfps/(int)fpscountc.size()-1));
 
-			std::string resultt = "Frames Rendered: " + renderedf + "\nMax Cpu Time: " + avgdtt + "\nAvg Cpu Time: " + avgcpu + "\nAvg Fps: " + avgfps;
+			std::string resultt = "Frames Rendered: " + renderedf + "\nMax Cpu Time: " + avgdtt + "\nAvg Cpu Time: " + avgcpu + "\nAvg Fps: " + avgfps + "\nAvg RenderTime: " + avgcpu2 + "ms/f\nAvg ConvertTime: " + avgcpu3 + "ms\n";
 			RenderD7::Error::DisplayError("Result", resultt, 30);
 			benchmark = false;
 		}
@@ -1842,13 +1865,28 @@ void RenderD7::BitmapPrinter::Benchmark()
 			frameCounter = 0;
 			fpsClock = 0.f;
 		}
-
+		uint64_t lastTime2 = svcGetSystemTick();
 		this->ClearBlank();
 		this->DrawRectFilled(0, 0, this->bitmap.bmp_info_header.width, this->bitmap.bmp_info_header.width, 255, 255, 255, 255);
 		this->DrawRect(5, 5, this->bitmap.bmp_info_header.width - 10, this->bitmap.bmp_info_header.height - 10, 5, 0, 0, 0, 0);
+		uint64_t currentTime2 = svcGetSystemTick();
+		dtt2 = ((float)(currentTime2 / (float)TICKS_PER_MSEC) - (float)(lastTime2 / (float)TICKS_PER_MSEC)) / 1000.f;
+		hdttt2.push_back(dtt2);
+		lastTime2 = svcGetSystemTick();
 		this->UpdateScreenF(testfps);
-		this->DrawScreen();
+		currentTime2 = svcGetSystemTick();
+		dtt3 = ((float)(currentTime2 / (float)TICKS_PER_MSEC) - (float)(lastTime2 / (float)TICKS_PER_MSEC)) / 1000.f;
+		hdttt3.push_back(dtt3);
+		if (!shouldbe_disabled) this->DrawScreen();
 		renderedframes++;
+		if(mdtt2 < dtt2)
+		{
+			mdtt2 = dtt2;
+		}
+		if(mdtt3 < dtt3)
+		{
+			mdtt3 = dtt3;
+		}
 		timer+= 1*dtt;
 		float hdtt = C3D_GetProcessingTime();
 		hdttt.push_back(hdtt);
@@ -1857,8 +1895,16 @@ void RenderD7::BitmapPrinter::Benchmark()
 		{
 			mhdtt = C3D_GetProcessingTime();
 		}
-		RenderD7::DrawText(0, 0, 0.5f, RenderD7::Color::Hex("#ff0000"), "Time: " + std::to_string(timer));
-		RenderD7::DrawText(0, 20, 0.5f, RenderD7::Color::Hex("#ff0000"), "Fps: " + std::to_string(fps));
+		if (!shouldbe_disabled)
+		{
+			RenderD7::OnScreen(Bottom);
+			RenderD7::DrawText(0, 0, 0.5f, RenderD7::Color::Hex("#ff0000"), "Time: " + std::to_string(timer));
+			RenderD7::DrawText(0, 20, 0.5f, RenderD7::Color::Hex("#ff0000"), "Fps: " + std::to_string(fps));
+			RenderD7::DrawText(0, 40, 0.5f, RenderD7::Color::Hex("#ff0000"), "dt: " + std::to_string(dtt));
+			RenderD7::DrawText(0, 60, 0.5f, RenderD7::Color::Hex("#ff0000"), "MaxRenderTime: " + std::to_string(mdtt2*1000) + "ms/f");
+			RenderD7::DrawText(0, 80, 0.5f, RenderD7::Color::Hex("#ff0000"), "MaxConvertTime: " + std::to_string(mdtt3*1000) + "ms");
+
+		}
 	}
 }
 
@@ -1867,4 +1913,9 @@ void RenderD7::BitmapPrinter::SetupBenchmark(int framerate)
 	benchmark = true;
 	setupbenchmark = true;
 	this->testfps = framerate;
+}
+
+void RenderD7::BitmapPrinter::DrawText(int x, int y, float t_size, u32 color, std::string text)
+{
+	//Todo
 }
