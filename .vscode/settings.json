@@ -55,6 +55,7 @@
         "ratio": "cpp",
         "regex": "cpp",
         "shared_mutex": "cpp",
-        "valarray": "cpp"
+        "valarray": "cpp",
+        "random": "cpp"
     }
 }

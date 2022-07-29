@@ -1,4 +1,24 @@
+#pragma once
+#include <string>
 
+namespace RenderD7
+{
+  inline bool NameIsEndingWith(const std::string &name, const std::vector<std::string> &extensions)
+  {
+    if (name.substr(0, 2) == "._") return false;
+
+	  if (name.size() == 0) return false;
+
+	  if (extensions.size() == 0) return true;
+
+	  for(int i = 0; i < (int)extensions.size(); i++) {
+		  const std::string ext = extensions.at(i);
+		  if (strcasecmp(name.c_str() + name.size() - ext.size(), ext.c_str()) == 0) return true;
+	  }
+
+	  return false;
+  }
+}
 template<class T>
 T GetFileName(T const & path, T const & delims = "/\\")
 {

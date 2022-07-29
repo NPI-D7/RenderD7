@@ -1,200 +1,23 @@
 #include <renderd7/Time.hpp>
-
-
-namespace rnd7 {
-////////////////////////////////////////////////////////////
-    const Time Time::Zero_;
-
-
-////////////////////////////////////////////////////////////
-    Time::Time() :
-            m_microseconds(0) {
-    }
-
-
-////////////////////////////////////////////////////////////
-    float Time::asSeconds() const {
-        return m_microseconds / 1000000.f;
-    }
-
-
-////////////////////////////////////////////////////////////
-    int Time::asMilliseconds() const {
-        return static_cast<int>(m_microseconds / 1000);
-    }
-
-
-////////////////////////////////////////////////////////////
-    long Time::asMicroseconds() const {
-        return m_microseconds;
-    }
-
-
-////////////////////////////////////////////////////////////
-    Time::Time(long microseconds) :
-            m_microseconds(microseconds) {
-    }
-
-
-////////////////////////////////////////////////////////////
-    Time seconds(float amount) {
-        return Time(static_cast<long>(amount * 1000000));
-    }
-
-
-////////////////////////////////////////////////////////////
-    Time milliseconds(int amount) {
-        return Time(static_cast<long>(amount) * 1000);
-    }
-
-
-////////////////////////////////////////////////////////////
-    Time microseconds(long amount) {
-        return Time(amount);
-    }
-
-
-////////////////////////////////////////////////////////////
-    bool operator==(Time left, Time right) {
-        return left.asMicroseconds() == right.asMicroseconds();
-    }
-
-
-////////////////////////////////////////////////////////////
-    bool operator!=(Time left, Time right) {
-        return left.asMicroseconds() != right.asMicroseconds();
-    }
-
-
-////////////////////////////////////////////////////////////
-    bool operator<(Time left, Time right) {
-        return left.asMicroseconds() < right.asMicroseconds();
-    }
-
-
-////////////////////////////////////////////////////////////
-    bool operator>(Time left, Time right) {
-        return left.asMicroseconds() > right.asMicroseconds();
-    }
-
-
-////////////////////////////////////////////////////////////
-    bool operator<=(Time left, Time right) {
-        return left.asMicroseconds() <= right.asMicroseconds();
-    }
-
-
-////////////////////////////////////////////////////////////
-    bool operator>=(Time left, Time right) {
-        return left.asMicroseconds() >= right.asMicroseconds();
-    }
-
-
-////////////////////////////////////////////////////////////
-    Time operator-(Time right) {
-        return microseconds(-right.asMicroseconds());
-    }
-
-
-////////////////////////////////////////////////////////////
-    Time operator+(Time left, Time right) {
-        return microseconds(left.asMicroseconds() + right.asMicroseconds());
-    }
-
-
-////////////////////////////////////////////////////////////
-    Time &operator+=(Time &left, Time right) {
-        return left = left + right;
-    }
-
-
-////////////////////////////////////////////////////////////
-    Time operator-(Time left, Time right) {
-        return microseconds(left.asMicroseconds() - right.asMicroseconds());
-    }
-
-
-////////////////////////////////////////////////////////////
-    Time &operator-=(Time &left, Time right) {
-        return left = left - right;
-    }
-
-
-////////////////////////////////////////////////////////////
-    Time operator*(Time left, float right) {
-        return seconds(left.asSeconds() * right);
-    }
-
-
-////////////////////////////////////////////////////////////
-    Time operator*(Time left, long right) {
-        return microseconds(left.asMicroseconds() * right);
-    }
-
-
-////////////////////////////////////////////////////////////
-    Time operator*(float left, Time right) {
-        return right * left;
-    }
-
-
-////////////////////////////////////////////////////////////
-    Time operator*(long left, Time right) {
-        return right * left;
-    }
-
-
-////////////////////////////////////////////////////////////
-    Time &operator*=(Time &left, float right) {
-        return left = left * right;
-    }
-
-
-////////////////////////////////////////////////////////////
-    Time &operator*=(Time &left, long right) {
-        return left = left * right;
-    }
-
-
-////////////////////////////////////////////////////////////
-    Time operator/(Time left, float right) {
-        return seconds(left.asSeconds() / right);
-    }
-
-
-////////////////////////////////////////////////////////////
-    Time operator/(Time left, long right) {
-        return microseconds(left.asMicroseconds() / right);
-    }
-
-
-////////////////////////////////////////////////////////////
-    Time &operator/=(Time &left, float right) {
-        return left = left / right;
-    }
-
-
-////////////////////////////////////////////////////////////
-    Time &operator/=(Time &left, long right) {
-        return left = left / right;
-    }
-
-
-////////////////////////////////////////////////////////////
-    float operator/(Time left, Time right) {
-        return left.asSeconds() / right.asSeconds();
-    }
-
-
-////////////////////////////////////////////////////////////
-    Time operator%(Time left, Time right) {
-        return microseconds(left.asMicroseconds() % right.asMicroseconds());
-    }
-
-
-////////////////////////////////////////////////////////////
-    Time &operator%=(Time &left, Time right) {
-        return left = left % right;
-    }
-
+#include <memory>
+#include <stdio.h>
+#include <stdarg.h>  
+#include <time.h>
+
+std::string RenderD7::FormatString(std::string fmt_str, ...)
+{
+	va_list ap;
+	char* fp = NULL;
+	va_start(ap, fmt_str);
+	vasprintf(&fp, fmt_str.c_str(), ap);
+	va_end(ap);
+	std::unique_ptr<char, decltype(free)*> formatted(fp, free);
+	return std::string(formatted.get());
+}
+
+std::string RenderD7::GetTimeStr(void)
+{
+	time_t unixTime       = time(NULL);
+	struct tm* timeStruct = gmtime((const time_t*)&unixTime);
+	return RenderD7::FormatString("%02i:%02i:%02i", timeStruct->tm_hour, timeStruct->tm_min, timeStruct->tm_sec);
 }

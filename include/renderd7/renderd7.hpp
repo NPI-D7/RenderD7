@@ -28,10 +28,18 @@
 #include <renderd7/thread.hpp>
 #include <renderd7/ini.hpp>
 #include <renderd7/stringtool.hpp>
-#include <renderd7/Clock.hpp>
 #include <renderd7/bmp.hpp>
 #include <renderd7/bmpconverter.hpp>
-
+#include <renderd7/Toast.hpp>
+#include <renderd7/Ovl.hpp>
+#include <renderd7/BitmapPrinter.hpp>
+#include <renderd7/Image.hpp>
+#include <renderd7/Sprite.hpp>
+#include <renderd7/SpriteAnimation.hpp>
+#include <renderd7/Sheet.hpp>
+#include <renderd7/Color.hpp>
+#include <renderd7/Time.hpp>
+#include <renderd7/Screen.hpp>
 
 extern "C"
 {
@@ -42,9 +50,9 @@ extern "C"
 #define CHANGELOG "0.8.0: Implement BitmapPrinter\n0.7.3: Implement Over Render Overlay Framework\n0.7.2: Implement MT to csv file saving. Add RGB2HEX. \n0.7.1: Add the New Overlay Handler. Its Just in code and does nothing yet. \n0.7.0: Made Big Progress In the MT Ovl but it still crashes On a Scnd C3D_FrameEnd(). Implement 800px but doesn't work that good. \n0.6.2: Fix Crash when exiting trouth Home Menu.  \n0.6.10: rewrite Threadsystem, Improve framerate\n0.6.02: Fix Code in lang.hpp\nadd Draw Text Left Function.\nadd changelog\n0.6.01: add Threading system."
 #define DEFAULT_CENTER 0.5f
 
-extern C3D_RenderTarget* Top;
+/*extern C3D_RenderTarget* Top;
 extern C3D_RenderTarget* TopRight;
-extern C3D_RenderTarget* Bottom;
+extern C3D_RenderTarget* Bottom;*/
 
 extern u32 d7_hDown;
 extern u32 d7_hHeld;
@@ -76,84 +84,6 @@ namespace RenderD7
         float correctx = 0; //Correct X Position
         float correcty = 0; //Correct Y Position
         float txtsize = 0.7f;  //Set Text Size
-    };
-    /// Set current RenderScreen
-    /// \param target The RenderTarget Top, Bottom
-    void OnScreen(C3D_RenderTarget *target);
-    /** The Spritesheet Class */
-    class Sheet
-    {
-        public:
-        /// Construct sheet
-        Sheet();
-        // Deconstruct sheet
-        ~Sheet();
-        /// Load a Sritesheet
-        /// \param path Path to the Spritesheet (.t3x)
-        Result Load(const char *path);
-        /// Unload the Spritesheet
-        void Free();
-        /// The Spritesheet
-        C2D_SpriteSheet spritesheet;
-    };
-    /// Image Class
-    class Image
-    {
-        public:
-        ~Image();
-
-        void Unload();
-        /// Load Image from Png
-        /// \param path path to png file
-        void LoadPng(const std::string path);
-        /// Load the Image from buffer
-        /// \param buffer the frame buffer
-        void LoadPFromBuffer(const std::vector<u8> &buffer);
-        void LoadFromBitmap(BMP bitmap);
-        /// Draw the Image directly
-        /// \param x The x position
-        /// \param y the y position
-        /// \param scaleX x scale from 0.0 to 1.0
-        /// \param scaleY y scale from 0.0 to 1.0
-        bool Draw(float x, float y, float scaleX = 1.0f, float scaleY = 1.0f);
-        /// \brief Get The Image
-        /// \return C2D_Image
-        C2D_Image Get(){return this->img;}
-
-        void FromSheet(RenderD7::Sheet sheet, size_t index);
-        /// \param img this is the C2D_Image
-        C2D_Image img;
-        /// \param loadet whether the image is loadet or not
-        bool loadet = false;
-    };
-    /// Sprite Class
-    class Sprite
-    {
-        public:
-        /// \brief Construct Sprite
-        Sprite();
-        /// \brief Deconstruct Sprite
-        ~Sprite();
-        /// \brief Load a Sprite From SpriteSheet
-        /// \param sheet the Sheet to load from.(RenderD7::Sheet)
-        /// \param index the number of the Sprite in the Sheet
-        void FromSheet(RenderD7::Sheet *sheet, size_t index);
-        /// \brief Load a Sprite From SpriteSheet
-        /// \param img the Image to load from.(RenderD7::Image)
-        void FromImage(RenderD7::Image *img);
-        bool Draw();
-        void SetCenter(float x, float y);
-        void SetPos(float x, float y);
-        void SetScale(float x, float y);
-        void SetRotation(float rotation);
-        void Rotate(float speed);
-        float getWidth();
-        float getHeigh();
-        float getPosX();
-        float getPosY();
-        private:
-        C2D_ImageTint tint;
-        C2D_Sprite sprite;
     };
 
     class Scene {
@@ -209,17 +139,6 @@ namespace RenderD7
 
     void LoadSettings();
 
-    class Ovl {
-        public:
-        virtual ~Ovl(){}
-        virtual void Draw() const = 0;
-        virtual void Logic() = 0;
-        inline bool IsKilled() {return this->iskilled; }
-        inline void Kill() { iskilled = true; }
-        private:
-        bool iskilled = false;
-    };
-
     class DSP_NF : public RenderD7::Ovl
     {
         public:
@@ -231,35 +150,7 @@ namespace RenderD7
         int delay = 0;
     };
 
-    class Toast : public RenderD7::Ovl
-    {
-        public:
-        Toast(std::string head, std::string msg);
-        void Draw(void) const override;
-        void Logic() override;
-        private:
-        std::string head, msg;
-        int msgposy = 240;
-        int delay = 0;
-    };
-
-    void AddOvl(std::unique_ptr<RenderD7::Ovl> scene);
-    namespace Color
-    {
-        struct rgba
-        {
-            u8 r, g, b, a;
-        };
-        class RGBA{
-            public:
-            RGBA(u8 r, u8 g, u8 b, u8 a) : m_r(r),m_g(g),m_b(b),m_a(a){}
-            u32 toRGBA() const {return (m_r << 24) | (m_g << 16) | (m_b << 8) | m_a;}
-            
-            u8 m_r, m_g ,m_b, m_a;
-        };
-        std::string RGB2Hex(int r, int g, int b);
-        u32 Hex(const std::string color, u8 a = 255);
-    }
+    
     int GetRandomInt(int b, int e);
     void DrawMetrikOvl();
     bool DrawImageFromSheet(RenderD7::Sheet* sheet, size_t index, float x, float y, float scaleX = 1.0, float scaleY = 1.0);
@@ -331,21 +222,6 @@ namespace RenderD7
     void FrameEnd();
     void ToggleRD7SR();
     bool IsRD7SR();
-
-    class SpriteSheetAnimation : public RenderD7::Sprite
-    {
-        public:
-        SpriteSheetAnimation();
-        ~SpriteSheetAnimation();
-        void Setup(RenderD7::Sheet *sheet, size_t imagecount, size_t startimage, float frame_begin, float frame_finish);
-        void Play(float timespeed);
-        private:
-        size_t images;
-        size_t imgs = 0;
-        float D_totaltime;
-        RenderD7::Sheet *sheet;
-        float time;
-    };
     
 
     struct TLBtn
@@ -388,8 +264,7 @@ namespace RenderD7
         u32 outcol, incol, chcol;
     };
     void DrawCheckbox(Checkbox box);
-    std::string FormatString(std::string fmt_str, ...);
-    std::string GetTimeStr(void);
+    
     class Console
     {
          public:
@@ -412,76 +287,7 @@ namespace RenderD7
            RenderD7::Color::rgba barcolor = {0, 0, 0, 255};
     };
 
-    bool NameIsEndingWith(const std::string &name, const std::vector<std::string> &extensions);
     void GetDirContentsExt(std::vector<RenderD7::DirContent> &dircontent, const std::vector<std::string> &extensions);
     void GetDirContents(std::vector<RenderD7::DirContent> &dircontent);
 
-    class BitmapPrinter
-    {
-        public:
-        BitmapPrinter(int w, int h);
-        ~BitmapPrinter();
-        bool DecodeFile(std::string file);
-        
-        bool DecodeMem(std::vector<unsigned char> buffer);
-        void DrawPixel(int x, int y, u8 b, u8 g, u8 r, u8 a);
-        void DrawRect(int x, int y, int w, int h, u8 line_w, u8 b, u8 g, u8 r, u8 a);
-        void DrawRectFilled(int x, int y, int w, int h, u8 b, u8 g, u8 r, u8 a);
-        void UsePreMap(BMP map);
-        void UsePrePrintMap(BitmapPrinter printmap);
-        BMP GetBitmap(){ return bitmap; }
-        void SaveBmp(std::string name);
-        void SavePng(std::string name);
-
-        void CreateScreen(C3D_RenderTarget *target);
-        void DrawScreenDirectF(int framerate);
-        void DrawScreenDirect();
-        void DrawScreenF(int framerate);
-        void DrawScreen();
-        void UpdateScreenF(int framerate);
-        void UpdateScreen();
-        void Clear(u8 b = 0, u8 g = 0, u8 r = 0, u8 a = 255);
-        void ClearBlank();
-        RenderD7::Image GetImage();
-        /// Test to Find out The Best Settings for BitmapPrinter
-        void Benchmark();
-        /// Setup the Benchmark
-        /// \param framerate The Fps of the ScreenUpdates
-        void SetupBenchmark(int framerate);
-        bool IsBenchmarkRunning() { return this->benchmark; }
-
-        void DrawText(int x, int y, float t_size, u32 color, std::string text);
-        private:
-        int frame = 0;
-        RenderD7::Image renderframe;
-        bool isscreen = false;
-        C3D_RenderTarget* targetr;
-        BMP bitmap = BMP(20, 20, true); //Need to Set e Predefined Bitmap. If not the System will Crash.
-        BMP blank = BMP(20, 20, true);  //Need to Set e Predefined Bitmap. If not the System will Crash.
-
-        ///////////////////////////////////////////////////////////////////////////////////////////////////
-        //Benchmark Stuff;
-        bool benchmark = false;
-        bool setupbenchmark;
-        float frametime = 0;
-        uint64_t lastTime = 0;
-        float dtt = 0.f;
-        float dtt2 = 0.f;
-        float dtt3 = 0.f;
-        float timer = 0;
-        float mhdtt = 0;
-        float mdtt2;
-        float mdtt3;
-
-        float fpsClock = 0.f;
-	    int frameCounter = 0, fps = 0;
-
-        std::vector<float> hdttt;
-        std::vector<float> hdttt2;
-        std::vector<float> hdttt3;
-        std::vector<int> fpscountc;
-        int renderedframes = 0;
-        int testfps = 60;
-        ////////////////////////////////////////////////////////////////////////////////////////////////
-    };
 } /// RenderD7
