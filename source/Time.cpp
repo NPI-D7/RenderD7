@@ -3,6 +3,11 @@
 #include <stdio.h>
 #include <stdarg.h>  
 #include <time.h>
+#include <unistd.h>
+#include <fstream>
+#include <string.h>
+#include <string>
+
 
 std::string RenderD7::FormatString(std::string fmt_str, ...)
 {
@@ -17,7 +22,10 @@ std::string RenderD7::FormatString(std::string fmt_str, ...)
 
 std::string RenderD7::GetTimeStr(void)
 {
-	time_t unixTime       = time(NULL);
-	struct tm* timeStruct = gmtime((const time_t*)&unixTime);
-	return RenderD7::FormatString("%02i-%02i-%02i", timeStruct->tm_hour, timeStruct->tm_min, timeStruct->tm_sec);
+	time_t unixTime;
+	struct tm timeStruct;
+	time(&unixTime);
+	localtime_r(&unixTime, &timeStruct);
+	return FormatString("%04i-%02i-%02i_%02i-%02i-%02i", timeStruct.tm_year + 1900, timeStruct.tm_mon + 1, timeStruct.tm_mday,
+		timeStruct.tm_hour, timeStruct.tm_min, timeStruct.tm_sec);
 }

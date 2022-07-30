@@ -1,5 +1,7 @@
 #pragma once
 #include <string>
+#include <iostream>
+#include <iomanip>
 
 namespace RenderD7
 {
@@ -29,4 +31,14 @@ T remove_ext(T const & filename)
 {
   typename T::size_type const p(filename.find_last_of('.'));
   return p > 0 && p != T::npos ? filename.substr(0, p) : filename;
+}
+
+template< typename T >
+std::string Int_To_Hex( T i )
+{
+  std::stringstream stream;
+  stream << "0x" 
+         << std::setfill ('0') << std::setw(sizeof(T)*2) 
+         << std::hex << i;
+  return stream.str();
 }

@@ -10,6 +10,8 @@
 #include <renderd7/Time.hpp>
 #include <renderd7/Screen.hpp>
 
+#include <renderd7/Fonts/NFontApi.hpp>
+
 namespace RenderD7
 {
     enum Encoder
@@ -59,13 +61,13 @@ namespace RenderD7
         void SetupBenchmark(int framerate);
         bool IsBenchmarkRunning() { return this->benchmark; }
 
-        void DrawDebugText(int x, int y, float t_size, u32 color, std::string text);
-        void DrawText(int x, int y, int t_size, u32 color, std::string text);
+        void DrawDebugText(int x, int y, int t_size, u32 color, std::string text);
+        void DrawText(int x, int y, float t_size, u32 color, std::string text, RenderD7::NFontApi font);
         private:
         //funcs
         bool Decode(Decoder deccc);
-        void DrawDebugChar(u32 posX, u32 posY, u32 color, char character);
-        void DrawChar(u32 posX, u32 posY, int t_size, u32 color, char character);
+        void DrawDebugChar(u32 posX, u32 posY, int t_size, u32 color, char character);
+        void DrawChar(int posX, int posY, float t_size, u32 color, char character, RenderD7::NFontApi font);
         //parameter
         int frame = 0;
         RenderD7::Image renderframe;

@@ -254,7 +254,7 @@ void RenderD7::BitmapPrinter::Benchmark()
 			std::string resultt = "TestMode: " + std::to_string(testfpsd) + "fps" + "\nRendered Frames: " + renderedf + "\nMax Cpu Time: " + avgdtt + "\nAvg Cpu Time: " + avgcpu + "\nAvg Fps: " + avgfps + "\nAvg EncodeTime: " + avgcpu2 + "ms/f\nAvg DecodeTime: " + avgcpu3 + "ms\n";
 			this->ClearBlank();
 			this->DrawRectFilled(0, 0, this->bitmap.bmp_info_header.width, this->bitmap.bmp_info_header.height, 0, 0, 0, 255);
-			this->DrawText(0, 0, 0, RenderD7::Color::Hex("#ffffff"), resultt);
+			this->DrawDebugText(0, 0, 0, RenderD7::Color::Hex("#ffffff"), resultt);
 			std::string outname = csvpc + "/benchmark_" + RenderD7::GetTimeStr() + ".png";
 			this->SavePng(outname);
 			RenderD7::AddOvl(std::make_unique<RenderD7::Toast>("Benchmark", "Saved to: \n" + outname));
@@ -275,12 +275,12 @@ void RenderD7::BitmapPrinter::Benchmark()
 		this->ClearBlank();
 		this->DrawRectFilled(0, 0, this->bitmap.bmp_info_header.width, this->bitmap.bmp_info_header.width, 255, 255, 255, 255);
 		this->DrawRect(5, 5, this->bitmap.bmp_info_header.width - 10, this->bitmap.bmp_info_header.height - 10, 5, 0, 0, 0, 0);
-		//this->DrawText(20, 20, 0, RenderD7::Color::Hex("#ffffff"), "Fps: " + std::to_string(fps));
-		this->DrawText(0, 0, 0.5f, RenderD7::Color::Hex("#ff0000"), "Time: " + std::to_string(timer));
-		this->DrawText(0, 10, 0.5f, RenderD7::Color::Hex("#ff0000"), "Fps: " + std::to_string(fps));
-		this->DrawText(0, 20, 0.5f, RenderD7::Color::Hex("#ff0000"), "dt: " + std::to_string(dtt));
-		this->DrawText(0, 30, 0.5f, RenderD7::Color::Hex("#ff0000"), "MaxEncodeTime: " + std::to_string(mdtt2*1000) + "ms/f");
-		this->DrawText(0, 40, 0.5f, RenderD7::Color::Hex("#ff0000"), "MaxDecodeTime: " + std::to_string(mdtt3*1000) + "ms");
+		//this->DrawDebugText(20, 20, 0, RenderD7::Color::Hex("#ffffff"), "Fps: " + std::to_string(fps));
+		this->DrawDebugText(0, 0, 0.5f, RenderD7::Color::Hex("#ff0000"), "Time: " + std::to_string(timer));
+		this->DrawDebugText(0, 10, 0.5f, RenderD7::Color::Hex("#ff0000"), "Fps: " + std::to_string(fps));
+		this->DrawDebugText(0, 20, 0.5f, RenderD7::Color::Hex("#ff0000"), "dt: " + std::to_string(dtt));
+		this->DrawDebugText(0, 30, 0.5f, RenderD7::Color::Hex("#ff0000"), "MaxEncodeTime: " + std::to_string(mdtt2*1000) + "ms/f");
+		this->DrawDebugText(0, 40, 0.5f, RenderD7::Color::Hex("#ff0000"), "MaxDecodeTime: " + std::to_string(mdtt3*1000) + "ms");
 		uint64_t currentTime2 = svcGetSystemTick();
 		dtt2 = ((float)(currentTime2 / (float)TICKS_PER_MSEC) - (float)(lastTime2 / (float)TICKS_PER_MSEC)) / 1000.f;
 		hdttt2.push_back(dtt2);
@@ -330,8 +330,9 @@ void RenderD7::BitmapPrinter::SetupBenchmark(int framerate)
 
 #include <renderd7/debugfont.h>
 
-void RenderD7::BitmapPrinter::DrawDebugChar(u32 posX, u32 posY, u32 color, char character)
+void RenderD7::BitmapPrinter::DrawDebugChar(u32 posX, u32 posY, int t_size, u32 color, char character)
 {
+	bool isscale = (t_size > 1) ? true : false;
 	for(u32 y = 0; y < 8; y++)
     {
         char charPos = debugfont[character * 8 + y];
@@ -339,60 +340,31 @@ void RenderD7::BitmapPrinter::DrawDebugChar(u32 posX, u32 posY, u32 color, char 
         for(u32 x = 0; x < 8; x++)
             if(((charPos >> (7 - x)) & 1) == 1)
             {
-				DrawPixel((int)posX + x + 1, (int)posY + y + 1, UNPACK_BGRA(color));
+				if (!isscale) DrawPixel((int)posX + x + 1, (int)posY + y + 1, UNPACK_BGRA(color));
+				if (isscale) DrawRectFilled(((int)posX) + (x*t_size) + 1, ((int)posY) + (y*t_size) + 1, t_size,  t_size, UNPACK_BGRA(color));
             }
     }
 }
 
-void RenderD7::BitmapPrinter::DrawChar(u32 posX, u32 posY, int t_size, u32 color, char character)
+void RenderD7::BitmapPrinter::DrawChar(int posX, int posY, float t_size, u32 color, char character, RenderD7::NFontApi font)
 {
-	for(u32 y = 0; y < (uint32_t)(8*t_size); y++)
+	for(int y = 0; y < font.GetGlyphHeight(RenderD7::utf8_decode(RenderD7::IntToUtf8((int)character).c_str())); y++)
     {
-        char charPos = debugfont[character * 8 + y/t_size];
+        char charPos = (char)font.GetGlyphBitmap(RenderD7::utf8_decode(RenderD7::IntToUtf8((int)character).c_str()))[character * font.GetGlyphHeight(RenderD7::utf8_decode(RenderD7::IntToUtf8((int)character).c_str())) + y];
 
-        for(u32 x = 0; x < (uint32_t)(8*t_size); x++)
-            if(((charPos >> (7 - x)) & 1) == 1)
+        for(int x = 0; x < font.GetGlyphWidth(RenderD7::utf8_decode(RenderD7::IntToUtf8((int)character).c_str())); x++)
+            if(((charPos >> (font.GetGlyphWidth(RenderD7::utf8_decode(RenderD7::IntToUtf8((int)character).c_str()) - 1) - x)) & 1) == 1)
             {
-				DrawPixel((int)posX + x + 1, (int)posY + y + 1, UNPACK_BGRA(color));
+				DrawPixel(posX + x + 1, posY + y + 1, UNPACK_BGRA(color));
             }
     }
+	
 }
 
 #define SPACING_Y 10
 #define SPACING_X 8
 
-void RenderD7::BitmapPrinter::DrawDebugText(int x, int y, float t_size, u32 color, std::string text)
-{
-	for(u32 i = 0, line_i = 0; i < strlen(text.c_str()); i++)
-        switch(text[i])
-        {
-            case '\n':
-                y += SPACING_Y;
-                line_i = 0;
-                break;
-
-            case '\t':
-                line_i += 2;
-                break;
-
-            default:
-                //Make sure we never get out of the screen
-                if(line_i >= (((u32)this->bitmap.bmp_info_header.width) - (u32)x) / SPACING_X)
-                {
-                    y += SPACING_Y;
-                    line_i = 1; //Little offset so we know the same text continues
-                    if(text[i] == ' ') break; //Spaces at the start look weird
-                }
-
-                this->DrawDebugChar((u32)x + line_i * SPACING_X, (u32)y, color, text[i]);
-
-                line_i++;
-                break;
-        }
-
-}
-
-void RenderD7::BitmapPrinter::DrawText(int x, int y, int t_size, u32 color, std::string text)
+void RenderD7::BitmapPrinter::DrawDebugText(int x, int y, int t_size, u32 color, std::string text)
 {
 	if (t_size < 1)
 	{
@@ -403,24 +375,59 @@ void RenderD7::BitmapPrinter::DrawText(int x, int y, int t_size, u32 color, std:
         switch(text[i])
         {
             case '\n':
-                y += SPACING_Y*t_size;
+                y += (SPACING_Y*t_size);
                 line_i = 0;
                 break;
 
             case '\t':
-                line_i += 2*t_size;
+                line_i += 2;
                 break;
 
             default:
                 //Make sure we never get out of the screen
-                if(line_i >= (((u32)this->bitmap.bmp_info_header.width) - (u32)x) / SPACING_X*t_size)
+                if(line_i >= (((u32)this->bitmap.bmp_info_header.width) - (u32)x) / (SPACING_X*t_size))
                 {
-                    y += SPACING_Y*t_size;
+                    y += (SPACING_Y*t_size);
                     line_i = 1; //Little offset so we know the same text continues
                     if(text[i] == ' ') break; //Spaces at the start look weird
                 }
 
-                this->DrawChar((u32)x + line_i * SPACING_X, (u32)y, t_size, color, text[i]);
+                this->DrawDebugChar((u32)x + line_i * (SPACING_X*t_size), (u32)y, t_size, color, text[i]);
+
+                line_i++;
+                break;
+        }
+}
+
+void RenderD7::BitmapPrinter::DrawText(int x, int y, float t_size, u32 color, std::string text, RenderD7::NFontApi font)
+{
+	if (t_size < 1)
+	{
+		t_size = 1;
+	}
+	
+	for(u32 i = 0, line_i = 0; i < strlen(text.c_str()); i++)
+        switch(text[i])
+        {
+            case '\n':
+                y += (font.GetLineHeight());
+                line_i = 0;
+                break;
+
+            case '\t':
+                line_i += 2;
+                break;
+
+            default:
+                //Make sure we never get out of the screen
+                if(line_i >= (((u32)this->bitmap.bmp_info_header.width) - (u32)x) / (u32)(font.GetGlyphWidth(RenderD7::utf8_decode(&text[i]))*t_size))
+                {
+                    y += (SPACING_Y*t_size);
+                    line_i = 1; //Little offset so we know the same text continues
+                    if(text[i] == ' ') break; //Spaces at the start look weird
+                }
+
+                this->DrawChar(x + line_i * (font.GetGlyphWidth(RenderD7::utf8_decode(&text[i])*t_size)), y, t_size, color, text[i], font);
 
                 line_i++;
                 break;

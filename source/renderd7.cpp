@@ -242,9 +242,9 @@ void RenderD7::Error::DisplayFatalError(std::string toptext, std::string errorte
 	C2D_TargetClear(Bottom, DSEVENBLACK);
 	RenderD7::BitmapPrinter errorss(400, 240);
 	errorss.DrawRectFilled(0, 0, 400, 240, 0, 0, 0, 255);
-	errorss.DrawText(4, 4, 2, RenderD7::Color::Hex("#ff0000"), toptext);
-	errorss.DrawText(4, 26, 1, RenderD7::Color::Hex("#000000"), errortext);
-	errorss.DrawText(4, 230, 1, RenderD7::Color::Hex("#000000"), "Press Start to Exit!");
+	errorss.DrawDebugText(4, 4, 2, RenderD7::Color::Hex("#ff0000"), toptext);
+	errorss.DrawDebugText(4, 26, 1, RenderD7::Color::Hex("#000000"), errortext);
+	errorss.DrawDebugText(4, 230, 1, RenderD7::Color::Hex("#000000"), "Press Start to Exit!");
 	RenderD7::Image img;
 	img.LoadFromBitmap(errorss.GetBitmap());
 	RenderD7::OnScreen(Top);

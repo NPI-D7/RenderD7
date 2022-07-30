@@ -8,8 +8,8 @@ RenderD7::Toast::Toast(std::string head, std::string msg)
     this->toast.ClearBlank();
 	this->toast.DrawRectFilled(0, 0, 400, 70, 40, 40, 40, 255);
 	this->toast.DrawRectFilled(0, 0, 400, 25, 70, 70, 70, 255);
-	this->toast.DrawText(4, 5, 0, RenderD7::Color::Hex("#ffffff"), this->head);
-	this->toast.DrawText(4, 40, 0, RenderD7::Color::Hex("#ffffff"), this->msg);
+	this->toast.DrawDebugText(4, 5, 0, RenderD7::Color::Hex("#ffffff"), this->head);
+	this->toast.DrawDebugText(4, 40, 0, RenderD7::Color::Hex("#ffffff"), this->msg);
 	this->toastrendered->LoadPFromBuffer(BitmapConverter::ConvertData(toast.GetBitmap().DATA()));
 }
 
