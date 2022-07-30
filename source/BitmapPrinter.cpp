@@ -31,16 +31,6 @@ bool RenderD7::BitmapPrinter::DecodeFile(std::string file)
 
 	return true;
 }
-bool RenderD7::BitmapPrinter::DecodeMem(std::vector<unsigned char> buffer)
-{
-	unsigned error = bitmap.read_mem(buffer);
-	if (error)
-	{
-		RenderD7::AddOvl(std::make_unique<RenderD7::Toast>("BitmapPrinter", "Error Code: " + std::to_string(error)));
-		return false;
-	}
-	return true;
-}	
 
 void RenderD7::BitmapPrinter::DrawPixel(int x, int y, u8 b, u8 g, u8 r, u8 a)
 {
@@ -117,7 +107,7 @@ bool RenderD7::BitmapPrinter::DrawScreenDirectF(int framerate)
 		if(frame == (60/framerate)){
 			RenderD7::OnScreen(targetr);
 			if(renderframe.loadet) renderframe.Unload();
-			renderframe.LoadFromBitmap(bitmap);
+			this->Decode(decc);
 			frame = 0;
 			updtt = true;
 		}
@@ -135,7 +125,7 @@ bool RenderD7::BitmapPrinter::DrawScreenDirect()
 	{
 		RenderD7::OnScreen(targetr);
 		if(renderframe.loadet) renderframe.Unload();
-		renderframe.LoadFromBitmap(bitmap);
+		this->Decode(decc);
 		updtt = true;
 		if(renderframe.loadet) renderframe.Draw(0, 0);
 	}	
@@ -195,7 +185,8 @@ bool RenderD7::BitmapPrinter::UpdateScreenF(int framerate)
 	{
 		if(frame == (60/framerate)){
 			if(renderframe.loadet) renderframe.Unload();
-			renderframe.LoadFromBitmap(bitmap);
+			//renderframe.LoadFromBitmap(bitmap);
+			this->Decode(decc);
 			frame = 0;
 			updtt = true;
 		}
@@ -209,7 +200,7 @@ bool RenderD7::BitmapPrinter::UpdateScreen()
 	if (isscreen)
 	{
 		if(renderframe.loadet) renderframe.Unload();
-		renderframe.LoadFromBitmap(bitmap);
+		this->Decode(decc);
 		updtt = true;
 	}	
 	return updtt;
@@ -260,8 +251,9 @@ void RenderD7::BitmapPrinter::Benchmark()
 			std::string avgcpu3 = std::to_string(((alldtt3/(float)hdttt3.size())*1000));
 			std::string avgfps = std::to_string((allfps/(int)fpscountc.size()-1));
 
-			std::string resultt = "Frames Rendered: " + renderedf + "\nMax Cpu Time: " + avgdtt + "\nAvg Cpu Time: " + avgcpu + "\nAvg Fps: " + avgfps + "\nAvg RenderTime: " + avgcpu2 + "ms/f\nAvg ConvertTime: " + avgcpu3 + "ms\n";
+			std::string resultt = "TestMode: " + std::to_string(testfpsd) + "fps" + "\nRendered Frames: " + renderedf + "\nMax Cpu Time: " + avgdtt + "\nAvg Cpu Time: " + avgcpu + "\nAvg Fps: " + avgfps + "\nAvg EncodeTime: " + avgcpu2 + "ms/f\nAvg DecodeTime: " + avgcpu3 + "ms\n";
 			this->ClearBlank();
+			this->DrawRectFilled(0, 0, this->bitmap.bmp_info_header.width, this->bitmap.bmp_info_header.height, 0, 0, 0, 255);
 			this->DrawText(0, 0, 0, RenderD7::Color::Hex("#ffffff"), resultt);
 			std::string outname = csvpc + "/benchmark_" + RenderD7::GetTimeStr() + ".png";
 			this->SavePng(outname);
@@ -285,10 +277,10 @@ void RenderD7::BitmapPrinter::Benchmark()
 		this->DrawRect(5, 5, this->bitmap.bmp_info_header.width - 10, this->bitmap.bmp_info_header.height - 10, 5, 0, 0, 0, 0);
 		//this->DrawText(20, 20, 0, RenderD7::Color::Hex("#ffffff"), "Fps: " + std::to_string(fps));
 		this->DrawText(0, 0, 0.5f, RenderD7::Color::Hex("#ff0000"), "Time: " + std::to_string(timer));
-		this->DrawText(0, 20, 0.5f, RenderD7::Color::Hex("#ff0000"), "Fps: " + std::to_string(fps));
-		this->DrawText(0, 40, 0.5f, RenderD7::Color::Hex("#ff0000"), "dt: " + std::to_string(dtt));
-		this->DrawText(0, 60, 0.5f, RenderD7::Color::Hex("#ff0000"), "MaxRenderTime: " + std::to_string(mdtt2*1000) + "ms/f");
-		this->DrawText(0, 80, 0.5f, RenderD7::Color::Hex("#ff0000"), "MaxConvertTime: " + std::to_string(mdtt3*1000) + "ms");
+		this->DrawText(0, 10, 0.5f, RenderD7::Color::Hex("#ff0000"), "Fps: " + std::to_string(fps));
+		this->DrawText(0, 20, 0.5f, RenderD7::Color::Hex("#ff0000"), "dt: " + std::to_string(dtt));
+		this->DrawText(0, 30, 0.5f, RenderD7::Color::Hex("#ff0000"), "MaxEncodeTime: " + std::to_string(mdtt2*1000) + "ms/f");
+		this->DrawText(0, 40, 0.5f, RenderD7::Color::Hex("#ff0000"), "MaxDecodeTime: " + std::to_string(mdtt3*1000) + "ms");
 		uint64_t currentTime2 = svcGetSystemTick();
 		dtt2 = ((float)(currentTime2 / (float)TICKS_PER_MSEC) - (float)(lastTime2 / (float)TICKS_PER_MSEC)) / 1000.f;
 		hdttt2.push_back(dtt2);
@@ -333,6 +325,7 @@ void RenderD7::BitmapPrinter::SetupBenchmark(int framerate)
 	benchmark = true;
 	setupbenchmark = true;
 	this->testfps = framerate;
+	this->testfpsd = framerate;
 }
 
 #include <renderd7/debugfont.h>
@@ -383,4 +376,26 @@ void RenderD7::BitmapPrinter::DrawText(int x, int y, float t_size, u32 color, st
                 break;
         }
 
+}
+
+bool RenderD7::BitmapPrinter::Decode(Decoder deccc)
+{
+	bool res = false;
+
+	switch (deccc)
+	{
+	case Decoder::BITMAP2PNG2C3D:
+		renderframe.LoadPFromBuffer(BitmapConverter::ConvertData(this->bitmap.DATA()));
+		res = true;
+		break;
+	case Decoder::BITMAP2C3D:
+		renderframe.LoadFromBitmap(this->bitmap);
+		res = true;
+		break;
+	
+	default:
+		res = false;
+		break;
+	}
+	return res;
 }

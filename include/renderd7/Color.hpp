@@ -13,14 +13,6 @@ namespace RenderD7
 {
     namespace Color
     {
-        enum ColorFmt
-        {
-            RGBA8,
-            RGB8,
-            RGB565,
-            BGRA8,
-            BGR8
-        };
         struct rgba
         {
             uint8_t r, g, b, a;
@@ -34,6 +26,5 @@ namespace RenderD7
         };
         std::string RGB2Hex(int r, int g, int b);
         uint32_t Hex(const std::string color, uint8_t a = 255);
-        uint32_t Convert(uint32_t src, RenderD7::Color::ColorFmt srcFormat, RenderD7::Color::ColorFmt dstFormat);
     }
 }

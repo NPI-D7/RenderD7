@@ -12,6 +12,19 @@
 
 namespace RenderD7
 {
+    enum Encoder
+    {
+        BITMAP,         ///< Encode Data to Bitmap
+        DIRECT,         ///< Encode Direct to Framebuffer(No Decoder Required)
+        C3D             ///< Encode Directly to C3D_Tex (Just an Idea)
+    };
+
+    enum Decoder
+    {
+        BITMAP2C3D,     ///< Decode and Encode to C3D_Tex (Currently Fastest) (47,4ms)
+        BITMAP2PNG2C3D  ///< Decode Bitmap end Convert to Png, then C3D (Very Slow) (201,4ms)
+    };
+
     class BitmapPrinter
     {
         public:
@@ -19,7 +32,7 @@ namespace RenderD7
         ~BitmapPrinter();
         bool DecodeFile(std::string file);
         
-        bool DecodeMem(std::vector<unsigned char> buffer);
+        void SetDecoder(Decoder deccc) { decc = deccc; }
         void DrawPixel(int x, int y, u8 b, u8 g, u8 r, u8 a);
         void DrawRect(int x, int y, int w, int h, u8 line_w, u8 b, u8 g, u8 r, u8 a);
         void DrawRectFilled(int x, int y, int w, int h, u8 b, u8 g, u8 r, u8 a);
@@ -49,6 +62,7 @@ namespace RenderD7
         void DrawText(int x, int y, float t_size, u32 color, std::string text);
         private:
         //funcs
+        bool Decode(Decoder deccc);
         void DrawChar(u32 posX, u32 posY, u32 color, char character);
         //parameter
         int frame = 0;
@@ -60,6 +74,7 @@ namespace RenderD7
 
         ///////////////////////////////////////////////////////////////////////////////////////////////////
         //Benchmark Stuff;
+        int testfpsd;
         bool benchmark = false;
         bool setupbenchmark;
         float frametime = 0;
@@ -81,6 +96,8 @@ namespace RenderD7
         std::vector<int> fpscountc;
         int renderedframes = 0;
         int testfps = 60;
+        Encoder encc = Encoder::BITMAP;
+        Decoder decc = Decoder::BITMAP2C3D;
         ////////////////////////////////////////////////////////////////////////////////////////////////
     };
 }
