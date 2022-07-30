@@ -8,6 +8,7 @@
 #include <regex>
 
 #define UNPACK_RGBA(col) (uint8_t) (col >> 24), (col >> 16), (col >> 8), (col)
+#define UNPACK_BGRA(col) (uint8_t) (col >> 8), (col >> 16), (col >> 24), (col)
 
 namespace RenderD7
 {

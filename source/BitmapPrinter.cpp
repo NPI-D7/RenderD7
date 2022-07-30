@@ -330,7 +330,7 @@ void RenderD7::BitmapPrinter::SetupBenchmark(int framerate)
 
 #include <renderd7/debugfont.h>
 
-void RenderD7::BitmapPrinter::DrawChar(u32 posX, u32 posY, u32 color, char character)
+void RenderD7::BitmapPrinter::DrawDebugChar(u32 posX, u32 posY, u32 color, char character)
 {
 	for(u32 y = 0; y < 8; y++)
     {
@@ -339,7 +339,21 @@ void RenderD7::BitmapPrinter::DrawChar(u32 posX, u32 posY, u32 color, char chara
         for(u32 x = 0; x < 8; x++)
             if(((charPos >> (7 - x)) & 1) == 1)
             {
-				DrawPixel((int)posX + x + 1, (int)posY + y + 1, 255, 255, 255, 255);
+				DrawPixel((int)posX + x + 1, (int)posY + y + 1, UNPACK_BGRA(color));
+            }
+    }
+}
+
+void RenderD7::BitmapPrinter::DrawChar(u32 posX, u32 posY, int t_size, u32 color, char character)
+{
+	for(u32 y = 0; y < (uint32_t)(8*t_size); y++)
+    {
+        char charPos = debugfont[character * 8 + y/t_size];
+
+        for(u32 x = 0; x < (uint32_t)(8*t_size); x++)
+            if(((charPos >> (7 - x)) & 1) == 1)
+            {
+				DrawPixel((int)posX + x + 1, (int)posY + y + 1, UNPACK_BGRA(color));
             }
     }
 }
@@ -347,7 +361,7 @@ void RenderD7::BitmapPrinter::DrawChar(u32 posX, u32 posY, u32 color, char chara
 #define SPACING_Y 10
 #define SPACING_X 8
 
-void RenderD7::BitmapPrinter::DrawText(int x, int y, float t_size, u32 color, std::string text)
+void RenderD7::BitmapPrinter::DrawDebugText(int x, int y, float t_size, u32 color, std::string text)
 {
 	for(u32 i = 0, line_i = 0; i < strlen(text.c_str()); i++)
         switch(text[i])
@@ -370,7 +384,43 @@ void RenderD7::BitmapPrinter::DrawText(int x, int y, float t_size, u32 color, st
                     if(text[i] == ' ') break; //Spaces at the start look weird
                 }
 
-                this->DrawChar((u32)x + line_i * SPACING_X, (u32)y, color, text[i]);
+                this->DrawDebugChar((u32)x + line_i * SPACING_X, (u32)y, color, text[i]);
+
+                line_i++;
+                break;
+        }
+
+}
+
+void RenderD7::BitmapPrinter::DrawText(int x, int y, int t_size, u32 color, std::string text)
+{
+	if (t_size < 1)
+	{
+		t_size = 1;
+	}
+	
+	for(u32 i = 0, line_i = 0; i < strlen(text.c_str()); i++)
+        switch(text[i])
+        {
+            case '\n':
+                y += SPACING_Y*t_size;
+                line_i = 0;
+                break;
+
+            case '\t':
+                line_i += 2*t_size;
+                break;
+
+            default:
+                //Make sure we never get out of the screen
+                if(line_i >= (((u32)this->bitmap.bmp_info_header.width) - (u32)x) / SPACING_X*t_size)
+                {
+                    y += SPACING_Y*t_size;
+                    line_i = 1; //Little offset so we know the same text continues
+                    if(text[i] == ' ') break; //Spaces at the start look weird
+                }
+
+                this->DrawChar((u32)x + line_i * SPACING_X, (u32)y, t_size, color, text[i]);
 
                 line_i++;
                 break;

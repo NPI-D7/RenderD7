@@ -59,11 +59,13 @@ namespace RenderD7
         void SetupBenchmark(int framerate);
         bool IsBenchmarkRunning() { return this->benchmark; }
 
-        void DrawText(int x, int y, float t_size, u32 color, std::string text);
+        void DrawDebugText(int x, int y, float t_size, u32 color, std::string text);
+        void DrawText(int x, int y, int t_size, u32 color, std::string text);
         private:
         //funcs
         bool Decode(Decoder deccc);
-        void DrawChar(u32 posX, u32 posY, u32 color, char character);
+        void DrawDebugChar(u32 posX, u32 posY, u32 color, char character);
+        void DrawChar(u32 posX, u32 posY, int t_size, u32 color, char character);
         //parameter
         int frame = 0;
         RenderD7::Image renderframe;

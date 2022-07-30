@@ -228,6 +228,9 @@ void RenderD7::Error::DisplayError(std::string toptext, std::string errortext, i
 		
 	}
 }
+
+#include <renderd7/BitmapPrinter.hpp>
+
 void RenderD7::Error::DisplayFatalError(std::string toptext, std::string errortext)
 {
 	shouldbe_disabled = true;
@@ -237,10 +240,18 @@ void RenderD7::Error::DisplayFatalError(std::string toptext, std::string errorte
 	C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
 	C2D_TargetClear(Top, DSEVENBLACK);
 	C2D_TargetClear(Bottom, DSEVENBLACK);
+	RenderD7::BitmapPrinter errorss(400, 240);
+	errorss.DrawRectFilled(0, 0, 400, 240, 0, 0, 0, 255);
+	errorss.DrawText(4, 4, 2, RenderD7::Color::Hex("#ff0000"), toptext);
+	errorss.DrawText(4, 26, 1, RenderD7::Color::Hex("#000000"), errortext);
+	errorss.DrawText(4, 230, 1, RenderD7::Color::Hex("#000000"), "Press Start to Exit!");
+	RenderD7::Image img;
+	img.LoadFromBitmap(errorss.GetBitmap());
 	RenderD7::OnScreen(Top);
-    RenderD7::DrawTextCentered(0, 0, 0.7f, DSEVENWHITE, toptext, 400);
+	img.Draw(0, 0);
+    /*RenderD7::DrawTextCentered(0, 0, 0.7f, DSEVENWHITE, toptext, 400);
 	RenderD7::DrawTextCentered(0, 100, 0.6f, DSEVENWHITE, errortext, 400);
-	RenderD7::DrawTextCentered(0, 200, 0.6f, DSEVENWHITE, "Press Start to Exit!", 400);
+	RenderD7::DrawTextCentered(0, 200, 0.6f, DSEVENWHITE, "Press Start to Exit!", 400);*/
 	C3D_FrameEnd(0);
     while (error___)
 	{
