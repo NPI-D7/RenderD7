@@ -111,6 +111,7 @@ namespace RenderD7
     }
 
 }
+#define I2U82I(val) RenderD7::utf8_decode(RenderD7::IntToUtf8(val).c_str())
 
     class NFontApi
     {
@@ -118,12 +119,13 @@ namespace RenderD7
         NFontApi();
         ~NFontApi();
         void LoadTTF(std::string path);
-        std::vector<unsigned char> GetGlyphBitmap(int glyph);
+        unsigned char* GetGlyphBitmap(char glyph);
         std::string GetStatus(){ return status; }
         float GetScale() {return scale; }
-        int GetGlyphWidth(int glyph);
-        int GetGlyphHeight(int glyph);
+        int GetGlyphWidth(char glyph);
+        int GetGlyphHeight(char glyph);
         int GetLineHeight(){ return l_h; }
+        int GetBaseHeight(){ return height; }
         private:
         std::string status;
 
@@ -138,7 +140,9 @@ namespace RenderD7
         int h;
 
         int x0,y0,x1,y1;
-	    int ascent,baseline, decent;
+	    int ascent,baseline,decent,linegap;
+
+        int linespace;
 
         stbtt_fontinfo font;
     };

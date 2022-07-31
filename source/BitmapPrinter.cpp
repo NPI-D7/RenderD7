@@ -348,15 +348,16 @@ void RenderD7::BitmapPrinter::DrawDebugChar(u32 posX, u32 posY, int t_size, u32 
 
 void RenderD7::BitmapPrinter::DrawChar(int posX, int posY, float t_size, u32 color, char character, RenderD7::NFontApi font)
 {
-	for(int y = 0; y < font.GetGlyphHeight(RenderD7::utf8_decode(RenderD7::IntToUtf8((int)character).c_str())); y++)
+	for(int y = 0; y < font.GetGlyphHeight(character); y++)
     {
-        char charPos = (char)font.GetGlyphBitmap(RenderD7::utf8_decode(RenderD7::IntToUtf8((int)character).c_str()))[character * font.GetGlyphHeight(RenderD7::utf8_decode(RenderD7::IntToUtf8((int)character).c_str())) + y];
-
-        for(int x = 0; x < font.GetGlyphWidth(RenderD7::utf8_decode(RenderD7::IntToUtf8((int)character).c_str())); x++)
-            if(((charPos >> (font.GetGlyphWidth(RenderD7::utf8_decode(RenderD7::IntToUtf8((int)character).c_str()) - 1) - x)) & 1) == 1)
+        for(int x = 0; x < font.GetGlyphWidth(character); x++)
+		{
+            if(((font.GetGlyphBitmap(character)[font.GetGlyphHeight(character) + y] >> (font.GetGlyphWidth(character - 1) - x)) & 1) == 1)
             {
 				DrawPixel(posX + x + 1, posY + y + 1, UNPACK_BGRA(color));
             }
+			
+		}
     }
 	
 }
@@ -420,14 +421,14 @@ void RenderD7::BitmapPrinter::DrawText(int x, int y, float t_size, u32 color, st
 
             default:
                 //Make sure we never get out of the screen
-                if(line_i >= (((u32)this->bitmap.bmp_info_header.width) - (u32)x) / (u32)(font.GetGlyphWidth(RenderD7::utf8_decode(&text[i]))*t_size))
+                if(line_i >= (((u32)this->bitmap.bmp_info_header.width) - (u32)x) / (u32)(font.GetGlyphWidth(text[i])))
                 {
                     y += (SPACING_Y*t_size);
                     line_i = 1; //Little offset so we know the same text continues
                     if(text[i] == ' ') break; //Spaces at the start look weird
                 }
 
-                this->DrawChar(x + line_i * (font.GetGlyphWidth(RenderD7::utf8_decode(&text[i])*t_size)), y, t_size, color, text[i], font);
+                this->DrawChar(x + line_i * (font.GetGlyphWidth(text[i])), y, t_size, color, text[i], font);
 
                 line_i++;
                 break;

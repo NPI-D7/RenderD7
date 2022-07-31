@@ -288,19 +288,20 @@ struct BMP {
     }
 
     unsigned fill_region(uint32_t x0, uint32_t y0, uint32_t w, uint32_t h, uint8_t B, uint8_t G, uint8_t R, uint8_t A) {
-        if (x0 + w > (uint32_t)bmp_info_header.width || y0 + h > (uint32_t)bmp_info_header.height) {
-            return 59;
-        }
-
         uint32_t channels = bmp_info_header.bit_count / 8;
         for (uint32_t y = y0; y < y0 + h; ++y) {
             for (uint32_t x = x0; x < x0 + w; ++x) {
-                data[channels * (y * bmp_info_header.width + x) + 0] = B;
-                data[channels * (y * bmp_info_header.width + x) + 1] = G;
-                data[channels * (y * bmp_info_header.width + x) + 2] = R;
-                if (channels == 4) {
-                    data[channels * (y * bmp_info_header.width + x) + 3] = A;
-                }
+                /*if (x + w > (uint32_t)bmp_info_header.width || y + h > (uint32_t)bmp_info_header.height) {
+                    //
+                }*/
+                //else{
+                    data[channels * (y * bmp_info_header.width + x) + 0] = B;
+                    data[channels * (y * bmp_info_header.width + x) + 1] = G;
+                    data[channels * (y * bmp_info_header.width + x) + 2] = R;
+                    if (channels == 4) {
+                        data[channels * (y * bmp_info_header.width + x) + 3] = A;
+                    }
+                //}
             }
         }
         return 0;
