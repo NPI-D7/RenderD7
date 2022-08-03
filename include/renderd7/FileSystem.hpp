@@ -5,6 +5,12 @@
 
 #include <physfs.h>
 
+#define RD7_FSYS_GETINFO(path) ({ \
+    RenderD7::FileSystem::Info inf; \
+    RenderD7::FileSystem::GetInfo(path, inf); \
+    inf; \
+    })
+
 namespace RenderD7
 {
     namespace FileSystem
