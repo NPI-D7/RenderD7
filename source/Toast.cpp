@@ -1,26 +1,27 @@
 #include <renderd7/Toast.hpp>
+#include <renderd7/Draw.hpp>
 
 RenderD7::Toast::Toast(std::string head, std::string msg)
 {
 	this->head = head;
 	this->msg = msg;
-    this->toast = RenderD7::BitmapPrinter(400, 70);
+    /*this->toast = RenderD7::BitmapPrinter(400, 70);
     this->toast.ClearBlank();
 	this->toast.DrawRectFilled(0, 0, 400, 70, 40, 40, 40, 255);
 	this->toast.DrawRectFilled(0, 0, 400, 25, 70, 70, 70, 255);
 	this->toast.DrawDebugText(4, 5, 0, RenderD7::Color::Hex("#ffffff"), this->head);
 	this->toast.DrawDebugText(4, 40, 0, RenderD7::Color::Hex("#ffffff"), this->msg);
-	this->toastrendered->LoadPFromBuffer(BitmapConverter::ConvertData(toast.GetBitmap().DATA()));
+	this->toastrendered->LoadPFromBuffer(BitmapConverter::ConvertData(toast.GetBitmap().DATA()));*/
 }
 
 void RenderD7::Toast::Draw(void) const
 {
 	RenderD7::OnScreen(Top);
-	/*RenderD7::DrawRect(0, msgposy, 400, 70, RenderD7::Color::Hex("#111111"));
-	RenderD7::DrawRect(0, msgposy, 400, 25, RenderD7::Color::Hex("#222222"));
-	RenderD7::DrawText(2, msgposy+3, 0.7f, RenderD7::Color::Hex("#ffffff"), head);
-	RenderD7::DrawText(2, msgposy+30, 0.6f, RenderD7::Color::Hex("#ffffff"), msg);*/
-	toastrendered->Draw(0, msgposy);
+	RenderD7::Draw::Rect(0, msgposy, 400, 70, RenderD7::Color::Hex("#111111"));
+	RenderD7::Draw::Rect(0, msgposy, 400, 25, RenderD7::Color::Hex("#222222"));
+	RenderD7::Draw::Text(2, msgposy+3, 0.7f, RenderD7::Color::Hex("#ffffff"), head);
+	RenderD7::Draw::Text(2, msgposy+30, 0.6f, RenderD7::Color::Hex("#ffffff"), msg);
+	//toastrendered->Draw(0, msgposy);
 }
 
 void RenderD7::Toast::Logic()

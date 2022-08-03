@@ -173,13 +173,13 @@ void RenderD7::Msg::Display(std::string titletxt, std::string subtext, C3D_Rende
 	C2D_TargetClear(Bottom, DSEVENBLACK);
     RenderD7::ClearTextBufs();
 	RenderD7::OnScreen(Top);
-	RenderD7::DrawRect(0, 0, 400, 240, RenderD7::Color::Hex("#111111"));
+	RenderD7::Draw::Rect(0, 0, 400, 240, RenderD7::Color::Hex("#111111"));
 	RenderD7::OnScreen(Bottom);
-	RenderD7::DrawRect(0, 0, 320, 240, RenderD7::Color::Hex("#111111"));
+	RenderD7::Draw::Rect(0, 0, 320, 240, RenderD7::Color::Hex("#111111"));
 	RenderD7::OnScreen(target);
-	RenderD7::DrawRect(0, 0, 400, 26, RenderD7::Color::Hex("#333333", 200));
-    RenderD7::DrawText(5, 2, 0.7f, DSEVENWHITE, titletxt);
-	RenderD7::DrawText(5, 30, 0.6f, DSEVENWHITE, subtext);
+	RenderD7::Draw::Rect(0, 0, 400, 26, RenderD7::Color::Hex("#333333", 200));
+    RenderD7::Draw::Text(5, 2, 0.7f, DSEVENWHITE, titletxt);
+	RenderD7::Draw::Text(5, 30, 0.6f, DSEVENWHITE, subtext);
 	C3D_FrameEnd(0);
 }
 void RenderD7::Msg::DisplayWithProgress(std::string titletext, std::string subtext, float current, float total, u32 prgbarcolor)
@@ -193,15 +193,15 @@ void RenderD7::Msg::DisplayWithProgress(std::string titletext, std::string subte
 	char str[256];
 	snprintf(str, sizeof(str), "(%.2f%%)", ((float)current/(float)total) * 100.0f);
 	RenderD7::OnScreen(Top);
-	RenderD7::DrawRect(0, 0, 400, 240, RenderD7::Color::Hex("#111111"));
-	RenderD7::DrawRect(0, 0, 400, 26, RenderD7::Color::Hex("#333333", 200));
-	RenderD7::DrawText(5, 2, 0.7f, DSEVENWHITE, titletext);
-	RenderD7::DrawText(5, 30, 0.6f, DSEVENWHITE, subtext);
-	RenderD7::DrawRect(30, 120, 342, 30, RenderD7::Color::Hex("#333333"));
-	RenderD7::DrawRect(31, 121, (int)(((float)current / (float)total) * 338.0f), 28, prgbarcolor);
-	RenderD7::DrawTextCentered(5, 124, 0.7f, RenderD7::Color::Hex("#111111"), str, 390); 
+	RenderD7::Draw::Rect(0, 0, 400, 240, RenderD7::Color::Hex("#111111"));
+	RenderD7::Draw::Rect(0, 0, 400, 26, RenderD7::Color::Hex("#333333", 200));
+	RenderD7::Draw::Text(5, 2, 0.7f, DSEVENWHITE, titletext);
+	RenderD7::Draw::Text(5, 30, 0.6f, DSEVENWHITE, subtext);
+	RenderD7::Draw::Rect(30, 120, 342, 30, RenderD7::Color::Hex("#333333"));
+	RenderD7::Draw::Rect(31, 121, (int)(((float)current / (float)total) * 338.0f), 28, prgbarcolor);
+	RenderD7::Draw::TextCentered(5, 124, 0.7f, RenderD7::Color::Hex("#111111"), str, 390); 
 	RenderD7::OnScreen(Bottom);
-	RenderD7::DrawRect(0, 0, 320, 240, RenderD7::Color::Hex("#111111"));
+	RenderD7::Draw::Rect(0, 0, 320, 240, RenderD7::Color::Hex("#111111"));
 	C3D_FrameEnd(0);
 }
 void RenderD7::SetupLog()
@@ -218,11 +218,11 @@ void RenderD7::Error::DisplayError(std::string toptext, std::string errortext, i
 	C2D_TargetClear(Top, DSEVENBLACK);
 	C2D_TargetClear(Bottom, DSEVENBLACK);
 	RenderD7::OnScreen(Top);
-    RenderD7::DrawText(0, 0, 0.7f, DSEVENWHITE, toptext);
-	RenderD7::DrawText(0, 30, 0.6f, DSEVENWHITE, errortext);
+    RenderD7::Draw::Text(0, 0, 0.7f, DSEVENWHITE, toptext);
+	RenderD7::Draw::Text(0, 30, 0.6f, DSEVENWHITE, errortext);
 	C3D_FrameEnd(0);
     for (int i = 0; i < 60*timesec; i++) {
-		RenderD7::DrawRect(0, 236, (int)(((float)i / (float)60*timesec) * 400.0f), 4, RenderD7::Color::Hex("#00ff00"));
+		RenderD7::Draw::Rect(0, 236, (int)(((float)i / (float)60*timesec) * 400.0f), 4, RenderD7::Color::Hex("#00ff00"));
 		gspWaitForVBlank();
 		
 		
@@ -249,9 +249,9 @@ void RenderD7::Error::DisplayFatalError(std::string toptext, std::string errorte
 	img.LoadFromBitmap(errorss.GetBitmap());
 	RenderD7::OnScreen(Top);
 	img.Draw(0, 0);
-    /*RenderD7::DrawTextCentered(0, 0, 0.7f, DSEVENWHITE, toptext, 400);
-	RenderD7::DrawTextCentered(0, 100, 0.6f, DSEVENWHITE, errortext, 400);
-	RenderD7::DrawTextCentered(0, 200, 0.6f, DSEVENWHITE, "Press Start to Exit!", 400);*/
+    /*RenderD7::Draw::TextCentered(0, 0, 0.7f, DSEVENWHITE, toptext, 400);
+	RenderD7::Draw::TextCentered(0, 100, 0.6f, DSEVENWHITE, errortext, 400);
+	RenderD7::Draw::TextCentered(0, 200, 0.6f, DSEVENWHITE, "Press Start to Exit!", 400);*/
 	C3D_FrameEnd(0);
     while (error___)
 	{
@@ -335,164 +335,6 @@ bool RenderD7::MainLoop()
 void RenderD7::ClearTextBufs(void)
 {
 	C2D_TextBufClear(TextBuf);
-}
-
-bool RenderD7::DrawRect(float x, float y, float w, float h, u32 color)
-{
-	return C2D_DrawRectSolid(x, y, 0.5f, w, h, color);
-}
-
-bool RenderD7::DrawPx(float x, float y, u32 color)
-{
-	return C2D_DrawRectSolid(x, y, 0.5f, 1, 1, color);
-}
-
-void RenderD7::DrawTextCentered(float x, float y, float size, u32 color, std::string Text, int maxWidth, int maxHeight, C2D_Font fnt) {
-	float lineHeight, widthScale;
-
-	// Check for the lineHeight.
-	if (fnt != nullptr) {
-		lineHeight = RenderD7::GetTextHeight(size, " ", fnt);
-	} else {
-		lineHeight = RenderD7::GetTextHeight(size, " ");
-	}
-
-	int line = 0;
-	while(Text.find('\n') != Text.npos) {
-		if (maxWidth == 0) {
-			// Do the widthScale.
-			if (fnt != nullptr) {
-				widthScale = RenderD7::GetTextWidth(size, Text.substr(0, Text.find('\n')), fnt);
-			} else {
-				widthScale = RenderD7::GetTextWidth(size, Text.substr(0, Text.find('\n')));
-			}
-		} else {
-			// Do the widthScale 2.
-			if (fnt != nullptr) {
-				widthScale = std::min((float)maxWidth, RenderD7::GetTextWidth(size, Text.substr(0, Text.find('\n')), fnt));
-			} else {
-				widthScale = std::min((float)maxWidth, RenderD7::GetTextWidth(size, Text.substr(0, Text.find('\n'))));
-			}
-		}
-		if (fnt != nullptr) {
-			RenderD7::DrawText((currentScreen ? 200 : 160)+x-(widthScale/2), y+(lineHeight*line), size, color, Text.substr(0, Text.find('\n')), maxWidth, maxHeight, fnt);
-		} else {
-			RenderD7::DrawText((currentScreen ? 200 : 160)+x-(widthScale/2), y+(lineHeight*line), size, color, Text.substr(0, Text.find('\n')), maxWidth, maxHeight);
-		}
-
-		Text = Text.substr(Text.find('\n')+1);
-		line++;
-	}
-
-	if (maxWidth == 0) {
-		// Do the next WidthScale.
-		if (fnt != nullptr) {
-			widthScale = RenderD7::GetTextWidth(size, Text.substr(0, Text.find('\n')), fnt);
-		} else {
-			widthScale = RenderD7::GetTextWidth(size, Text.substr(0, Text.find('\n')));
-		}
-	} else {
-		// And again.
-		if (fnt != nullptr) {
-			widthScale = std::min((float)maxWidth, RenderD7::GetTextWidth(size, Text.substr(0, Text.find('\n')), fnt));
-		} else {
-			widthScale = std::min((float)maxWidth, RenderD7::GetTextWidth(size, Text.substr(0, Text.find('\n'))));
-		}
-	}
-	if (fnt != nullptr) {
-		RenderD7::DrawText((currentScreen ? 200 : 160)+x-(widthScale/2), y+(lineHeight*line), size, color, Text.substr(0, Text.find('\n')), maxWidth, maxHeight, fnt);
-	} else {
-		RenderD7::DrawText((currentScreen ? 200 : 160)+x-(widthScale/2), y+(lineHeight*line), size, color, Text.substr(0, Text.find('\n')), maxWidth, maxHeight);
-	}
-}
-
-// Draw String or Text.
-void RenderD7::DrawText(float x, float y, float size, u32 color, std::string Text, int maxWidth, int maxHeight, C2D_Font fnt) {
-	C2D_Text c2d_text;
-
-	if (fnt != nullptr) {
-		C2D_TextFontParse(&c2d_text, fnt, TextBuf, Text.c_str());
-	} else {
-		C2D_TextFontParse(&c2d_text, Font, TextBuf, Text.c_str());
-	}
-
-	C2D_TextOptimize(&c2d_text);
-
-	float heightScale;
-	if (maxHeight == 0) {
-		heightScale = size;
-	} else {
-		if (fnt != nullptr) {
-			heightScale = std::min(size, size*(maxHeight/RenderD7::GetTextHeight(size, Text, fnt)));
-		} else {
-			heightScale = std::min(size, size*(maxHeight/RenderD7::GetTextHeight(size, Text)));
-		}
-	}
-
-	if (maxWidth == 0) {
-		C2D_DrawText(&c2d_text, C2D_WithColor, x, y, 0.5f, size, heightScale, color);
-	} else {
-		if (fnt != nullptr) {
-			C2D_DrawText(&c2d_text, C2D_WithColor, x, y, 0.5f, std::min(size, size*(maxWidth/RenderD7::GetTextWidth(size, Text, fnt))), heightScale, color);
-		} else {
-			C2D_DrawText(&c2d_text, C2D_WithColor, x, y, 0.5f, std::min(size, size*(maxWidth/RenderD7::GetTextWidth(size, Text))), heightScale, color);
-		}
-	}
-}
-void RenderD7::DrawTextLeft(float x, float y, float size, u32 color, std::string Text, int maxWidth, int maxHeight, C2D_Font fnt)
-{
-	RenderD7::DrawText(x - RenderD7::GetTextWidth(size, Text, fnt), y, size, color, Text, maxWidth, maxHeight, fnt);
-}
-// Get String or Text Width.
-float RenderD7::GetTextWidth(float size, std::string Text, C2D_Font fnt) {
-	float width = 0;
-	if (fnt != nullptr) {
-		GetTextSize(size, &width, NULL, Text, fnt);
-	} else {
-		GetTextSize(size, &width, NULL, Text);
-	}
-	return width;
-}
-
-// Get String or Text Size.
-void RenderD7::GetTextSize(float size, float *width, float *height, std::string Text, C2D_Font fnt) {
-	C2D_Text c2d_text;
-	if (fnt != nullptr) {
-		C2D_TextFontParse(&c2d_text, fnt, TextBuf, Text.c_str());
-	} else {
-		C2D_TextFontParse(&c2d_text, Font, TextBuf, Text.c_str());
-	}
-	C2D_TextGetDimensions(&c2d_text, size, size, width, height);
-}
-
-
-// Get String or Text Height.
-float RenderD7::GetTextHeight(float size, std::string Text, C2D_Font fnt) {
-	float height = 0;
-	if (fnt != nullptr) {
-		GetTextSize(size, NULL, &height, Text.c_str(), fnt);
-	} else {
-		GetTextSize(size, NULL, &height, Text.c_str());
-	}
-	return height;
-}
-
-Result RenderD7::loadFont(C2D_Font &fnt, const char* Path) {
-	fnt = C2D_FontLoad(Path); // Only load if found.
-	return 0;
-}
-
-// Unload a Font.
-Result RenderD7::unloadFont(C2D_Font &fnt) {
-	if (fnt != nullptr) {
-		C2D_FontFree(fnt); // Make sure to only unload if not nullptr.
-	}
-	return 0;
-}
-
-bool RenderD7::DrawCircle(float x, float y, float radius, u32 color)
-{
-	return C2D_DrawCircleSolid(x, y, 0.5f, radius, color);
 }
 
 void MetrikThread(RenderD7::Parameter param) {
@@ -704,15 +546,15 @@ void RenderD7::DrawTObjects(std::vector<RenderD7::TObject> tobjects, u32 color, 
 	{
 		if (selection == i)
 		{
-			RenderD7::DrawRect(tobjects[i].x - 2, tobjects[i].y - 2, tobjects[i].w + 4, tobjects[i].h + 4, selbgcolor);
-			RenderD7::DrawRect(tobjects[i].x, tobjects[i].y, tobjects[i].w, tobjects[i].h, color);
-			RenderD7::DrawRect(tobjects[i].x, tobjects[i].y, tobjects[i].w, tobjects[i].h, selcolor);
-			RenderD7::DrawText(tobjects[i].x + (tobjects[i].w/2) - RenderD7::GetTextHeight(tobjects[i].txtsize , tobjects[i].text) + tobjects[i].correctx, tobjects[i].y + (tobjects[i].h/2) - RenderD7::GetTextHeight(tobjects[i].txtsize, tobjects[i].text) + tobjects[i].correcty, tobjects[i].txtsize, txtcolor, tobjects[i].text);
+			RenderD7::Draw::Rect(tobjects[i].x - 2, tobjects[i].y - 2, tobjects[i].w + 4, tobjects[i].h + 4, selbgcolor);
+			RenderD7::Draw::Rect(tobjects[i].x, tobjects[i].y, tobjects[i].w, tobjects[i].h, color);
+			RenderD7::Draw::Rect(tobjects[i].x, tobjects[i].y, tobjects[i].w, tobjects[i].h, selcolor);
+			RenderD7::Draw::Text(tobjects[i].x + (tobjects[i].w/2) - RenderD7::Draw::GetTextHeight(tobjects[i].txtsize , tobjects[i].text) + tobjects[i].correctx, tobjects[i].y + (tobjects[i].h/2) - RenderD7::Draw::GetTextHeight(tobjects[i].txtsize, tobjects[i].text) + tobjects[i].correcty, tobjects[i].txtsize, txtcolor, tobjects[i].text);
 		}
 		else
 		{
-			RenderD7::DrawRect(tobjects[i].x, tobjects[i].y - 1, tobjects[i].w, tobjects[i].h, color);
-			RenderD7::DrawText(tobjects[i].x + (tobjects[i].w/2) - RenderD7::GetTextHeight(tobjects[i].txtsize , tobjects[i].text) + tobjects[i].correctx, tobjects[i].y + (tobjects[i].h/2) - RenderD7::GetTextHeight(tobjects[i].txtsize, tobjects[i].text) + tobjects[i].correcty, tobjects[i].txtsize, txtcolor, tobjects[i].text);
+			RenderD7::Draw::Rect(tobjects[i].x, tobjects[i].y - 1, tobjects[i].w, tobjects[i].h, color);
+			RenderD7::Draw::Text(tobjects[i].x + (tobjects[i].w/2) - RenderD7::Draw::GetTextHeight(tobjects[i].txtsize , tobjects[i].text) + tobjects[i].correctx, tobjects[i].y + (tobjects[i].h/2) - RenderD7::Draw::GetTextHeight(tobjects[i].txtsize, tobjects[i].text) + tobjects[i].correcty, tobjects[i].txtsize, txtcolor, tobjects[i].text);
 		}
 	}
 }
@@ -723,13 +565,13 @@ void RenderD7::DrawTLBtns(std::vector<RenderD7::TLBtn> btns, u32 color, int sele
 	{
 		if (selection == i)
 		{
-			RenderD7::DrawRect(btns[i].x - 2, btns[i].y - 2, btns[i].w + 4, btns[i].h + 4, selbgcolor);
-			RenderD7::DrawRect(btns[i].x, btns[i].y, btns[i].w, btns[i].h, color);
-			RenderD7::DrawRect(btns[i].x, btns[i].y, btns[i].w,  btns[i].h, selcolor);
+			RenderD7::Draw::Rect(btns[i].x - 2, btns[i].y - 2, btns[i].w + 4, btns[i].h + 4, selbgcolor);
+			RenderD7::Draw::Rect(btns[i].x, btns[i].y, btns[i].w, btns[i].h, color);
+			RenderD7::Draw::Rect(btns[i].x, btns[i].y, btns[i].w,  btns[i].h, selcolor);
 	        }
 		else
 		{
-			RenderD7::DrawRect(btns[i].x, btns[i].y - 1, btns[i].w, btns[i].h, color);
+			RenderD7::Draw::Rect(btns[i].x, btns[i].y - 1, btns[i].w, btns[i].h, color);
 		}
 	}
 }
@@ -761,8 +603,8 @@ int RenderD7::GetRandomInt(int b, int e)
 
 void RenderD7::DrawSTObject(std::vector<RenderD7::TObject> tobject, int tobjectindex, u32 color, u32 txtcolor)
 {
-	RenderD7::DrawRect(tobject[tobjectindex].x, tobject[tobjectindex].y, tobject[tobjectindex].w, tobject[tobjectindex].h, color);
-	RenderD7::DrawText(tobject[tobjectindex].x + (tobject[tobjectindex].w/2) - RenderD7::GetTextHeight(tobject[tobjectindex].txtsize , tobject[tobjectindex].text) + tobject[tobjectindex].correctx, tobject[tobjectindex].y + (tobject[tobjectindex].h/2) - RenderD7::GetTextHeight(tobject[tobjectindex].txtsize, tobject[tobjectindex].text) + tobject[tobjectindex].correcty, tobject[tobjectindex].txtsize, txtcolor, tobject[tobjectindex].text);
+	RenderD7::Draw::Rect(tobject[tobjectindex].x, tobject[tobjectindex].y, tobject[tobjectindex].w, tobject[tobjectindex].h, color);
+	RenderD7::Draw::Text(tobject[tobjectindex].x + (tobject[tobjectindex].w/2) - RenderD7::Draw::GetTextHeight(tobject[tobjectindex].txtsize , tobject[tobjectindex].text) + tobject[tobjectindex].correctx, tobject[tobjectindex].y + (tobject[tobjectindex].h/2) - RenderD7::Draw::GetTextHeight(tobject[tobjectindex].txtsize, tobject[tobjectindex].text) + tobject[tobjectindex].correcty, tobject[tobjectindex].txtsize, txtcolor, tobject[tobjectindex].text);
 }
 
 bool dirEntryPredicate(const RenderD7::DirContent &lhs, const RenderD7::DirContent &rhs) {
@@ -804,11 +646,6 @@ void RenderD7::GetDirContents(std::vector<RenderD7::DirContent> &dircontent) {
 	RenderD7::GetDirContentsExt(dircontent, {});
 }
 
-bool RenderD7::DrawImage(C2D_Image img, float x, float y, float scaleX, float scaleY)
-{
-	return C2D_DrawImageAt(img, x, y, 0.5f, nullptr, scaleX, scaleY);
-}
-
 bool RenderD7::FS::FileExist(const std::string& path)
 {
 	FILE *test = fopen(path.c_str(), "r");
@@ -837,8 +674,8 @@ bool RenderD7::IsNdspInit()
 void RenderD7::DrawList1(RenderD7::ScrollList1 &l, float txtsize, C3D_RenderTarget *t)
 {
 	RenderD7::OnScreen(t);
-	RenderD7::DrawRect(0, 0, 400, 240, RenderD7::Color::Hex("#dddddd"));
-	RenderD7::DrawText(0, 0, 0.8f, RenderD7::Color::Hex("#ffffff"), l.Text);
+	RenderD7::Draw::Rect(0, 0, 400, 240, RenderD7::Color::Hex("#dddddd"));
+	RenderD7::Draw::Text(0, 0, 0.8f, RenderD7::Color::Hex("#ffffff"), l.Text);
 }
 
 
@@ -858,36 +695,27 @@ void RenderD7::DrawMetrikOvl()
     }
 	std::string __C = RENDERD7VSTRING;
 	std::string info = "RenderD7 " + __C + " Debug Overlay";
-	float infoy = 240 - RenderD7::GetTextHeight(mt_txtSize, info);
+	float infoy = 240 - RenderD7::Draw::GetTextHeight(mt_txtSize, info);
 	mt_fps = "FPS: " + RenderD7::GetFramerate();
 	mt_cpu = "CPU: " + std::to_string(C3D_GetProcessingTime()*(d11framerate/10)).substr(0, 4) + "%/" + std::to_string(C3D_GetProcessingTime()).substr(0, 4) + "ms";
 	mt_gpu = "GPU: " + std::to_string(C3D_GetDrawingTime()*(d11framerate/10)).substr(0, 4) + "%/" + std::to_string(C3D_GetDrawingTime()).substr(0, 4) + "ms";
 	mt_cmd = "CMD: " + std::to_string(C3D_GetCmdBufUsage()*100.0f).substr(0, 4) + "%/" + std::to_string(C3D_GetCmdBufUsage()).substr(0, 4) + "ms";
-	RenderD7::DrawRect(0, 0, RenderD7::GetTextWidth(mt_txtSize, mt_fps), RenderD7::GetTextHeight(mt_txtSize, mt_fps), mt_color);
-	RenderD7::DrawRect(0, 50, RenderD7::GetTextWidth(mt_txtSize, mt_cpu), RenderD7::GetTextHeight(mt_txtSize, mt_cpu), mt_color);
-	RenderD7::DrawRect(0, 70, RenderD7::GetTextWidth(mt_txtSize, mt_gpu), RenderD7::GetTextHeight(mt_txtSize, mt_gpu), mt_color);
-	RenderD7::DrawRect(0, 90, RenderD7::GetTextWidth(mt_txtSize, mt_cmd), RenderD7::GetTextHeight(mt_txtSize, mt_cmd), mt_color);
-	RenderD7::DrawRect(0, infoy, RenderD7::GetTextWidth(mt_txtSize, info), RenderD7::GetTextHeight(mt_txtSize, info), mt_color);
-	RenderD7::DrawText(0, 0, mt_txtSize, mt_txtcolor, mt_fps);
-    RenderD7::DrawText(0, 50, mt_txtSize, mt_txtcolor, mt_cpu);
-    RenderD7::DrawText(0, 70, mt_txtSize, mt_txtcolor, mt_gpu);
-	RenderD7::DrawText(0, 90, mt_txtSize, mt_txtcolor, mt_cmd);
-	RenderD7::DrawText(0, infoy, mt_txtSize, mt_txtcolor, info);
+	RenderD7::Draw::Rect(0, 0, RenderD7::Draw::GetTextWidth(mt_txtSize, mt_fps), RenderD7::Draw::GetTextHeight(mt_txtSize, mt_fps), mt_color);
+	RenderD7::Draw::Rect(0, 50, RenderD7::Draw::GetTextWidth(mt_txtSize, mt_cpu), RenderD7::Draw::GetTextHeight(mt_txtSize, mt_cpu), mt_color);
+	RenderD7::Draw::Rect(0, 70, RenderD7::Draw::GetTextWidth(mt_txtSize, mt_gpu), RenderD7::Draw::GetTextHeight(mt_txtSize, mt_gpu), mt_color);
+	RenderD7::Draw::Rect(0, 90, RenderD7::Draw::GetTextWidth(mt_txtSize, mt_cmd), RenderD7::Draw::GetTextHeight(mt_txtSize, mt_cmd), mt_color);
+	RenderD7::Draw::Rect(0, infoy, RenderD7::Draw::GetTextWidth(mt_txtSize, info), RenderD7::Draw::GetTextHeight(mt_txtSize, info), mt_color);
+	RenderD7::Draw::Text(0, 0, mt_txtSize, mt_txtcolor, mt_fps);
+    RenderD7::Draw::Text(0, 50, mt_txtSize, mt_txtcolor, mt_cpu);
+    RenderD7::Draw::Text(0, 70, mt_txtSize, mt_txtcolor, mt_gpu);
+	RenderD7::Draw::Text(0, 90, mt_txtSize, mt_txtcolor, mt_cmd);
+	RenderD7::Draw::Text(0, infoy, mt_txtSize, mt_txtcolor, info);
 	
     /*for (int z = 0; z < (int)mt_fpsgraph.size(); z++)
     {
 		//mt_fpsgraph[z] = (int)d11framerate;
         C2D_DrawLine(z, 239 - mt_fpsgraph[z], mt_txtcolor, z + 1, 239 - mt_fpsgraph[z + 1], mt_txtcolor, 1, 1);
     }*/
-}
-
-bool RenderD7::DrawNFRect(float p1x, float p1y, float w, float h, u32 color, float scale)
-{  
-    C2D_DrawLine(p1x, p1y, color,w, p1y, color, scale, 1);
-    C2D_DrawLine(w, p1y, color,w, h, color, scale, 1);
-    C2D_DrawLine(w, h, color,p1x, h, color, scale, 1);
-    C2D_DrawLine(p1x, h, color,p1x, p1y, color, scale, 1);
-    return true;
 }
 
 RenderD7::DSP_NF::DSP_NF()
@@ -898,10 +726,10 @@ RenderD7::DSP_NF::DSP_NF()
 void RenderD7::DSP_NF::Draw(void) const
 {
 	RenderD7::OnScreen(Top);
-	RenderD7::DrawRect(0, msgposy, 400, 70, RenderD7::Color::Hex("#111111"));
-	RenderD7::DrawRect(0, msgposy, 400, 25, RenderD7::Color::Hex("#222222"));
-	RenderD7::DrawText(2, msgposy+3, 0.7f, RenderD7::Color::Hex("#ffffff"), "Warning! Code: 00027");
-	RenderD7::DrawText(2, msgposy+30, 0.6f, RenderD7::Color::Hex("#ffffff"), "You can't use Sound effects because the file\n<<sdmc:/3ds/dspfirm.cdc>> was not found!");
+	RenderD7::Draw::Rect(0, msgposy, 400, 70, RenderD7::Color::Hex("#111111"));
+	RenderD7::Draw::Rect(0, msgposy, 400, 25, RenderD7::Color::Hex("#222222"));
+	RenderD7::Draw::Text(2, msgposy+3, 0.7f, RenderD7::Color::Hex("#ffffff"), "Warning! Code: 00027");
+	RenderD7::Draw::Text(2, msgposy+30, 0.6f, RenderD7::Color::Hex("#ffffff"), "You can't use Sound effects because the file\n<<sdmc:/3ds/dspfirm.cdc>> was not found!");
 }
 
 void RenderD7::DSP_NF::Logic()
@@ -975,23 +803,23 @@ void RenderD7::RSettings::Draw(void) const
 	if (m_state == RSETTINGS)
 	{
 		RenderD7::OnScreen(Top);
-		RenderD7::DrawRect(0, 0, 400, 21, RenderD7::Color::Hex("#111111"));
-		RenderD7::DrawRect(0, 21, 400, 220, RenderD7::Color::Hex("#eeeeee"));
-		RenderD7::DrawText(0, 0, 0.7f, DSEVENWHITE, "RenderD7->Settings");
-		RenderD7::DrawTextLeft(400, 0, 0.7f, RenderD7::Color::Hex("#ffffff"), RENDERD7VSTRING);
-		RenderD7::DrawText(0, 30, 0.7f, DSEVENBLACK, "RD7SR: " + rd7srstate);
-		RenderD7::DrawText(0, 50, 0.7f, DSEVENBLACK, "Metrik to Csv: " + csvstate);
-		RenderD7::DrawText(0, 70, 0.7f, DSEVENBLACK, "Metrik Overlay: " + mtovlstate);
-		RenderD7::DrawText(0, 90, 0.7f, DSEVENBLACK, "Force FPS: " + fpsstate);
-		RenderD7::DrawText(0, 110, 0.7f, DSEVENBLACK, "Metrik Screen: " + mtscreenstate);
-		/*RenderD7::DrawText(0, 130, 0.7f, DSEVENBLACK, "Metrik Text RGB: " + mttxtcolstate);
-		RenderD7::DrawText(0, 150, 0.7f, DSEVENBLACK, "Metrik Alpha: " + mtcola);
-		RenderD7::DrawText(0, 170, 0.7f, DSEVENBLACK, "Metrik Text Alpha: " + mttxtcola);*/
+		RenderD7::Draw::Rect(0, 0, 400, 21, RenderD7::Color::Hex("#111111"));
+		RenderD7::Draw::Rect(0, 21, 400, 220, RenderD7::Color::Hex("#eeeeee"));
+		RenderD7::Draw::Text(0, 0, 0.7f, DSEVENWHITE, "RenderD7->Settings");
+		RenderD7::Draw::TextRight(400, 0, 0.7f, RenderD7::Color::Hex("#ffffff"), RENDERD7VSTRING);
+		RenderD7::Draw::Text(0, 30, 0.7f, DSEVENBLACK, "RD7SR: " + rd7srstate);
+		RenderD7::Draw::Text(0, 50, 0.7f, DSEVENBLACK, "Metrik to Csv: " + csvstate);
+		RenderD7::Draw::Text(0, 70, 0.7f, DSEVENBLACK, "Metrik Overlay: " + mtovlstate);
+		RenderD7::Draw::Text(0, 90, 0.7f, DSEVENBLACK, "Force FPS: " + fpsstate);
+		RenderD7::Draw::Text(0, 110, 0.7f, DSEVENBLACK, "Metrik Screen: " + mtscreenstate);
+		/*RenderD7::Draw::Text(0, 130, 0.7f, DSEVENBLACK, "Metrik Text RGB: " + mttxtcolstate);
+		RenderD7::Draw::Text(0, 150, 0.7f, DSEVENBLACK, "Metrik Alpha: " + mtcola);
+		RenderD7::Draw::Text(0, 170, 0.7f, DSEVENBLACK, "Metrik Text Alpha: " + mttxtcola);*/
 		RenderD7::OnScreen(Bottom);
 		std::string verc = "Config Version: ";
 		verc += CFGVER;
-		RenderD7::DrawRect(0, 0, 320, 240, RenderD7::Color::Hex("#eeeeee"));
-		RenderD7::DrawText(0, 0, 0.7f, RenderD7::Color::Hex("#111111"), verc);
+		RenderD7::Draw::Rect(0, 0, 320, 240, RenderD7::Color::Hex("#eeeeee"));
+		RenderD7::Draw::Text(0, 0, 0.7f, RenderD7::Color::Hex("#111111"), verc);
 		RenderD7::DrawTObjects(buttons, RenderD7::Color::Hex("#111111"), RenderD7::Color::Hex("#eeeeee"));
 
 	}
@@ -1003,24 +831,24 @@ void RenderD7::RSettings::Draw(void) const
 		std::string buildtime = V_TIME;
 		std::string commit = V_STRING;
 		RenderD7::OnScreen(Top);
-		RenderD7::DrawRect(0, 0, 400, 21, RenderD7::Color::Hex("#111111"));
-		RenderD7::DrawRect(0, 21, 400, 220, RenderD7::Color::Hex("#eeeeee"));
-		RenderD7::DrawText(0, 0, 0.7f, DSEVENWHITE, "RenderD7->Info");
-		RenderD7::DrawTextLeft(400, 0, 0.7f, RenderD7::Color::Hex("#ffffff"), RENDERD7VSTRING);
-		RenderD7::DrawText(0, 30, 0.7f, DSEVENBLACK, "App: " + D_app_name);
-		RenderD7::DrawText(0, 50, 0.7f, DSEVENBLACK, "RenderD7: " + rd7ver);
-		RenderD7::DrawText(0, 70, 0.7f, DSEVENBLACK, "Config-Version: " + rd7cfgver);
-		RenderD7::DrawText(0, 90, 0.7f, DSEVENBLACK, "Citra: " + citras);
-		RenderD7::DrawText(0, 110, 0.7f, DSEVENBLACK, "RenderD7-Build-Time: \n" + buildtime);
-		RenderD7::DrawText(0, 150, 0.7f, DSEVENBLACK, "RenderD7-Commit: " + commit);
-		/*RenderD7::DrawText(0, 130, 0.7f, DSEVENBLACK, "Metrik Text RGB: " + mttxtcolstate);
-		RenderD7::DrawText(0, 150, 0.7f, DSEVENBLACK, "Metrik Alpha: " + mtcola);
-		RenderD7::DrawText(0, 170, 0.7f, DSEVENBLACK, "Metrik Text Alpha: " + mttxtcola);*/
+		RenderD7::Draw::Rect(0, 0, 400, 21, RenderD7::Color::Hex("#111111"));
+		RenderD7::Draw::Rect(0, 21, 400, 220, RenderD7::Color::Hex("#eeeeee"));
+		RenderD7::Draw::Text(0, 0, 0.7f, DSEVENWHITE, "RenderD7->Info");
+		RenderD7::Draw::TextRight(400, 0, 0.7f, RenderD7::Color::Hex("#ffffff"), RENDERD7VSTRING);
+		RenderD7::Draw::Text(0, 30, 0.7f, DSEVENBLACK, "App: " + D_app_name);
+		RenderD7::Draw::Text(0, 50, 0.7f, DSEVENBLACK, "RenderD7: " + rd7ver);
+		RenderD7::Draw::Text(0, 70, 0.7f, DSEVENBLACK, "Config-Version: " + rd7cfgver);
+		RenderD7::Draw::Text(0, 90, 0.7f, DSEVENBLACK, "Citra: " + citras);
+		RenderD7::Draw::Text(0, 110, 0.7f, DSEVENBLACK, "RenderD7-Build-Time: \n" + buildtime);
+		RenderD7::Draw::Text(0, 150, 0.7f, DSEVENBLACK, "RenderD7-Commit: " + commit);
+		/*RenderD7::Draw::Text(0, 130, 0.7f, DSEVENBLACK, "Metrik Text RGB: " + mttxtcolstate);
+		RenderD7::Draw::Text(0, 150, 0.7f, DSEVENBLACK, "Metrik Alpha: " + mtcola);
+		RenderD7::Draw::Text(0, 170, 0.7f, DSEVENBLACK, "Metrik Text Alpha: " + mttxtcola);*/
 		RenderD7::OnScreen(Bottom);
 		std::string verc = "Config Version: ";
 		verc += CFGVER;
-		RenderD7::DrawRect(0, 0, 320, 240, RenderD7::Color::Hex("#eeeeee"));
-		RenderD7::DrawText(0, 0, 0.7f, RenderD7::Color::Hex("#111111"), verc);
+		RenderD7::Draw::Rect(0, 0, 320, 240, RenderD7::Color::Hex("#eeeeee"));
+		RenderD7::Draw::Text(0, 0, 0.7f, RenderD7::Color::Hex("#111111"), verc);
 		RenderD7::DrawTObjects(buttons, RenderD7::Color::Hex("#111111"), RenderD7::Color::Hex("#eeeeee"));
 
 	}

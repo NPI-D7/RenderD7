@@ -40,6 +40,7 @@
 #include <renderd7/Color.hpp>
 #include <renderd7/Time.hpp>
 #include <renderd7/Screen.hpp>
+#include <renderd7/Draw.hpp>
 
 extern "C"
 {
@@ -206,19 +207,7 @@ namespace RenderD7
     void ClearTextBufs(void);
    
     std::string Kbd(int lenght, SwkbdType tp);
-    bool DrawRect(float x, float y, float w, float h, u32 color);
-    bool DrawNFRect(float p1x, float p1y, float w, float h, u32 color, float scale = 1);
-    bool DrawPx(float x, float y, u32 color);
-    void DrawTextCentered(float x, float y, float size, u32 color, std::string Text, int maxWidth = 0, int maxHeight = 0, C2D_Font fnt = nullptr);
-	void DrawText(float x, float y, float size, u32 color, std::string Text, int maxWidth = 0, int maxHeight = 0, C2D_Font fnt = nullptr);
-    void DrawTextLeft(float x, float y, float size, u32 color, std::string Text, int maxWidth = 0, int maxHeight = 0, C2D_Font fnt = nullptr);
-	float GetTextWidth(float size, std::string Text, C2D_Font fnt = nullptr);
-	void GetTextSize(float size, float *width, float *height, std::string Text, C2D_Font fnt = nullptr);
-	float GetTextHeight(float size, std::string Text, C2D_Font fnt = nullptr);
-    Result loadFont(C2D_Font &fnt, const char * Path = "");
-	Result unloadFont(C2D_Font &fnt);
-    bool DrawCircle(float x, float y, float radius, u32 color);
-    bool DrawImage(C2D_Image img, float x, float y, float scaleX = 1.0f, float scaleY = 1.0f);
+    
     void FrameEnd();
     void ToggleRD7SR();
     bool IsRD7SR();
