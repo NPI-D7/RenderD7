@@ -1,6 +1,10 @@
 #include <renderd7/FileSystem.hpp>
 #include <3ds.h>
 #include <cstring>
+//Debugging
+#include <memory>
+#include <renderd7/Ovl.hpp>
+#include <renderd7/Toast.hpp>
 
 const char* RenderD7::FileSystem::GetPhysfsError()
 {
@@ -32,16 +36,24 @@ void RenderD7::FileSystem::Initialize()
 
 int RenderD7::FileSystem::Init(const char* argv)
 {
-    return PHYSFS_init(argv);
+    int res = PHYSFS_init(argv);
+    if (res != 1)
+    {
+        RenderD7::AddOvl(std::make_unique<RenderD7::Toast>("PHYSFS-Error", RenderD7::FileSystem::GetPhysfsError()));
+    }
+    
+    return res;
 }
 
 bool RenderD7::FileSystem::SetSource(const char* source)
 {
     if (!PHYSFS_isInit())
+        RenderD7::AddOvl(std::make_unique<RenderD7::Toast>("PHYSFS-Error", RenderD7::FileSystem::GetPhysfsError()));
         return false;
 
     std::string searchPath = source;
     if (!PHYSFS_mount(searchPath.c_str(), NULL, 1))
+        RenderD7::AddOvl(std::make_unique<RenderD7::Toast>("PHYSFS-Error", RenderD7::FileSystem::GetPhysfsError()));
         return false;
 
     return true;
@@ -50,6 +62,7 @@ bool RenderD7::FileSystem::SetSource(const char* source)
 bool RenderD7::FileSystem::SetIdentity(const char* name, bool append)
 {
     if (!PHYSFS_isInit())
+        RenderD7::AddOvl(std::make_unique<RenderD7::Toast>("PHYSFS-Error", RenderD7::FileSystem::GetPhysfsError()));
         return false;
 
     std::string old = RenderD7::FileSystem::savePath;
@@ -76,9 +89,11 @@ std::string RenderD7::FileSystem::GetSaveDirectory()
 bool RenderD7::FileSystem::SetupWriteDirectory()
 {
     if (!PHYSFS_isInit())
+        RenderD7::AddOvl(std::make_unique<RenderD7::Toast>("PHYSFS-Error", RenderD7::FileSystem::GetPhysfsError()));
         return false;
 
     if (RenderD7::FileSystem::savePath.empty())
+        RenderD7::AddOvl(std::make_unique<RenderD7::Toast>("PHYSFS-Error", "Path is Empty"));
         return false;
 
     std::string tmpWritePath     = RenderD7::FileSystem::savePath;
@@ -99,6 +114,7 @@ bool RenderD7::FileSystem::SetupWriteDirectory()
     if (!PHYSFS_setWriteDir(tmpWritePath.c_str()))
     {
         printf("Failed to set write dir to %s\n", tmpWritePath.c_str());
+        RenderD7::AddOvl(std::make_unique<RenderD7::Toast>("PHYSFS-Error", RenderD7::FormatString("Failed to set write dir to %s\n", tmpWritePath.c_str())));
         return false;
     }
 
@@ -106,6 +122,7 @@ bool RenderD7::FileSystem::SetupWriteDirectory()
     {
         printf("Failed to create dir %s\n", tmpDirectoryPath.c_str());
         /* clear the write directory in case of error */
+        RenderD7::AddOvl(std::make_unique<RenderD7::Toast>("PHYSFS-Error", RenderD7::FormatString("Failed to create dir %s\n", tmpDirectoryPath.c_str())));
         PHYSFS_setWriteDir(nullptr);
         return false;
     }
@@ -113,12 +130,14 @@ bool RenderD7::FileSystem::SetupWriteDirectory()
     if (!PHYSFS_setWriteDir(savePath.c_str()))
     {
         printf("Failed to set write dir to %s\n", savePath.c_str());
+        RenderD7::AddOvl(std::make_unique<RenderD7::Toast>("PHYSFS-Error", RenderD7::FormatString("Failed to set write dir to %s\n", savePath.c_str())));
         return false;
     }
 
     if (!PHYSFS_mount(savePath.c_str(), nullptr, 0))
     {
         printf("Failed to mount write dir (%s)\n", RenderD7::FileSystem::GetPhysfsError());
+        RenderD7::AddOvl(std::make_unique<RenderD7::Toast>("PHYSFS-Error", RenderD7::FormatString("Failed to mount write dir (%s)\n", RenderD7::FileSystem::GetPhysfsError())));
         /* clear the write directory in case of error */
         PHYSFS_setWriteDir(nullptr);
         return false;
@@ -135,11 +154,13 @@ std::string RenderD7::FileSystem::GetUserDirectory()
 bool RenderD7::FileSystem::GetInfo(const char* filename, RenderD7::FileSystem::Info& info)
 {
     if (!PHYSFS_isInit())
+        RenderD7::AddOvl(std::make_unique<RenderD7::Toast>("PHYSFS-Error", RenderD7::FileSystem::GetPhysfsError()));
         return false;
 
     PHYSFS_Stat stat = {};
 
     if (!PHYSFS_stat(filename, &stat))
+        RenderD7::AddOvl(std::make_unique<RenderD7::Toast>("PHYSFS-Error", RenderD7::FileSystem::GetPhysfsError()));
         return false;
 
     info.mod_time = std::min<int64_t>(stat.modtime, RenderD7::FileSystem::MAX_STAMP);
@@ -160,11 +181,13 @@ bool RenderD7::FileSystem::GetInfo(const char* filename, RenderD7::FileSystem::I
 void RenderD7::FileSystem::GetDirectoryItems(const char* path, std::vector<std::string>& items)
 {
     if (!PHYSFS_isInit())
+        RenderD7::AddOvl(std::make_unique<RenderD7::Toast>("PHYSFS-Error", RenderD7::FileSystem::GetPhysfsError()));
         return;
 
     char** results = PHYSFS_enumerateFiles(path);
 
     if (results == nullptr)
+        RenderD7::AddOvl(std::make_unique<RenderD7::Toast>("PHYSFS-Error", RenderD7::FileSystem::GetPhysfsError()));
         return;
 
     for (char** item = results; *item != 0; item++)
@@ -176,9 +199,11 @@ void RenderD7::FileSystem::GetDirectoryItems(const char* path, std::vector<std::
 bool RenderD7::FileSystem::OpenFile(File& file, const char* name, FileMode mode)
 {
     if (mode == FileMode_Closed)
+        RenderD7::AddOvl(std::make_unique<RenderD7::Toast>("PHYSFS-Error", RenderD7::FileSystem::GetPhysfsError()));
         return false;
 
     if (!PHYSFS_isInit())
+        RenderD7::AddOvl(std::make_unique<RenderD7::Toast>("PHYSFS-Error", RenderD7::FileSystem::GetPhysfsError()));
         return false;
 
     if (file.handle)
@@ -187,6 +212,7 @@ bool RenderD7::FileSystem::OpenFile(File& file, const char* name, FileMode mode)
     if (mode == FileMode_Read && !PHYSFS_exists(name))
     {
         printf("Could not open file %s, does not exist.\n", name);
+        RenderD7::AddOvl(std::make_unique<RenderD7::Toast>("PHYSFS-Error", RenderD7::FormatString("Could not open file %s, does not exist.\n", name)));
         return false;
     }
 
@@ -194,6 +220,7 @@ bool RenderD7::FileSystem::OpenFile(File& file, const char* name, FileMode mode)
         (PHYSFS_getWriteDir() == nullptr && RenderD7::FileSystem::SetupWriteDirectory()))
     {
         printf("Could not set write directory.\n");
+        RenderD7::AddOvl(std::make_unique<RenderD7::Toast>("PHYSFS-Error", RenderD7::FormatString("Could not set write directory.\n")));
         return false;
     }
 
@@ -219,6 +246,7 @@ bool RenderD7::FileSystem::OpenFile(File& file, const char* name, FileMode mode)
             error = "unknown error";
 
         printf("Could not open file %s (%s)\n", name, error);
+        RenderD7::AddOvl(std::make_unique<RenderD7::Toast>("PHYSFS-Error", RenderD7::FormatString("Could not open file %s (%s)\n", name, error)));
 
         return false;
     }
@@ -241,12 +269,15 @@ bool RenderD7::FileSystem::CloseFile(File& file)
 bool RenderD7::FileSystem::CreateDirectory(const char* name)
 {
     if (!PHYSFS_isInit())
+        RenderD7::AddOvl(std::make_unique<RenderD7::Toast>("PHYSFS-Error", RenderD7::FileSystem::GetPhysfsError()));
         return false;
 
     if (PHYSFS_getWriteDir() == nullptr && !RenderD7::FileSystem::SetupWriteDirectory())
+        RenderD7::AddOvl(std::make_unique<RenderD7::Toast>("PHYSFS-Error", RenderD7::FileSystem::GetPhysfsError()));
         return false;
 
     if (!PHYSFS_mkdir(name))
+        RenderD7::AddOvl(std::make_unique<RenderD7::Toast>("PHYSFS-Error", RenderD7::FileSystem::GetPhysfsError()));
         return false;
 
     return true;
@@ -257,6 +288,7 @@ int64_t RenderD7::FileSystem::ReadFile(File& file, void* destination, int64_t si
     if (!file.handle || file.mode != FileMode_Read)
     {
         printf("File is not opened for reading.\n");
+        RenderD7::AddOvl(std::make_unique<RenderD7::Toast>("PHYSFS-Error", "File is not opened for reading.\n"));
         return 0;
     }
 
@@ -265,6 +297,7 @@ int64_t RenderD7::FileSystem::ReadFile(File& file, void* destination, int64_t si
     else if (size < 0)
     {
         printf("Invalid read size %lld\n", size);
+        RenderD7::AddOvl(std::make_unique<RenderD7::Toast>("PHYSFS-Error", RenderD7::FormatString("Invalid read size %lld\n", size)));
         return 0;
     }
 
@@ -276,13 +309,16 @@ bool RenderD7::FileSystem::WriteFile(File& file, const void* data, int64_t size)
     if (!file.handle || file.mode != FileMode_Write)
     {
         printf("File is not opened for writing.\n");
+        RenderD7::AddOvl(std::make_unique<RenderD7::Toast>("PHYSFS-Error", "File is not opened for writing.\n"));
         return false;
     }
 
     int64_t written = PHYSFS_writeBytes(file.handle, data, (PHYSFS_uint64)size);
 
-    if (written != size)
+    if (written != size){
+        RenderD7::AddOvl(std::make_unique<RenderD7::Toast>("PHYSFS-Error", RenderD7::FileSystem::GetPhysfsError()));
         return false;
+    }
 
     return true;
 }
