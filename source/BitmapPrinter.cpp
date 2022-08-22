@@ -352,7 +352,7 @@ void RenderD7::BitmapPrinter::DrawChar(int posX, int posY, float t_size, u32 col
     {
         for(int x = 0; x < font.GetGlyphWidth(character); x++)
 		{
-            DrawPixel(posX + x + 1, posY + y + 1, 255, 255, 255, font.GetGlyphBitmap(character)[y*x]);
+            DrawPixel(posX + x + 1, posY + y + 1, 255, 255, 255, font.GetGlyphBitmap(character)[((y * width + x) * 1)]);
             if(((font.GetGlyphBitmap(character)[font.GetGlyphHeight(character) + y] >> (font.GetGlyphWidth(character - 1) - x)) & 1) == 1)
             {
 				
