@@ -20,7 +20,6 @@
 #include <unistd.h>
 #include <vector>
 
-
 #include <codecvt>
 
 #include <renderd7/BitmapPrinter.hpp>
@@ -43,14 +42,15 @@
 #include <renderd7/stringtool.hpp>
 #include <renderd7/thread.hpp>
 
-
 extern "C" {
 #include <renderd7/external/fs.h>
 }
 
-#define RENDERD7VSTRING "0.8.0"
+#define RENDERD7VSTRING "0.8.1"
 #define CHANGELOG                                                              \
-  "0.8.0: Implement BitmapPrinter\n0.7.3: Implement Over Render Overlay "      \
+  "0.8.1: Add abillity to Get Stdout as string to render it to the "           \
+  "screen.\n0.8.0: Implement BitmapPrinter\n0.7.3: Implement Over Render "     \
+  "Overlay "                                                                   \
   "Framework\n0.7.2: Implement MT to csv file saving. Add RGB2HEX. \n0.7.1: "  \
   "Add the New Overlay Handler. Its Just in code and does nothing yet. "       \
   "\n0.7.0: Made Big Progress In the MT Ovl but it still crashes On a Scnd "   \
