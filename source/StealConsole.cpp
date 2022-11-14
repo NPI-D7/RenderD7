@@ -13,5 +13,12 @@ StealConsole::~StealConsole() {
   // Do Nothing Here
 }
 
-std::string StealConsole::GetStdout() { return this->stolen_stdout.str(); }
+std::string StealConsole::GetStdout() {
+  if (this->stolen_stdout.str().length() < 400) {
+    return this->stolen_stdout.str();
+  } else {
+    return this->stolen_stdout.str().substr(stolen_stdout.str().length() - 400);
+  }
+  return "";
+}
 } // namespace RenderD7
