@@ -27,6 +27,7 @@ public:
   /// \param buffer the frame buffer
   void LoadPFromBuffer(const std::vector<u8> &buffer);
   void LoadFromBitmap(BMP bitmap);
+  void LoadJpg(std::string path);
   /// Draw the Image directly
   /// \param x The x position
   /// \param y the y position

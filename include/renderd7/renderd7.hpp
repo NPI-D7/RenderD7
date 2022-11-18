@@ -46,9 +46,10 @@ extern "C" {
 #include <renderd7/external/fs.h>
 }
 
-#define RENDERD7VSTRING "0.8.1"
+#define RENDERD7VSTRING "0.8.2"
 #define CHANGELOG                                                              \
-  "0.8.1: Add abillity to Get Stdout as string to render it to the "           \
+  "0.8.2: Fix a lot of Stuff and add c++17 based filesystem class.\n0.8.1: "   \
+  "Add abillity to Get Stdout as string to render it to the "                  \
   "screen.\n0.8.0: Implement BitmapPrinter\n0.7.3: Implement Over Render "     \
   "Overlay "                                                                   \
   "Framework\n0.7.2: Implement MT to csv file saving. Add RGB2HEX. \n0.7.1: "  \
