@@ -10,7 +10,7 @@ include $(DEVKITARM)/3ds_rules
 
 export renderd7_MAJOR	:= 0
 export renderd7_MINOR	:= 8
-export renderd7_PATCH	:= 2
+export renderd7_PATCH	:= 3
 
 VERSION	:=	$(renderd7_MAJOR).$(renderd7_MINOR).$(renderd7_PATCH)
 

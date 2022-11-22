@@ -877,6 +877,8 @@ void RenderD7::RSettings::Draw(void) const {
                          "RenderD7-Build-Time: \n" + buildtime);
     RenderD7::Draw::Text(0, 150, 0.7f, DSEVENBLACK,
                          "RenderD7-Commit: " + commit);
+    RenderD7::Draw::Text(0, 170, 0.7f, DSEVENBLACK,
+                         "RenderD7-Overlays: " + std::to_string(overlays.size()));
     /*RenderD7::Draw::Text(0, 130, 0.7f, DSEVENBLACK, "Metrik Text RGB: " +
     mttxtcolstate); RenderD7::Draw::Text(0, 150, 0.7f, DSEVENBLACK, "Metrik
     Alpha: " + mtcola); RenderD7::Draw::Text(0, 170, 0.7f, DSEVENBLACK, "Metrik

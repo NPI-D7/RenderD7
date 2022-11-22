@@ -27,6 +27,7 @@
 #include <renderd7/Draw.hpp>
 #include <renderd7/Image.hpp>
 #include <renderd7/Ovl.hpp>
+#include <renderd7/ResultDecoder.hpp>
 #include <renderd7/Screen.hpp>
 #include <renderd7/Sheet.hpp>
 #include <renderd7/Sprite.hpp>
@@ -42,13 +43,16 @@
 #include <renderd7/stringtool.hpp>
 #include <renderd7/thread.hpp>
 
+
 extern "C" {
 #include <renderd7/external/fs.h>
 }
 
-#define RENDERD7VSTRING "0.8.2"
+#define RENDERD7VSTRING "0.8.3"
 #define CHANGELOG                                                              \
-  "0.8.2: Fix a lot of Stuff and add c++17 based filesystem class.\n0.8.1: "   \
+  "0.8.3: Addet Overlaycount to Info and Addet ResultDecoder for "             \
+  "errors.0.8.2: Fix a lot of Stuff and add c++17 based filesystem "           \
+  "class.\n0.8.1: "                                                            \
   "Add abillity to Get Stdout as string to render it to the "                  \
   "screen.\n0.8.0: Implement BitmapPrinter\n0.7.3: Implement Over Render "     \
   "Overlay "                                                                   \
