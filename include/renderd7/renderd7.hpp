@@ -43,14 +43,14 @@
 #include <renderd7/stringtool.hpp>
 #include <renderd7/thread.hpp>
 
-
 extern "C" {
 #include <renderd7/external/fs.h>
 }
 
 #define RENDERD7VSTRING "0.8.3"
 #define CHANGELOG                                                              \
-  "0.8.3: Addet Overlaycount to Info and Addet ResultDecoder for "             \
+  "0.8.4: A lot of Fixes and new Features for BitmapPrinter! 0.8.3: Addet "    \
+  "Overlaycount to Info and Addet ResultDecoder for "                          \
   "errors.0.8.2: Fix a lot of Stuff and add c++17 based filesystem "           \
   "class.\n0.8.1: "                                                            \
   "Add abillity to Get Stdout as string to render it to the "                  \
