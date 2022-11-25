@@ -35,6 +35,7 @@ public:
   void DrawPixel(int x, int y, u8 b, u8 g, u8 r, u8 a);
   void DrawRect(int x, int y, int w, int h, u8 line_w, u8 b, u8 g, u8 r, u8 a);
   void DrawRectFilled(int x, int y, int w, int h, u8 b, u8 g, u8 r, u8 a);
+  void DrawBitmap(int x, int y, BMP map);
   void UsePreMap(BMP map);
   void UsePrePrintMap(BitmapPrinter printmap);
   BMP GetBitmap() { return bitmap; }

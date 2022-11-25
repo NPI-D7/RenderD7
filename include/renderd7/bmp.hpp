@@ -5,6 +5,7 @@
 #include <sstream>
 #include <stdexcept>
 #include <vector>
+
 using namespace std;
 #pragma pack(push, 1)
 
@@ -48,7 +49,8 @@ struct BMPColorHeader {
 };
 #pragma pack(pop)
 
-struct BMP {
+class BMP {
+public:
   BMPFileHeader file_header;
   BMPInfoHeader bmp_info_header;
   BMPColorHeader bmp_color_header;
@@ -62,8 +64,8 @@ struct BMP {
       inp.read((char *)&file_header, sizeof(file_header));
       if (file_header.file_type != 0x4D42) {
 
-        return 50; // throw std::runtime_error("Error! Unrecognized file
-                   // format.");
+        return 50;
+        // throw std::runtime_error("Error! Unrecognized file format.");
       }
       inp.read((char *)&bmp_info_header, sizeof(bmp_info_header));
 
@@ -78,9 +80,8 @@ struct BMP {
           check_color_header(bmp_color_header);
         } else {
           // std::cerr << "Error! The file \"" << fname << "\" does not seem to
-          // contain bit mask information\n";
-          return 51; // throw std::runtime_error("Error! Unrecognized file
-                     // format.");
+          // contain bit mask information\n"; return 51;//throw
+          // std::runtime_error("Error! Unrecognized file format.");
         }
       }
 
@@ -137,12 +138,14 @@ struct BMP {
     std::stringstream inp;
     std::copy(buffer.begin(), buffer.end(),
               std::ostream_iterator<unsigned char>(inp, "\n"));
+    std::cout << buffer.size() << std::endl;
     if (inp) {
       inp.read((char *)&file_header, sizeof(file_header));
       if (file_header.file_type != 0x4D42) {
 
-        return 50; // throw std::runtime_error("Error! Unrecognized file
-                   // format.");
+        return 50;
+        // throw std::runtime_error("Error! Unrecognized file format. Header " +
+        //                          std::to_string(file_header.file_type));
       }
       inp.read((char *)&bmp_info_header, sizeof(bmp_info_header));
 
@@ -158,8 +161,8 @@ struct BMP {
         } else {
           // std::cerr << "Error! The file \"" << fname << "\" does not seem to
           // contain bit mask information\n";
-          return 51; // throw std::runtime_error("Error! Unrecognized file
-                     // format.");
+          return 51;
+          // throw std::runtime_error("Error! Unrecognized file format. Size");
         }
       }
 
@@ -181,8 +184,10 @@ struct BMP {
       file_header.file_size = file_header.offset_data;
 
       if (bmp_info_header.height < 0) {
-        return 52; // throw std::runtime_error("The program can treat only BMP
-                   // images with the origin in the bottom left corner!");
+        return 52;
+        // throw std::runtime_error("The program can treat only BMP images with
+        // "
+        //                          "the origin in the bottom left corner!");
       }
 
       data.resize(bmp_info_header.width * bmp_info_header.height *
@@ -206,8 +211,8 @@ struct BMP {
             bmp_info_header.height * static_cast<uint32_t>(padding_row.size());
       }
     } else {
-      return 53; // throw std::runtime_error("Unable to open the input image
-                 // file   "+std::string(fname));
+      return 53;
+      // throw std::runtime_error("Unable to open the input image buffer");
     }
     return 0;
   }
@@ -525,108 +530,14 @@ struct BMP {
     }
   }
 
-  int OrganizeAverageRed() {
-    int ColorRed[bmp_info_header.height][bmp_info_header.width];
-    int ColorGreen[bmp_info_header.height][bmp_info_header.width];
-    ;
-    int ColorBlue[bmp_info_header.height][bmp_info_header.width];
-    float pixels = bmp_info_header.height * bmp_info_header.width;
-    float intensity = 0;
-    float sum = 0;
-    uint32_t channels = bmp_info_header.bit_count / 8;
-    cout << "The Width of the image is " << bmp_info_header.width << endl;
-    cout << "The height of the image is " << bmp_info_header.height << endl;
-    for (int y = 0; y < bmp_info_header.height; ++y) {
-      for (int x = 0; x < bmp_info_header.width; ++x) {
-        // cout << channels*(y*bmp_info_header.width+x) << endl;
-        // Read red
-        ColorBlue[y][x] = data[channels * (y * bmp_info_header.width + x) + 0];
-        ColorGreen[y][x] = data[channels * (y * bmp_info_header.width + x) + 1];
-        ColorRed[y][x] = data[channels * (y * bmp_info_header.width + x) + 2];
-      }
-    }
-    for (int y = 0; y < bmp_info_header.height; y++) {
-      for (int x = 0; x < bmp_info_header.width; x++) {
-        sum = ColorRed[y][x] + sum -
-              ((ColorBlue[y][x]) / 2 + (ColorGreen[y][x]) / 2);
-      }
-    }
-
-    intensity = sum / pixels;
-    cout << intensity << endl;
-    return intensity;
-  }
-
-  int OrganizeAverageGreen() {
-    int ColorRed[bmp_info_header.height][bmp_info_header.width];
-    int ColorGreen[bmp_info_header.height][bmp_info_header.width];
-    ;
-    int ColorBlue[bmp_info_header.height][bmp_info_header.width];
-    float pixels = bmp_info_header.height * bmp_info_header.width;
-    float intensity = 0;
-    float sum = 0;
-    uint32_t channels = bmp_info_header.bit_count / 8;
-    cout << "The Width of the image is " << bmp_info_header.width << endl;
-    cout << "The height of the image is " << bmp_info_header.height << endl;
-    for (int y = 0; y < bmp_info_header.height; ++y) {
-      for (int x = 0; x < bmp_info_header.width; ++x) {
-        // cout << channels*(y*bmp_info_header.width+x) << endl;
-        // Read Green
-        ColorBlue[y][x] = data[channels * (y * bmp_info_header.width + x) + 0];
-        ColorGreen[y][x] = data[channels * (y * bmp_info_header.width + x) + 1];
-        ColorRed[y][x] = data[channels * (y * bmp_info_header.width + x) + 2];
-      }
-    }
-    for (int y = 0; y < bmp_info_header.height; y++) {
-      for (int x = 0; x < bmp_info_header.width; x++) {
-        sum = ColorGreen[y][x] + sum -
-              ((ColorBlue[y][x]) / 2 + (ColorRed[y][x]) / 2);
-      }
-    }
-
-    intensity = sum / pixels;
-    cout << intensity << endl;
-    return intensity;
-  }
-
-  int OrganizeAverageBlue() {
-    int ColorRed[bmp_info_header.height][bmp_info_header.width];
-    int ColorGreen[bmp_info_header.height][bmp_info_header.width];
-    ;
-    int ColorBlue[bmp_info_header.height][bmp_info_header.width];
-    float pixels = bmp_info_header.height * bmp_info_header.width;
-    float intensity = 0;
-    float sum = 0;
-    uint32_t channels = bmp_info_header.bit_count / 8;
-    cout << "The Width of the image is " << bmp_info_header.width << endl;
-    cout << "The height of the image is " << bmp_info_header.height << endl;
-    for (int y = 0; y < bmp_info_header.height; ++y) {
-      for (int x = 0; x < bmp_info_header.width; ++x) {
-        // cout << channels*(y*bmp_info_header.width+x) << endl;
-        // Read Blue
-        ColorBlue[y][x] = data[channels * (y * bmp_info_header.width + x) + 0];
-        ColorGreen[y][x] = data[channels * (y * bmp_info_header.width + x) + 1];
-        ColorRed[y][x] = data[channels * (y * bmp_info_header.width + x) + 2];
-      }
-    }
-    for (int y = 0; y < bmp_info_header.height; y++) {
-      for (int x = 0; x < bmp_info_header.width; x++) {
-        sum = ColorBlue[y][x] + sum -
-              ((ColorGreen[y][x]) / 2 + (ColorRed[y][x]) / 2);
-      }
-    }
-
-    intensity = sum / pixels;
-    cout << intensity << endl;
-    return intensity;
-  }
-
   unsigned set_pixel(uint32_t x0, uint32_t y0, uint8_t B, uint8_t G, uint8_t R,
                      uint8_t A) {
     if (x0 >= (uint32_t)bmp_info_header.width ||
         y0 >= (uint32_t)bmp_info_header.height || x0 < 0 || y0 < 0) {
-      return 59; // throw std::runtime_error("The point is outside the image
-                 // boundaries!");
+      return 59;
+      // std::string errr = "The point is outside the image boundaries! -> " +
+      // std::to_string(x0) + "," + std::to_string(y0); throw
+      // std::runtime_error(errr);
     }
     uint32_t channels = bmp_info_header.bit_count / 8;
     data[channels * (y0 * bmp_info_header.width + x0) + 0] = B;
@@ -643,8 +554,9 @@ struct BMP {
     uint32_t y1 = this->bmp_info_header.height - y0;
     if (x0 >= (uint32_t)bmp_info_header.width ||
         y1 <= (uint32_t)bmp_info_header.width || x0 < 0 || y0 > 0) {
-      return; // throw std::runtime_error("The point is outside the image
-              // boundaries!");
+      return;
+      // throw std::runtime_error("The point is outside the image boundaries! ->
+      // " + std::to_string(x0) + "," + std::to_string(y1));
     }
 
     uint32_t channels = bmp_info_header.bit_count / 8;
@@ -654,6 +566,52 @@ struct BMP {
     if (channels == 4) {
       data[channels * (y0 * bmp_info_header.width + x0) + 3] = A;
     }
+  }
+
+  uint32_t get_pixel(uint32_t x0, uint32_t y0) {
+    if (x0 >= (uint32_t)bmp_info_header.width ||
+        y0 >= (uint32_t)bmp_info_header.height || x0 < 0 || y0 < 0) {
+      return 59; // throw std::runtime_error("The point is outside the image
+                 // boundaries!");
+    }
+    uint32_t channels = bmp_info_header.bit_count / 8;
+    uint32_t outcol = 0;
+    uint8_t red = 0;
+    uint8_t green = 0;
+    uint8_t blue = 0;
+    uint8_t alpha = 255;
+    blue = data[channels * (y0 * bmp_info_header.width + x0) + 0];
+    green = data[channels * (y0 * bmp_info_header.width + x0) + 1];
+    red = data[channels * (y0 * bmp_info_header.width + x0) + 2];
+    if (channels == 4) {
+      alpha = data[channels * (y0 * bmp_info_header.width + x0) + 3];
+    }
+    outcol = ((red << 24) | (green << 16) | (blue << 8) | alpha);
+    return outcol;
+  }
+
+  uint32_t get_pixel_df(uint32_t x0, uint32_t y0) {
+    uint32_t y1 = this->bmp_info_header.height - y0;
+    if (x0 >= (uint32_t)bmp_info_header.width ||
+        y1 <= (uint32_t)bmp_info_header.width || x0 < 0 || y0 > 0) {
+      return 0; // throw std::runtime_error("The point is outside the image
+                // boundaries!");
+    }
+
+    uint32_t channels = bmp_info_header.bit_count / 8;
+    uint32_t outcol = 0;
+    uint8_t red = 0;
+    uint8_t green = 0;
+    uint8_t blue = 0;
+    uint8_t alpha = 255;
+    blue = data[channels * (y0 * bmp_info_header.width + x0) + 0];
+    green = data[channels * (y0 * bmp_info_header.width + x0) + 1];
+    red = data[channels * (y0 * bmp_info_header.width + x0) + 2];
+    if (channels == 4) {
+      alpha = data[channels * (y0 * bmp_info_header.width + x0) + 3];
+    }
+    outcol = ((red << 24) | (green << 16) | (blue << 8) | alpha);
+    return outcol;
   }
 
   unsigned draw_rectangle(uint32_t x0, uint32_t y0, uint32_t w, uint32_t h,

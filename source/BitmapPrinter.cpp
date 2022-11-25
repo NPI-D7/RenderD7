@@ -463,3 +463,13 @@ bool RenderD7::BitmapPrinter::Decode(Decoder deccc) {
   }
   return res;
 }
+
+void RenderD7::BitmapPrinter::DrawBitmap(int x, int y, BMP map) {
+  for (int i = 0; i < map.bmp_info_header.width; i++) {
+    for (int j = 0; j < map.bmp_info_header.height; j++) {
+      bitmap.set_pixel(
+          x + i, (bitmap.bmp_info_header.height - 1) - (y + j),
+          UNPACK_BGRA(map.get_pixel(i, (map.bmp_info_header.height - 1) - j)));
+    }
+  }
+}
