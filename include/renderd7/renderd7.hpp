@@ -47,7 +47,7 @@ extern "C" {
 #include <renderd7/external/fs.h>
 }
 
-#define RENDERD7VSTRING "0.8.3"
+#define RENDERD7VSTRING "0.8.5"
 #define CHANGELOG                                                              \
   "0.8.4: A lot of Fixes and new Features for BitmapPrinter! 0.8.3: Addet "    \
   "Overlaycount to Info and Addet ResultDecoder for "                          \
