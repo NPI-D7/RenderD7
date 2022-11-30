@@ -2,6 +2,7 @@
 #include <renderd7/log.hpp>
 #include <renderd7/renderd7.hpp>
 
+#define TICKS_PER_MSEC 268111.856
 
 #define D7_NOTHING C2D_Color32(0, 0, 0, 0)
 #define CFGVER "3"
@@ -84,6 +85,8 @@ C3D_RenderTarget *Bottom;
 #define DSEVENWHITE C2D_Color32(255, 255, 255, 255)
 
 u64 delta_time;
+u64 last_tm;
+float dtm;
 
 // Screen Fade
 bool fadeout = false, fadein = false, fadeout2 = false, fadein2 = false;
@@ -122,7 +125,7 @@ void screenon() {
   gspLcdExit();
 }
 
-float RenderD7::GetDeltaTime() { return delta_time; }
+float RenderD7::GetDeltaTime() { return (float)dtm; }
 
 bool RenderD7::DrawImageFromSheet(RenderD7::Sheet *sheet, size_t index, float x,
                                   float y, float scaleX, float scaleY) {
@@ -291,6 +294,12 @@ std::string RenderD7::GetFramerate() {
 bool RenderD7::MainLoop() {
   if (!aptMainLoop())
     return false;
+
+  //Deltatime
+  uint64_t currentTime = svcGetSystemTick();
+  dtm = ((float)(currentTime / (float)TICKS_PER_MSEC) - (float)(last_tm / (float)TICKS_PER_MSEC)) / 1000.f;
+  last_tm = currentTime;
+
   hidScanInput();
   d7_hDown = hidKeysDown();
   d7_hUp = hidKeysUp();
@@ -481,6 +490,7 @@ Result RenderD7::Init::Main(std::string app_name) {
   TextBuf = C2D_TextBufNew(4096);
   Font = C2D_FontLoadSystem(CFG_REGION_USA);
   printf("Graphical Interface\n");
+  last_tm = svcGetSystemTick();
   // RenderD7::Msg::Display("RenderD7", "RenderD7 init success!\nWaiting for
   // MainLoop!", Top);
   return 0;

@@ -49,7 +49,8 @@ extern "C" {
 
 #define RENDERD7VSTRING "0.8.5"
 #define CHANGELOG                                                              \
-  "0.8.4: A lot of Fixes and new Features for BitmapPrinter! 0.8.3: Addet "    \
+  "0.8.5: Fix Deltatime 0.8.4: A lot of Fixes and new Features for "           \
+  "BitmapPrinter! 0.8.3: Addet "                                               \
   "Overlaycount to Info and Addet ResultDecoder for "                          \
   "errors.0.8.2: Fix a lot of Stuff and add c++17 based filesystem "           \
   "class.\n0.8.1: "                                                            \
