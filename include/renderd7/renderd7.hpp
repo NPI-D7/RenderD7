@@ -42,6 +42,7 @@
 #include <renderd7/parameter.hpp>
 #include <renderd7/stringtool.hpp>
 #include <renderd7/thread.hpp>
+#include <renderd7/Tasks.hpp>
 
 extern "C" {
 #include <renderd7/external/fs.h>
@@ -161,12 +162,14 @@ void DisplayFatalError(std::string toptext, std::string errortext);
 } // namespace Error
 namespace Init {
 Result Main(std::string app_name = "RD7Game");
+Result Minimal(std::string app_name = "RD7Game");
 Result Reload();
 void Graphics();
 void NdspFirm(bool useit = false);
 } // namespace Init
 namespace Exit {
 void Main();
+void Minimal();
 void NdspFirm();
 void Graphics();
 } // namespace Exit

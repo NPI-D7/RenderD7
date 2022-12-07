@@ -496,6 +496,117 @@ Result RenderD7::Init::Main(std::string app_name) {
   return 0;
 }
 
+Result RenderD7::Init::Minimal(std::string app_name)
+{
+  D_app_name = app_name;
+  gfxInitDefault();
+  romfsInit();
+  // Check if citra
+  s64 citracheck = 0;
+  svcGetSystemInfo(&citracheck, 0x20000, 0);
+  is_citra = citracheck ? true : false;
+
+  if (cobj___) {
+    maxobj__ = cobj___;
+  }
+  if (!cobj___) {
+    maxobj__ = C2D_DEFAULT_MAX_OBJECTS;
+  }
+  cfgpath = "sdmc:/RenderD7/Apps/";
+  cfgpath += D_app_name;
+  csvpc = "sdmc:/RenderD7/Apps/";
+  csvpc += D_app_name;
+  csvpc += "/mt";
+  mkdir("sdmc:/RenderD7/", 0777);
+  mkdir("sdmc:/RenderD7/Apps", 0777);
+  mkdir(cfgpath.c_str(), 0777);
+  mkdir(csvpc.c_str(), 0777);
+  bool renew = false;
+  printf("folderset\n");
+  if (FS::FileExist(cfgpath + "/config.ini")) {
+    cfgfile = std::make_unique<INI::INIFile>(cfgpath + "/config.ini");
+    cfgfile->read(cfgstruct);
+    std::string version = cfgstruct["info"]["version"];
+    if (version != CFGVER)
+      renew = true;
+  }
+  printf("vercheck\n");
+  renderd7log.Write("Point At: " + std::to_string(__LINE__) + " : " +
+                    GetFileName<std::string>(__FILE__));
+  if (!FS::FileExist(cfgpath + "/config.ini") || renew) {
+    cfgfile = std::make_unique<INI::INIFile>(cfgpath + "/config.ini");
+    renderd7log.Write("Point At: " + std::to_string(__LINE__) + " : " +
+                      GetFileName<std::string>(__FILE__));
+    cfgfile->read(cfgstruct);
+    renderd7log.Write("Point At: " + std::to_string(__LINE__) + " : " +
+                      GetFileName<std::string>(__FILE__));
+    cfgstruct["info"]["version"] = CFGVER;
+    cfgstruct["info"]["renderd7ver"] = RENDERD7VSTRING;
+    cfgstruct["settings"]["doscreentimeout"] = "0";
+    cfgstruct["settings"]["forcetimeoutLB"] = "1";
+    cfgstruct["settings"]["forceFrameRate"] = "60";
+    cfgstruct["settings"]["super-reselution"] = "0";
+    cfgstruct["settings"]["renderer"] = "c3d_c2d";
+    renderd7log.Write("Point At: " + std::to_string(__LINE__) + " : " +
+                      GetFileName<std::string>(__FILE__));
+    cfgstruct["metrik-settings"]["enableoverlay"] = "0";
+    cfgstruct["metrik-settings"]["Screen"] = "0";
+    cfgstruct["metrik-settings"]["txtColor"] = "#ffffff";
+    cfgstruct["metrik-settings"]["txtColorA"] = "255";
+    cfgstruct["metrik-settings"]["ColorA"] = "255";
+    cfgstruct["metrik-settings"]["Color"] = "#000000";
+    cfgstruct["metrik-settings"]["txtSize"] = "0.7f";
+    cfgstruct["metrik-settings"]["dumpcsv"] = "0";
+    cfgstruct["metrik-settings"]["dumpcsvloop"] = "0";
+    cfgfile->write(cfgstruct);
+  }
+  if (renew)
+    printf("renew\n");
+  renderd7log.Write("Point At: " + std::to_string(__LINE__) + " : " +
+                    GetFileName<std::string>(__FILE__));
+  cfgfile = std::make_unique<INI::INIFile>(cfgpath + "/config.ini");
+  cfgfile->read(cfgstruct);
+  std::string Fps = cfgstruct["settings"]["forceFrameRate"];
+  C3D_FrameRate(RenderD7::Convert::StringtoFloat(Fps));
+  metrikd = RenderD7::Convert::FloatToBool(RenderD7::Convert::StringtoFloat(
+      cfgstruct["metrik-settings"]["enableoverlay"]));
+  mt_txtcolor =
+      RenderD7::Color::Hex(cfgstruct["metrik-settings"]["txtColor"],
+                           (u8)RenderD7::Convert::StringtoFloat(
+                               cfgstruct["metrik-settings"]["txtColorA"]));
+  mt_color = RenderD7::Color::Hex(cfgstruct["metrik-settings"]["Color"],
+                                  (u8)RenderD7::Convert::StringtoFloat(
+                                      cfgstruct["metrik-settings"]["ColorA"]));
+  mt_txtSize =
+      RenderD7::Convert::StringtoFloat(cfgstruct["metrik-settings"]["txtSize"]);
+  mt_screen =
+      RenderD7::Convert::StringtoInt(cfgstruct["metrik-settings"]["Screen"]);
+  rd7_superreselution =
+      RenderD7::Convert::FloatToBool(RenderD7::Convert::StringtoFloat(
+          cfgstruct["settings"]["super-reselution"]));
+  mt_dumpcsv = RenderD7::Convert::FloatToBool(RenderD7::Convert::StringtoFloat(
+      cfgstruct["metrik-settings"]["dumpcsv"]));
+  mt_csvloop = RenderD7::Convert::FloatToBool(RenderD7::Convert::StringtoFloat(
+      cfgstruct["metrik-settings"]["dumpcsvloop"]));
+  printf("boost\n");
+  if (!is_citra && rd7_superreselution) {
+    if (consoleModel != 3)
+      gfxSetWide(true);
+  }
+
+
+  osSetSpeedupEnable(true);
+  C3D_Init(C3D_DEFAULT_CMDBUF_SIZE);
+  C2D_Init(C2D_DEFAULT_MAX_OBJECTS);
+  C2D_Prepare();
+  Top = C2D_CreateScreenTarget(GFX_TOP, GFX_LEFT);
+  TopRight = C2D_CreateScreenTarget(GFX_TOP, GFX_RIGHT);
+  Bottom = C2D_CreateScreenTarget(GFX_BOTTOM, GFX_LEFT);
+  TextBuf = C2D_TextBufNew(4096);
+  Font = C2D_FontLoadSystem(CFG_REGION_USA);
+  return 0;
+}
+
 Result RenderD7::Init::Reload() {
   C2D_TextBufDelete(TextBuf);
   C2D_Fini();
@@ -539,6 +650,16 @@ void RenderD7::Exit::Main() {
   gfxExit();
   romfsExit();
   cfguExit();
+}
+
+void RenderD7::Exit::Minimal() {
+  cfgfile->write(cfgstruct);
+  if (RenderD7::Threads::threadrunning)
+    RenderD7::Threads::Exit();
+  C2D_TextBufDelete(TextBuf);
+  C2D_Fini();
+  C3D_Fini();
+  gfxExit();
   romfsExit();
 }
 
