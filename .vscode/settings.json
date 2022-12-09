@@ -86,6 +86,8 @@
         "xstddef": "cpp",
         "xtr1common": "cpp",
         "xtree": "cpp",
-        "xutility": "cpp"
+        "xutility": "cpp",
+        "queue": "cpp",
+        "semaphore": "cpp"
     }
 }

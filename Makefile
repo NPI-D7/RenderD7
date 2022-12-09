@@ -9,8 +9,8 @@ endif
 include $(DEVKITARM)/3ds_rules
 
 export renderd7_MAJOR	:= 0
-export renderd7_MINOR	:= 8
-export renderd7_PATCH	:= 5
+export renderd7_MINOR	:= 9
+export renderd7_PATCH	:= 0
 
 VERSION	:=	$(renderd7_MAJOR).$(renderd7_MINOR).$(renderd7_PATCH)
 

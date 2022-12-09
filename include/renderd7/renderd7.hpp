@@ -32,6 +32,7 @@
 #include <renderd7/Sheet.hpp>
 #include <renderd7/Sprite.hpp>
 #include <renderd7/SpriteAnimation.hpp>
+#include <renderd7/Tasks.hpp>
 #include <renderd7/Time.hpp>
 #include <renderd7/Toast.hpp>
 #include <renderd7/bmp.hpp>
@@ -42,29 +43,33 @@
 #include <renderd7/parameter.hpp>
 #include <renderd7/stringtool.hpp>
 #include <renderd7/thread.hpp>
-#include <renderd7/Tasks.hpp>
 
 extern "C" {
 #include <renderd7/external/fs.h>
 }
 
-#define RENDERD7VSTRING "0.8.5"
+#define RENDERD7VSTRING "0.9.0"
 #define CHANGELOG                                                              \
-  "0.8.5: Fix Deltatime 0.8.4: A lot of Fixes and new Features for "           \
-  "BitmapPrinter! 0.8.3: Addet "                                               \
-  "Overlaycount to Info and Addet ResultDecoder for "                          \
-  "errors.0.8.2: Fix a lot of Stuff and add c++17 based filesystem "           \
-  "class.\n0.8.1: "                                                            \
-  "Add abillity to Get Stdout as string to render it to the "                  \
-  "screen.\n0.8.0: Implement BitmapPrinter\n0.7.3: Implement Over Render "     \
-  "Overlay "                                                                   \
-  "Framework\n0.7.2: Implement MT to csv file saving. Add RGB2HEX. \n0.7.1: "  \
-  "Add the New Overlay Handler. Its Just in code and does nothing yet. "       \
-  "\n0.7.0: Made Big Progress In the MT Ovl but it still crashes On a Scnd "   \
-  "C3D_FrameEnd(). Implement 800px but doesn't work that good. \n0.6.2: Fix "  \
-  "Crash when exiting trouth Home Menu.  \n0.6.10: rewrite Threadsystem, "     \
-  "Improve framerate\n0.6.02: Fix Code in lang.hpp\nadd Draw Text Left "       \
-  "Function.\nadd changelog\n0.6.01: add Threading system."
+  "0.9.0: Remove Stupid try of Console\nAdd Services list and Clean up "       \
+  "Code.\nAlso added Minimal Init for hax2.x\n0.8.5: Fix Deltatime \n0.8.4: "  \
+  "A lot of Fixes and new\nFeatures for BitmapPrinter! \n0.8.3: Addet "        \
+  "Overlaycount to Info\nand Addet ResultDecoder for errors.\n0.8.2: Fix a "   \
+  "lot of Stuff and\nadd c++17 based filesystem class.\n0.8.1: Add abillity "  \
+  "to Get Stdout as string\nto render it to the screen.\n0.8.0: Implement "    \
+  "BitmapPrinter\n0.7.3: Implement Over\nRender Overlay Framework\n0.7.2: "    \
+  "Implement MT to csv file\nsaving.(removed) Add RGB2HEX.\n0.7.1: Add the "   \
+  "New Overlay Handler. Its\nJust in code and does nothing yet.\n0.7.0: Made " \
+  "Big Progress In the MT\nOvl but it still crashes On\na Scnd "               \
+  "C3D_FrameEnd()."                                                            \
+  "\nImplement 800px but\ndoesn't work that good. \n0.6.2: Fix Crash when "    \
+  "exiting\ntrouth Home Menu.\n0.6.10: rewrite Threadsystem,\nImprove "        \
+  "framerate\n0.6.02: Fix Code in lang.hpp\nadd Draw Text Left "               \
+  "Function\n(Right since 0.7.0).\nadd changelog\n0.6.01: add Threading "      \
+  "system.\n0.6.0: Better "                                                    \
+  "Scene Management\n0.5.0: Fixed some Bugs!\n0.4.0: Trying to fix "           \
+  "Filesystem and Bugs!\n0.3.0: Recreate D7-Core into RenderD7!\n0.2.0: "      \
+  "Trying to create Animations of\nImages instead of Sheets!\n0.1.0: Initial " \
+  "Release of\nD7-Core sprite animation plugin!"
 #define DEFAULT_CENTER 0.5f
 
 /*extern C3D_RenderTarget* Top;
@@ -110,11 +115,12 @@ public:
 
 class RSettings : public RenderD7::Scene {
 private:
-  enum RState { RSETTINGS, RINFO };
+  enum RState { RSETTINGS, RINFO, RSERVICES, RCLOG };
   RenderD7::RSettings::RState m_state = RenderD7::RSettings::RState::RSETTINGS;
 
+  mutable float txtposy = 30;
+
   std::string rd7srstate = "false";
-  std::string csvstate = "false";
   std::string mtovlstate = "false";
   std::string fpsstate = "60";
   std::string mtscreenstate = "Top";
@@ -124,13 +130,13 @@ private:
 
   std::vector<RenderD7::TObject> buttons = {
       {20, 35, 120, 35, "RD7SR", -11, 10},
-      {20, 85, 120, 35, "MT_CSV", -15, 9},
+      {20, 85, 120, 35, "Changelog", -27, 9},
       {20, 135, 120, 35, "MT_OVL", -19, 10},
       {20, 185, 120, 35, "FPS", 6, 10},
       {180, 35, 120, 35, "MTSCREEN", -29, 10},
       {180, 85, 120, 35, "DSPERR", -13, 10},
       {180, 135, 120, 35, "INFO", 2, 10},
-      {180, 185, 120, 35, "", -13, 10}};
+      {180, 185, 120, 35, "Services", -13, 10}};
 
 public:
   RSettings();
@@ -165,7 +171,7 @@ Result Main(std::string app_name = "RD7Game");
 Result Minimal(std::string app_name = "RD7Game");
 Result Reload();
 void Graphics();
-void NdspFirm(bool useit = false);
+void NdspFirm();
 } // namespace Init
 namespace Exit {
 void Main();
@@ -258,31 +264,6 @@ struct Checkbox {
   u32 outcol, incol, chcol;
 };
 void DrawCheckbox(Checkbox box);
-
-class Console {
-public:
-  Console();
-  Console(int x, int y, int w, int h, u8 a = 255);
-  Console(int x, int y, int w, int h, RenderD7::Color::rgba col);
-  Console(int x, int y, int w, int h, std::string name,
-          RenderD7::Color::rgba col = {255, 255, 255, 255},
-          RenderD7::Color::rgba barcol = {0, 0, 0, 255},
-          RenderD7::Color::rgba outlinecol = {222, 222, 222, 255});
-  void On(C3D_RenderTarget *t_cscreen);
-  bool Update();
-  ~Console();
-
-private:
-  std::vector<std::string> m_lines;
-  int x, y, w, h;
-  std::string m_name = "";
-  C3D_RenderTarget *cscreen;
-  bool m_nconsole = false;
-  bool m_mconsole = false;
-  RenderD7::Color::rgba color = {255, 255, 255, 255};
-  RenderD7::Color::rgba outlinecol = {222, 222, 222, 255};
-  RenderD7::Color::rgba barcolor = {0, 0, 0, 255};
-};
 
 void GetDirContentsExt(std::vector<RenderD7::DirContent> &dircontent,
                        const std::vector<std::string> &extensions);

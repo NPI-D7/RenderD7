@@ -5,7 +5,8 @@
 #define TICKS_PER_MSEC 268111.856
 
 #define D7_NOTHING C2D_Color32(0, 0, 0, 0)
-#define CFGVER "3"
+#define CFGVER "4"
+
 Log renderd7log;
 float animtime;
 bool isndspinit = false;
@@ -66,14 +67,6 @@ bool metrikd = false;
 // double mt_fpsgraph[320];
 std::vector<int> mt_fpsgraph(320);
 
-// Metrik-CSV
-std::string csvpc;
-bool mt_dumpcsv = false; // Logs the Fps and stuff to csv. It saves every second
-                         // to not loose performence.
-bool mt_csvloop = false; // Saves In Every Frame but slows down performens.
-                         // mt_dumpcsv must be enabled.
-std::ofstream mt_csv;
-std::string mt_cname;
 //-------------------------------------------
 bool currentScreen = false;
 
@@ -92,6 +85,13 @@ float dtm;
 bool fadeout = false, fadein = false, fadeout2 = false, fadein2 = false;
 int fadealpha = 0;
 int fadecolor = 0;
+
+// Sercices
+int sv_gfx = 0;
+int sv_dsp = 0;
+int sv_cfgu = 0;
+int sv_apt = 0;
+int sv_romfs = 0;
 
 std::string _FMT_(const std::string &fmt_str, ...) {
   va_list ap;
@@ -137,17 +137,17 @@ bool RenderD7::DrawImageFromSheet(RenderD7::Sheet *sheet, size_t index, float x,
   }
   return false;
 }
-void RenderD7::Init::NdspFirm(bool useit) {
-  if (useit) {
-    if (access("sdmc:/3ds/dspfirm.cdc", F_OK) != -1) {
-      ndspInit();
-      isndspinit = true;
-      dspststus = "Initialisized success!";
-    } else {
-      dspststus = "Not found: dspfirm.cdc";
-      renderd7log.Write("RenderD7: SoundEngine Error! ndspfirm not found!");
-      RenderD7::AddOvl(std::make_unique<RenderD7::DSP_NF>());
-    }
+void RenderD7::Init::NdspFirm() {
+  if (access("sdmc:/3ds/dspfirm.cdc", F_OK) != -1) {
+    Result res;
+    res = ndspInit();
+    sv_dsp = R_FAILED(res) ? 1 : 2;
+    isndspinit = true;
+    dspststus = "Initialisized success!";
+  } else {
+    dspststus = "Not found: dspfirm.cdc";
+    renderd7log.Write("RenderD7: SoundEngine Error! ndspfirm not found!");
+    RenderD7::AddOvl(std::make_unique<RenderD7::DSP_NF>());
   }
 }
 void RenderD7::Exit::NdspFirm() {
@@ -295,9 +295,11 @@ bool RenderD7::MainLoop() {
   if (!aptMainLoop())
     return false;
 
-  //Deltatime
+  // Deltatime
   uint64_t currentTime = svcGetSystemTick();
-  dtm = ((float)(currentTime / (float)TICKS_PER_MSEC) - (float)(last_tm / (float)TICKS_PER_MSEC)) / 1000.f;
+  dtm = ((float)(currentTime / (float)TICKS_PER_MSEC) -
+         (float)(last_tm / (float)TICKS_PER_MSEC)) /
+        1000.f;
   last_tm = currentTime;
 
   hidScanInput();
@@ -353,6 +355,7 @@ void RenderD7::Exit::Graphics() {
 
 Result RenderD7::Init::Main(std::string app_name) {
   gfxInitDefault();
+  sv_gfx = 2;
   // consoleInit(GFX_TOP, NULL);
   Result res = cfguInit();
   if (R_SUCCEEDED(res)) {
@@ -365,9 +368,12 @@ Result RenderD7::Init::Main(std::string app_name) {
     gfxSetWide(consoleModel != 3);
   }
   printf("rd7sr\n");
-  aptInit();
-  romfsInit();
-  cfguInit();
+  res = aptInit();
+  sv_apt = R_FAILED(res) ? 1 : 2;
+  res = romfsInit();
+  sv_romfs = R_FAILED(res) ? 1 : 2;
+  res = cfguInit();
+  sv_cfgu = R_FAILED(res) ? 1 : 2;
   printf("stuff\n");
   if (cobj___) {
     maxobj__ = cobj___;
@@ -378,13 +384,9 @@ Result RenderD7::Init::Main(std::string app_name) {
   D_app_name = app_name;
   cfgpath = "sdmc:/RenderD7/Apps/";
   cfgpath += D_app_name;
-  csvpc = "sdmc:/RenderD7/Apps/";
-  csvpc += D_app_name;
-  csvpc += "/mt";
   mkdir("sdmc:/RenderD7/", 0777);
   mkdir("sdmc:/RenderD7/Apps", 0777);
   mkdir(cfgpath.c_str(), 0777);
-  mkdir(csvpc.c_str(), 0777);
   bool renew = false;
   printf("folderset\n");
   if (FS::FileExist(cfgpath + "/config.ini")) {
@@ -420,8 +422,6 @@ Result RenderD7::Init::Main(std::string app_name) {
     cfgstruct["metrik-settings"]["ColorA"] = "255";
     cfgstruct["metrik-settings"]["Color"] = "#000000";
     cfgstruct["metrik-settings"]["txtSize"] = "0.7f";
-    cfgstruct["metrik-settings"]["dumpcsv"] = "0";
-    cfgstruct["metrik-settings"]["dumpcsvloop"] = "0";
     cfgfile->write(cfgstruct);
   }
   if (renew)
@@ -448,10 +448,6 @@ Result RenderD7::Init::Main(std::string app_name) {
   rd7_superreselution =
       RenderD7::Convert::FloatToBool(RenderD7::Convert::StringtoFloat(
           cfgstruct["settings"]["super-reselution"]));
-  mt_dumpcsv = RenderD7::Convert::FloatToBool(RenderD7::Convert::StringtoFloat(
-      cfgstruct["metrik-settings"]["dumpcsv"]));
-  mt_csvloop = RenderD7::Convert::FloatToBool(RenderD7::Convert::StringtoFloat(
-      cfgstruct["metrik-settings"]["dumpcsvloop"]));
   printf("read\n");
   // Check if citra
   s64 citracheck = 0;
@@ -467,19 +463,6 @@ Result RenderD7::Init::Main(std::string app_name) {
   }
   printf("rd7sr\n");
   // consoleInit(GFX_BOTTOM, NULL);
-  if (mt_dumpcsv) {
-    mt_cname = csvpc;
-    mt_cname += "/";
-    mt_cname += Date();
-    mt_cname += ".csv";
-
-    FILE *logfile = fopen((mt_cname.c_str()), "w");
-    fclose(logfile);
-
-    mt_csv.open((mt_cname), std::ofstream::app);
-    mt_csv << "FPS,CPU,GPU,CMD\n";
-    mt_csv.close();
-  }
   printf("csv\n");
   C3D_Init(C3D_DEFAULT_CMDBUF_SIZE);
   C2D_Init(C2D_DEFAULT_MAX_OBJECTS);
@@ -496,11 +479,13 @@ Result RenderD7::Init::Main(std::string app_name) {
   return 0;
 }
 
-Result RenderD7::Init::Minimal(std::string app_name)
-{
+Result RenderD7::Init::Minimal(std::string app_name) {
   D_app_name = app_name;
+  Result res_;
   gfxInitDefault();
-  romfsInit();
+  sv_gfx = 2;
+  res_ = romfsInit();
+  sv_romfs = R_FAILED(res_) ? 1 : 2;
   // Check if citra
   s64 citracheck = 0;
   svcGetSystemInfo(&citracheck, 0x20000, 0);
@@ -514,13 +499,9 @@ Result RenderD7::Init::Minimal(std::string app_name)
   }
   cfgpath = "sdmc:/RenderD7/Apps/";
   cfgpath += D_app_name;
-  csvpc = "sdmc:/RenderD7/Apps/";
-  csvpc += D_app_name;
-  csvpc += "/mt";
   mkdir("sdmc:/RenderD7/", 0777);
   mkdir("sdmc:/RenderD7/Apps", 0777);
   mkdir(cfgpath.c_str(), 0777);
-  mkdir(csvpc.c_str(), 0777);
   bool renew = false;
   printf("folderset\n");
   if (FS::FileExist(cfgpath + "/config.ini")) {
@@ -556,8 +537,6 @@ Result RenderD7::Init::Minimal(std::string app_name)
     cfgstruct["metrik-settings"]["ColorA"] = "255";
     cfgstruct["metrik-settings"]["Color"] = "#000000";
     cfgstruct["metrik-settings"]["txtSize"] = "0.7f";
-    cfgstruct["metrik-settings"]["dumpcsv"] = "0";
-    cfgstruct["metrik-settings"]["dumpcsvloop"] = "0";
     cfgfile->write(cfgstruct);
   }
   if (renew)
@@ -584,16 +563,11 @@ Result RenderD7::Init::Minimal(std::string app_name)
   rd7_superreselution =
       RenderD7::Convert::FloatToBool(RenderD7::Convert::StringtoFloat(
           cfgstruct["settings"]["super-reselution"]));
-  mt_dumpcsv = RenderD7::Convert::FloatToBool(RenderD7::Convert::StringtoFloat(
-      cfgstruct["metrik-settings"]["dumpcsv"]));
-  mt_csvloop = RenderD7::Convert::FloatToBool(RenderD7::Convert::StringtoFloat(
-      cfgstruct["metrik-settings"]["dumpcsvloop"]));
   printf("boost\n");
   if (!is_citra && rd7_superreselution) {
     if (consoleModel != 3)
       gfxSetWide(true);
   }
-
 
   osSetSpeedupEnable(true);
   C3D_Init(C3D_DEFAULT_CMDBUF_SIZE);
@@ -934,18 +908,6 @@ void RenderD7::FrameEnd() {
   {
           RenderD7::LoadSettings();
   }*/
-  if (mt_dumpcsv && lp == 60) {
-    std::string _mt_fps = RenderD7::GetFramerate();
-    std::string _mt_cpu = std::to_string(C3D_GetProcessingTime()).substr(0, 4);
-    std::string _mt_gpu = std::to_string(C3D_GetDrawingTime()).substr(0, 4);
-    std::string _mt_cmd = std::to_string(C3D_GetCmdBufUsage()).substr(0, 4);
-    mt_csv.open((mt_cname), std::ofstream::app);
-    std::string fmt_ =
-        _mt_fps + "," + _mt_cpu + "," + _mt_gpu + "," + _mt_cmd + "\n";
-    mt_csv << fmt_;
-    mt_csv.close();
-    lp = 0;
-  }
   lp++;
 
   C3D_FrameEnd(0);
@@ -959,6 +921,16 @@ RenderD7::RSettings::RSettings() {
 
 RenderD7::RSettings::~RSettings() { cfgfile->write(cfgstruct); }
 
+std::vector<std::string> StrHelper(std::string input) {
+  std::string ss(input);
+  std::istringstream in(ss);
+  std::vector<std::string> test1;
+
+  std::copy(std::istream_iterator<std::string>(in),
+            std::istream_iterator<std::string>(), std::back_inserter(test1));
+  return test1;
+}
+
 void RenderD7::RSettings::Draw(void) const {
   if (m_state == RSETTINGS) {
     RenderD7::OnScreen(Top);
@@ -968,8 +940,6 @@ void RenderD7::RSettings::Draw(void) const {
     RenderD7::Draw::TextRight(400, 0, 0.7f, RenderD7::Color::Hex("#ffffff"),
                               RENDERD7VSTRING);
     RenderD7::Draw::Text(0, 30, 0.7f, DSEVENBLACK, "RD7SR: " + rd7srstate);
-    RenderD7::Draw::Text(0, 50, 0.7f, DSEVENBLACK,
-                         "Metrik to Csv: " + csvstate);
     RenderD7::Draw::Text(0, 70, 0.7f, DSEVENBLACK,
                          "Metrik Overlay: " + mtovlstate);
     RenderD7::Draw::Text(0, 90, 0.7f, DSEVENBLACK, "Force FPS: " + fpsstate);
@@ -986,6 +956,60 @@ void RenderD7::RSettings::Draw(void) const {
     RenderD7::Draw::Text(0, 0, 0.7f, RenderD7::Color::Hex("#111111"), verc);
     RenderD7::DrawTObjects(buttons, RenderD7::Color::Hex("#111111"),
                            RenderD7::Color::Hex("#eeeeee"));
+
+  } else if (m_state == RSERVICES) {
+    RenderD7::OnScreen(Top);
+    RenderD7::Draw::Rect(0, 0, 400, 21, RenderD7::Color::Hex("#111111"));
+    RenderD7::Draw::Rect(0, 21, 400, 220, RenderD7::Color::Hex("#eeeeee"));
+    RenderD7::Draw::Text(0, 0, 0.7f, DSEVENWHITE, "RenderD7->Services");
+    RenderD7::Draw::TextRight(400, 0, 0.7f, RenderD7::Color::Hex("#ffffff"),
+                              RENDERD7VSTRING);
+    RenderD7::Draw::Text(0, 30, 0.7f, DSEVENBLACK,
+                         "gfx: " + std::string(sv_gfx == 0   ? "Not Init"
+                                               : sv_gfx == 2 ? "Success"
+                                                             : "Failed"));
+    RenderD7::Draw::Text(0, 50, 0.7f, DSEVENBLACK,
+                         "Apt: " + std::string(sv_apt == 0   ? "Not Init"
+                                               : sv_apt == 2 ? "Success"
+                                                             : "Failed"));
+    RenderD7::Draw::Text(0, 70, 0.7f, DSEVENBLACK,
+                         "Romfs: " + std::string(sv_romfs == 0   ? "Not Init"
+                                                 : sv_romfs == 2 ? "Success"
+                                                                 : "Failed"));
+    RenderD7::Draw::Text(0, 90, 0.7f, DSEVENBLACK,
+                         "cfgu: " + std::string(sv_cfgu == 0   ? "Not Init"
+                                                : sv_cfgu == 2 ? "Success"
+                                                               : "Failed"));
+    RenderD7::Draw::Text(0, 110, 0.7f, DSEVENBLACK,
+                         "NDSP: " + std::string(sv_dsp == 0   ? "Not Init"
+                                                : sv_dsp == 2 ? "Success"
+                                                              : "Failed"));
+    RenderD7::OnScreen(Bottom);
+    RenderD7::Draw::Rect(0, 0, 320, 240, RenderD7::Color::Hex("#eeeeee"));
+    RenderD7::Draw::Text(0, 0, 0.7f, RenderD7::Color::Hex("#111111"),
+                         "Press B to Get back!");
+
+  } else if (m_state == RCLOG) {
+    RenderD7::OnScreen(Top);
+
+    RenderD7::Draw::Rect(0, 21, 400, 220, RenderD7::Color::Hex("#eeeeee"));
+    for(int i = txtposy; i < (int)StrHelper(CHANGELOG).size(); i++)
+    {
+      RenderD7::Draw::Text(5, 30+(i*20), 0.7f, DSEVENBLACK,
+                         std::string(StrHelper(CHANGELOG)[i]));
+    }
+    
+    RenderD7::Draw::Rect(0, 0, 400, 21, RenderD7::Color::Hex("#111111"));
+    txtposy++;
+    if (txtposy < StrHelper(CHANGELOG).size())
+      txtposy = 0;
+    RenderD7::Draw::Text(0, 0, 0.7f, DSEVENWHITE, "RenderD7->Changelog");
+    RenderD7::Draw::TextRight(400, 0, 0.7f, RenderD7::Color::Hex("#ffffff"),
+                              RENDERD7VSTRING);
+    RenderD7::OnScreen(Bottom);
+    RenderD7::Draw::Rect(0, 0, 320, 240, RenderD7::Color::Hex("#eeeeee"));
+    RenderD7::Draw::Text(0, 0, 0.7f, RenderD7::Color::Hex("#111111"),
+                         "Press B to Get back!\ntxty: " + std::to_string(txtposy));
 
   } else if (m_state == RINFO) {
     std::string rd7ver = RENDERD7VSTRING;
@@ -1009,18 +1033,16 @@ void RenderD7::RSettings::Draw(void) const {
     RenderD7::Draw::Text(0, 150, 0.7f, DSEVENBLACK,
                          "RenderD7-Commit: " + commit);
     RenderD7::Draw::Text(0, 170, 0.7f, DSEVENBLACK,
-                         "RenderD7-Overlays: " + std::to_string(overlays.size()));
+                         "RenderD7-Overlays: " +
+                             std::to_string(overlays.size()));
     /*RenderD7::Draw::Text(0, 130, 0.7f, DSEVENBLACK, "Metrik Text RGB: " +
     mttxtcolstate); RenderD7::Draw::Text(0, 150, 0.7f, DSEVENBLACK, "Metrik
     Alpha: " + mtcola); RenderD7::Draw::Text(0, 170, 0.7f, DSEVENBLACK, "Metrik
     Text Alpha: " + mttxtcola);*/
     RenderD7::OnScreen(Bottom);
-    std::string verc = "Config Version: ";
-    verc += CFGVER;
     RenderD7::Draw::Rect(0, 0, 320, 240, RenderD7::Color::Hex("#eeeeee"));
-    RenderD7::Draw::Text(0, 0, 0.7f, RenderD7::Color::Hex("#111111"), verc);
-    RenderD7::DrawTObjects(buttons, RenderD7::Color::Hex("#111111"),
-                           RenderD7::Color::Hex("#eeeeee"));
+    RenderD7::Draw::Text(0, 0, 0.7f, RenderD7::Color::Hex("#111111"),
+                         "Press B to Get back!");
   }
 }
 std::string RenderD7::Kbd(int lenght, SwkbdType tp) {
@@ -1040,7 +1062,6 @@ void RenderD7::RSettings::Logic(u32 hDown, u32 hHeld, u32 hUp,
                                 touchPosition touch) {
   if (m_state == RSETTINGS) {
     rd7srstate = rd7_superreselution ? "true" : "false";
-    csvstate = mt_dumpcsv ? "true" : "false";
     mtovlstate = metrikd ? "true" : "false";
     fpsstate = cfgstruct["settings"]["forceFrameRate"];
     mtscreenstate = mt_screen ? "Bottom" : "Top";
@@ -1051,19 +1072,8 @@ void RenderD7::RSettings::Logic(u32 hDown, u32 hHeld, u32 hUp,
           rd7_superreselution ? "1" : "0";
     }
     if (d7_hDown & KEY_TOUCH && RenderD7::touchTObj(d7_touch, buttons[1])) {
-      mt_dumpcsv = mt_dumpcsv ? false : true;
-      cfgstruct["metrik-settings"]["dumpcsv"] = mt_dumpcsv ? "1" : "0";
-      if (mt_dumpcsv) {
-        mt_cname = csvpc;
-        mt_cname += "/";
-        mt_cname += Date();
-        mt_cname += ".csv";
-        FILE *logfile = fopen((mt_cname.c_str()), "w");
-        fclose(logfile);
-        mt_csv.open((mt_cname), std::ofstream::app);
-        mt_csv << "FPS,CPU,GPU,CMD\n";
-        mt_csv.close();
-      }
+      m_state = RCLOG;
+      txtposy = 0;
     }
     if (d7_hDown & KEY_TOUCH && RenderD7::touchTObj(d7_touch, buttons[2])) {
       metrikd = metrikd ? false : true;
@@ -1085,6 +1095,9 @@ void RenderD7::RSettings::Logic(u32 hDown, u32 hHeld, u32 hUp,
     if (d7_hDown & KEY_TOUCH && RenderD7::touchTObj(d7_touch, buttons[6])) {
       m_state = RINFO;
     }
+    if (d7_hDown & KEY_TOUCH && RenderD7::touchTObj(d7_touch, buttons[7])) {
+      m_state = RSERVICES;
+    }
     if (d7_hDown & KEY_B) {
       cfgfile->write(cfgstruct);
       rd7settings = false;
@@ -1092,6 +1105,16 @@ void RenderD7::RSettings::Logic(u32 hDown, u32 hHeld, u32 hUp,
     }
   }
   if (m_state == RINFO) {
+    if (d7_hDown & KEY_B) {
+      m_state = RSETTINGS;
+    }
+  }
+  if (m_state == RSERVICES) {
+    if (d7_hDown & KEY_B) {
+      m_state = RSETTINGS;
+    }
+  }
+  if (m_state == RCLOG) {
     if (d7_hDown & KEY_B) {
       m_state = RSETTINGS;
     }
@@ -1104,48 +1127,4 @@ void RenderD7::LoadSettings() {
 
 void RenderD7::AddOvl(std::unique_ptr<RenderD7::Ovl> overlay) {
   overlays.push(std::move(overlay));
-}
-
-RenderD7::Console::Console() {
-  this->x = 0;
-  this->y = 0;
-  this->w = 320;
-  this->h = 240;
-  this->color = {0, 0, 0, 255};
-}
-RenderD7::Console::Console(int x, int y, int w, int h, u8 a) {
-  this->x = x;
-  this->y = y;
-  this->w = w;
-  this->h = h;
-  this->color = {0, 0, 0, a};
-}
-RenderD7::Console::Console(int x, int y, int w, int h,
-                           RenderD7::Color::rgba col) {
-  this->x = x;
-  this->y = y;
-  this->w = w;
-  this->h = h;
-  this->color = col;
-}
-RenderD7::Console::Console(int x, int y, int w, int h, std::string name,
-                           RenderD7::Color::rgba col,
-                           RenderD7::Color::rgba barcol,
-                           RenderD7::Color::rgba outlinecol) {
-  this->x = x;
-  this->y = y;
-  this->w = w;
-  this->h = h;
-  this->color = col;
-  this->outlinecol = outlinecol;
-  this->barcolor = barcol;
-  this->m_name = name;
-}
-RenderD7::Console::~Console() {}
-void RenderD7::Console::On(C3D_RenderTarget *t_cscreen) {
-  this->cscreen = t_cscreen;
-}
-bool RenderD7::Console::Update() {
-  bool dr_sc = true;
-  return dr_sc;
 }
