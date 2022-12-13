@@ -57,6 +57,7 @@ std::string mt_fps;
 std::string mt_cpu;
 std::string mt_gpu;
 std::string mt_cmd;
+std::string mt_lfr;
 
 bool shouldbe_disabled = false;
 int cnttttt = 0;
@@ -805,6 +806,27 @@ void RenderD7::DrawList1(RenderD7::ScrollList1 &l, float txtsize,
   RenderD7::Draw::Text(0, 0, 0.8f, RenderD7::Color::Hex("#ffffff"), l.Text);
 }
 
+std::string priv_fmt_bytes(int bytes) {
+  char out[32];
+
+  if (bytes == 1)
+    snprintf(out, sizeof(out), "%d Byte", bytes);
+
+  else if (bytes < 1024)
+    snprintf(out, sizeof(out), "%d Bytes", bytes);
+
+  else if (bytes < 1024 * 1024)
+    snprintf(out, sizeof(out), "%.1f KB", (float)bytes / 1024);
+
+  else if (bytes < 1024 * 1024 * 1024)
+    snprintf(out, sizeof(out), "%.1f MB", (float)bytes / 1024 / 1024);
+
+  else
+    snprintf(out, sizeof(out), "%.1f GB", (float)bytes / 1024 / 1024 / 1024);
+
+  return out;
+}
+
 void RenderD7::DrawMetrikOvl() {
   switch (mt_screen) {
   case 0:
@@ -832,6 +854,7 @@ void RenderD7::DrawMetrikOvl() {
   mt_cmd =
       "CMD: " + std::to_string(C3D_GetCmdBufUsage() * 100.0f).substr(0, 4) +
       "%/" + std::to_string(C3D_GetCmdBufUsage()).substr(0, 4) + "ms";
+  mt_lfr = "Linear: " + priv_fmt_bytes(linearSpaceFree());
   RenderD7::Draw::Rect(0, 0, RenderD7::Draw::GetTextWidth(mt_txtSize, mt_fps),
                        RenderD7::Draw::GetTextHeight(mt_txtSize, mt_fps),
                        mt_color);
@@ -844,6 +867,9 @@ void RenderD7::DrawMetrikOvl() {
   RenderD7::Draw::Rect(0, 90, RenderD7::Draw::GetTextWidth(mt_txtSize, mt_cmd),
                        RenderD7::Draw::GetTextHeight(mt_txtSize, mt_cmd),
                        mt_color);
+  RenderD7::Draw::Rect(0, 110, RenderD7::Draw::GetTextWidth(mt_txtSize, mt_lfr),
+                       RenderD7::Draw::GetTextHeight(mt_txtSize, mt_lfr),
+                       mt_color);
   RenderD7::Draw::Rect(0, infoy, RenderD7::Draw::GetTextWidth(mt_txtSize, info),
                        RenderD7::Draw::GetTextHeight(mt_txtSize, info),
                        mt_color);
@@ -851,6 +877,7 @@ void RenderD7::DrawMetrikOvl() {
   RenderD7::Draw::Text(0, 50, mt_txtSize, mt_txtcolor, mt_cpu);
   RenderD7::Draw::Text(0, 70, mt_txtSize, mt_txtcolor, mt_gpu);
   RenderD7::Draw::Text(0, 90, mt_txtSize, mt_txtcolor, mt_cmd);
+  RenderD7::Draw::Text(0, 110, mt_txtSize, mt_txtcolor, mt_lfr);
   RenderD7::Draw::Text(0, infoy, mt_txtSize, mt_txtcolor, info);
 
   /*for (int z = 0; z < (int)mt_fpsgraph.size(); z++)
@@ -993,16 +1020,10 @@ void RenderD7::RSettings::Draw(void) const {
     RenderD7::OnScreen(Top);
 
     RenderD7::Draw::Rect(0, 21, 400, 220, RenderD7::Color::Hex("#eeeeee"));
-    for(int i = txtposy; i < (int)StrHelper(CHANGELOG).size(); i++)
-    {
-      RenderD7::Draw::Text(5, 30+(i*20), 0.7f, DSEVENBLACK,
-                         std::string(StrHelper(CHANGELOG)[i]));
-    }
+      RenderD7::Draw::Text(5, 30, 0.7f, DSEVENBLACK,
+                         std::string(CHANGELOG));
     
     RenderD7::Draw::Rect(0, 0, 400, 21, RenderD7::Color::Hex("#111111"));
-    txtposy++;
-    if (txtposy < StrHelper(CHANGELOG).size())
-      txtposy = 0;
     RenderD7::Draw::Text(0, 0, 0.7f, DSEVENWHITE, "RenderD7->Changelog");
     RenderD7::Draw::TextRight(400, 0, 0.7f, RenderD7::Color::Hex("#ffffff"),
                               RENDERD7VSTRING);
