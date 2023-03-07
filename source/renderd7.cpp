@@ -432,7 +432,7 @@ Result RenderD7::Init::Main(std::string app_name) {
   cfgfile = std::make_unique<INI::INIFile>(cfgpath + "/config.ini");
   cfgfile->read(cfgstruct);
   std::string Fps = cfgstruct["settings"]["forceFrameRate"];
-  C3D_FrameRate(RenderD7::Convert::StringtoFloat(Fps));
+  ////C3D_FrameRate(RenderD7::Convert::StringtoFloat(Fps));
   metrikd = RenderD7::Convert::FloatToBool(RenderD7::Convert::StringtoFloat(
       cfgstruct["metrik-settings"]["enableoverlay"]));
   mt_txtcolor =
@@ -547,7 +547,7 @@ Result RenderD7::Init::Minimal(std::string app_name) {
   cfgfile = std::make_unique<INI::INIFile>(cfgpath + "/config.ini");
   cfgfile->read(cfgstruct);
   std::string Fps = cfgstruct["settings"]["forceFrameRate"];
-  C3D_FrameRate(RenderD7::Convert::StringtoFloat(Fps));
+  //C3D_FrameRate(RenderD7::Convert::StringtoFloat(Fps));
   metrikd = RenderD7::Convert::FloatToBool(RenderD7::Convert::StringtoFloat(
       cfgstruct["metrik-settings"]["enableoverlay"]));
   mt_txtcolor =
@@ -1020,9 +1020,8 @@ void RenderD7::RSettings::Draw(void) const {
     RenderD7::OnScreen(Top);
 
     RenderD7::Draw::Rect(0, 21, 400, 220, RenderD7::Color::Hex("#eeeeee"));
-      RenderD7::Draw::Text(5, 30, 0.7f, DSEVENBLACK,
-                         std::string(CHANGELOG));
-    
+    RenderD7::Draw::Text(5, 30, 0.7f, DSEVENBLACK, std::string(CHANGELOG));
+
     RenderD7::Draw::Rect(0, 0, 400, 21, RenderD7::Color::Hex("#111111"));
     RenderD7::Draw::Text(0, 0, 0.7f, DSEVENWHITE, "RenderD7->Changelog");
     RenderD7::Draw::TextRight(400, 0, 0.7f, RenderD7::Color::Hex("#ffffff"),
@@ -1030,7 +1029,8 @@ void RenderD7::RSettings::Draw(void) const {
     RenderD7::OnScreen(Bottom);
     RenderD7::Draw::Rect(0, 0, 320, 240, RenderD7::Color::Hex("#eeeeee"));
     RenderD7::Draw::Text(0, 0, 0.7f, RenderD7::Color::Hex("#111111"),
-                         "Press B to Get back!\ntxty: " + std::to_string(txtposy));
+                         "Press B to Get back!\ntxty: " +
+                             std::to_string(txtposy));
 
   } else if (m_state == RINFO) {
     std::string rd7ver = RENDERD7VSTRING;
@@ -1103,8 +1103,8 @@ void RenderD7::RSettings::Logic(u32 hDown, u32 hHeld, u32 hUp,
     if (d7_hDown & KEY_TOUCH && RenderD7::touchTObj(d7_touch, buttons[3]) &&
         !metrikd) {
       cfgstruct["settings"]["forceFrameRate"] = Kbd(2, SWKBD_TYPE_NUMPAD);
-      C3D_FrameRate(RenderD7::Convert::StringtoFloat(
-          cfgstruct["settings"]["forceFrameRate"]));
+      //C3D_FrameRate(RenderD7::Convert::StringtoFloat(
+          //cfgstruct["settings"]["forceFrameRate"]));
     }
     if (d7_hDown & KEY_TOUCH && RenderD7::touchTObj(d7_touch, buttons[4])) {
       mt_screen = mt_screen ? 0 : 1;

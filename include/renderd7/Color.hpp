@@ -26,6 +26,6 @@ public:
   uint8_t m_r, m_g, m_b, m_a;
 };
 std::string RGB2Hex(int r, int g, int b);
-uint32_t Hex(const std::string color, uint8_t a = 255);
+uint32_t Hex(const std::string &color, uint8_t a = 255);
 } // namespace Color
 } // namespace RenderD7

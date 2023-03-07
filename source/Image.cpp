@@ -77,76 +77,82 @@ static bool C3DTexToC2DImage(C2D_Image *texture, u32 width, u32 height,
   return false;
 }
 
-static void OLD_C3DTexToC2DImage(C3D_Tex *tex, Tex3DS_SubTexture *subtex, u8 *buf, u32 size, u32 width, u32 height, GPU_TEXCOLOR format) {
-	// RGBA -> ABGR
-	for (u32 row = 0; row < width; row++) {
-		for (u32 col = 0; col < height; col++) {
-			u32 z = (row + col * width) * 4;
+static void OLD_C3DTexToC2DImage(C3D_Tex *tex, Tex3DS_SubTexture *subtex,
+                                 u8 *buf, u32 size, u32 width, u32 height,
+                                 GPU_TEXCOLOR format) {
+  // RGBA -> ABGR
+  for (u32 row = 0; row < width; row++) {
+    for (u32 col = 0; col < height; col++) {
+      u32 z = (row + col * width) * 4;
 
-			u8 r = *(u8 *)(buf + z);
-			u8 g = *(u8 *)(buf + z + 1);
-			u8 b = *(u8 *)(buf + z + 2);
-			u8 a = *(u8 *)(buf + z + 3);
+      u8 r = *(u8 *)(buf + z);
+      u8 g = *(u8 *)(buf + z + 1);
+      u8 b = *(u8 *)(buf + z + 2);
+      u8 a = *(u8 *)(buf + z + 3);
 
-			*(buf + z) = a;
-			*(buf + z + 1) = b;
-			*(buf + z + 2) = g;
-			*(buf + z + 3) = r;
-		}
-	}
+      *(buf + z) = a;
+      *(buf + z + 1) = b;
+      *(buf + z + 2) = g;
+      *(buf + z + 3) = r;
+    }
+  }
 
-	u32 w_pow2 = GetNextPowerOf2(width);
-	u32 h_pow2 = GetNextPowerOf2(height);
+  u32 w_pow2 = GetNextPowerOf2(width);
+  u32 h_pow2 = GetNextPowerOf2(height);
 
-	subtex->width = (u16)width;
-	subtex->height = (u16)height;
-	subtex->left = 0.0f;
-	subtex->top = 1.0f;
-	subtex->right = (width / (float)w_pow2);
-	subtex->bottom = 1.0 - (height / (float)h_pow2);
+  subtex->width = (u16)width;
+  subtex->height = (u16)height;
+  subtex->left = 0.0f;
+  subtex->top = 1.0f;
+  subtex->right = (width / (float)w_pow2);
+  subtex->bottom = 1.0 - (height / (float)h_pow2);
 
-	C3D_TexInit(tex, (u16)w_pow2, (u16)h_pow2, format);
-	C3D_TexSetFilter(tex, GPU_NEAREST, GPU_NEAREST);
+  C3D_TexInit(tex, (u16)w_pow2, (u16)h_pow2, format);
+  C3D_TexSetFilter(tex, GPU_NEAREST, GPU_NEAREST);
 
-	u32 pixel_size = (size / width / height);
+  u32 pixel_size = (size / width / height);
 
-	memset(tex->data, 0, tex->size);
+  memset(tex->data, 0, tex->size);
 
-	for (u32 x = 0; x < width; x++) {
-		for (u32 y = 0; y < height; y++) {
-			u32 dst_pos = ((((y >> 3) * (w_pow2 >> 3) + (x >> 3)) << 6) + ((x & 1) | ((y & 1) << 1) | ((x & 2) << 1) | ((y & 2) << 2) | ((x & 4) << 2) | ((y & 4) << 3))) * pixel_size;
-			u32 src_pos = (y * width + x) * pixel_size;
+  for (u32 x = 0; x < width; x++) {
+    for (u32 y = 0; y < height; y++) {
+      u32 dst_pos = ((((y >> 3) * (w_pow2 >> 3) + (x >> 3)) << 6) +
+                     ((x & 1) | ((y & 1) << 1) | ((x & 2) << 1) |
+                      ((y & 2) << 2) | ((x & 4) << 2) | ((y & 4) << 3))) *
+                    pixel_size;
+      u32 src_pos = (y * width + x) * pixel_size;
 
-			memcpy(&((u8*)tex->data)[dst_pos], &((u8*)buf)[src_pos], pixel_size);
-		}
-	}
+      memcpy(&((u8 *)tex->data)[dst_pos], &((u8 *)buf)[src_pos], pixel_size);
+    }
+  }
 
-	C3D_TexFlush(tex);
+  C3D_TexFlush(tex);
 
-	tex->border = 0x00000000;
-	C3D_TexSetWrap(tex, GPU_CLAMP_TO_BORDER, GPU_CLAMP_TO_BORDER);
-	linearFree(buf);
+  tex->border = 0x00000000;
+  C3D_TexSetWrap(tex, GPU_CLAMP_TO_BORDER, GPU_CLAMP_TO_BORDER);
+  linearFree(buf);
 }
 
 bool IMG_LoadImageFile(C2D_Image *texture, const char *path) {
-	stbi_uc *image = NULL;
-	int width = 0, height = 0;
+  stbi_uc *image = NULL;
+  int width = 0, height = 0;
   int nc;
 
-	image = stbi_load(path, &width, &height, &nc, 4);
+  image = stbi_load(path, &width, &height, &nc, 4);
 
-	if (width > 1024 || height > 1024) {
-		stbi_image_free(image);
-		return false;
-	}
+  if (width > 1024 || height > 1024) {
+    stbi_image_free(image);
+    return false;
+  }
 
-	C3D_Tex *tex = new C3D_Tex;
-	Tex3DS_SubTexture *subtex = new Tex3DS_SubTexture;
-	OLD_C3DTexToC2DImage(tex, subtex, image, (u32)(width * height * 4), (u32)width, (u32)height, GPU_RGBA8);
-	texture->tex = tex;
-	texture->subtex = subtex;
-	stbi_image_free(image);
-	return true;
+  C3D_Tex *tex = new C3D_Tex;
+  Tex3DS_SubTexture *subtex = new Tex3DS_SubTexture;
+  OLD_C3DTexToC2DImage(tex, subtex, image, (u32)(width * height * 4),
+                       (u32)width, (u32)height, GPU_RGBA8);
+  texture->tex = tex;
+  texture->subtex = subtex;
+  stbi_image_free(image);
+  return true;
 }
 
 extern "C" {

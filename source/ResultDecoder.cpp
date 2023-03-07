@@ -162,7 +162,7 @@ static std::map<int, std::string> descos = {
     {47, "Invalid command header."},
 };
 
-//Need to Fix The Range based Values
+// Need to Fix The Range based Values
 static std::map<int, std::string> descfs = {
     {101, "Archive not mounted or mount-point not found."},
     {120, "Title or object not found."},
@@ -262,9 +262,9 @@ static std::map<int, std::string> descmvd = {
 
 static std::map<int, std::string> descqtm = {
     {8, "Camera is already in use or busy."},
-}; 
+};
 
-//Need to Fix The Range based Values
+// Need to Fix The Range based Values
 static std::map<int, std::string> descapplication = {
     {0, "The application raised an error. Please consult the application's "
         "source code or ask the author for assistance with it."},

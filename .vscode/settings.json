@@ -88,6 +88,15 @@
         "xtree": "cpp",
         "xutility": "cpp",
         "queue": "cpp",
-        "semaphore": "cpp"
+        "semaphore": "cpp",
+        "hash_map": "cpp",
+        "set": "cpp",
+        "unordered_set": "cpp",
+        "source_location": "cpp",
+        "future": "cpp",
+        "cfenv": "cpp",
+        "cinttypes": "cpp",
+        "typeindex": "cpp",
+        "variant": "cpp"
     }
 }

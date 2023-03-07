@@ -2,7 +2,6 @@
 #include <sstream>
 #include <string>
 
-
 namespace RenderD7 {
 class StealConsole {
 public:
