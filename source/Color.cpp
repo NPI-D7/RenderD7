@@ -1,5 +1,5 @@
-#include <renderd7/Color.hpp>
 #include <map>
+#include <renderd7/Color.hpp>
 
 #define RGBA8(r, g, b, a)                                                      \
   ((((r)&0xFF) << 0) | (((g)&0xFF) << 8) | (((b)&0xFF) << 16) |                \

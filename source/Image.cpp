@@ -155,78 +155,6 @@ bool IMG_LoadImageFile(C2D_Image *texture, const char *path) {
   return true;
 }
 
-extern "C" {
-#include <renderd7/external/libnsbmp/libnsbmp.h>
-}
-static const u32 BYTES_PER_PIXEL = 4;
-#define MAX_IMAGE_BYTES (48 * 1024 * 1024)
-
-namespace LIBBMP {
-static void *bitmap_create(int width, int height,
-                           [[maybe_unused]] unsigned int state) {
-  /* ensure a stupidly large (>50Megs or so) bitmap is not created */
-  if ((static_cast<long long>(width) * static_cast<long long>(height)) >
-      (MAX_IMAGE_BYTES / BYTES_PER_PIXEL))
-    return nullptr;
-
-  return std::calloc(width * height, BYTES_PER_PIXEL);
-}
-
-static unsigned char *bitmap_get_buffer(void *bitmap) {
-  assert(bitmap);
-  return static_cast<unsigned char *>(bitmap);
-}
-
-static size_t bitmap_get_bpp([[maybe_unused]] void *bitmap) {
-  return BYTES_PER_PIXEL;
-}
-
-static void bitmap_destroy(void *bitmap) {
-  assert(bitmap);
-  std::free(bitmap);
-}
-} // namespace LIBBMP
-
-unsigned Image_to_C3D(C2D_Image img, const std::vector<unsigned char> &bmpc) {
-  bmp_bitmap_callback_vt bitmap_callbacks = {
-      LIBBMP::bitmap_create, LIBBMP::bitmap_destroy, LIBBMP::bitmap_get_buffer,
-      LIBBMP::bitmap_get_bpp};
-
-  bmp_result code = BMP_OK;
-  bmp_image bmp;
-  bmp_create(&bmp, &bitmap_callbacks);
-
-  code = bmp_analyse(&bmp, bmpc.size(), (u8 *)bmpc.data());
-  if (code != BMP_OK) {
-    bmp_finalise(&bmp);
-    return 1;
-  }
-
-  code = bmp_decode(&bmp);
-  if (code != BMP_OK) {
-    if ((code != BMP_INSUFFICIENT_DATA) && (code != BMP_DATA_ERROR)) {
-      bmp_finalise(&bmp);
-      return 2;
-    }
-
-    /* skip if the decoded image would be ridiculously large */
-    if ((bmp.width * bmp.height) > 200000) {
-      bmp_finalise(&bmp);
-      return 3;
-    }
-  }
-  C2D_Image *texture = new C2D_Image();
-  bool ret = C3DTexToC2DImage(texture, static_cast<u32>(bmp.width),
-                              static_cast<u32>(bmp.height),
-                              static_cast<u8 *>(bmp.bitmap));
-  bmp_finalise(&bmp);
-  delete texture;
-  if (!ret) {
-    return 4;
-  }
-  return 0;
-}
-
 void RenderD7::Image::LoadPng(const std::string path) {
   if (usedbgmsg) {
     // RenderD7::Msg::Display("RenderD7", "Loading Png:" + path, Top);
@@ -327,7 +255,9 @@ bool RenderD7::Image::Draw(float x, float y, float scaleX, float scaleY) {
 
 void RenderD7::Image::LoadFromBitmap(BMP bitmap) {
   loadet = false;
-  unsigned error = Image_to_C3D(this->img, bitmap.DATA());
+  unsigned error =
+      C3DTexToC2DImage(&this->img, bitmap.bmp_info_header.width,
+                       bitmap.bmp_info_header.height, bitmap.data.data());
   if (error == 0) {
     this->loadet = true;
   }

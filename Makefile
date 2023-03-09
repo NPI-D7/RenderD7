@@ -10,7 +10,7 @@ include $(DEVKITARM)/3ds_rules
 
 export renderd7_MAJOR	:= 0
 export renderd7_MINOR	:= 9
-export renderd7_PATCH	:= 0
+export renderd7_PATCH	:= 1
 
 VERSION	:=	$(renderd7_MAJOR).$(renderd7_MINOR).$(renderd7_PATCH)
 
@@ -32,7 +32,7 @@ TIME_TIME := $(shell date --iso=seconds)
 # INCLUDES is a list of directories containing header files
 #---------------------------------------------------------------------------------
 TARGET		:=	renderd7
-SOURCES		:=	source external/source external/libnsbmp/source
+SOURCES		:=	source external/source
 DATA		:=	data
 INCLUDES	:=	include
 

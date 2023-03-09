@@ -547,7 +547,7 @@ Result RenderD7::Init::Minimal(std::string app_name) {
   cfgfile = std::make_unique<INI::INIFile>(cfgpath + "/config.ini");
   cfgfile->read(cfgstruct);
   std::string Fps = cfgstruct["settings"]["forceFrameRate"];
-  //C3D_FrameRate(RenderD7::Convert::StringtoFloat(Fps));
+  // C3D_FrameRate(RenderD7::Convert::StringtoFloat(Fps));
   metrikd = RenderD7::Convert::FloatToBool(RenderD7::Convert::StringtoFloat(
       cfgstruct["metrik-settings"]["enableoverlay"]));
   mt_txtcolor =
@@ -932,6 +932,7 @@ void RenderD7::FrameEnd() {
   if (!shouldbe_disabled)
     OvlHandler();
   /*if (d7_hHeld & KEY_R && d7_hDown & KEY_SELECT)
+
   {
           RenderD7::LoadSettings();
   }*/
@@ -1103,8 +1104,8 @@ void RenderD7::RSettings::Logic(u32 hDown, u32 hHeld, u32 hUp,
     if (d7_hDown & KEY_TOUCH && RenderD7::touchTObj(d7_touch, buttons[3]) &&
         !metrikd) {
       cfgstruct["settings"]["forceFrameRate"] = Kbd(2, SWKBD_TYPE_NUMPAD);
-      //C3D_FrameRate(RenderD7::Convert::StringtoFloat(
-          //cfgstruct["settings"]["forceFrameRate"]));
+      // C3D_FrameRate(RenderD7::Convert::StringtoFloat(
+      // cfgstruct["settings"]["forceFrameRate"]));
     }
     if (d7_hDown & KEY_TOUCH && RenderD7::touchTObj(d7_touch, buttons[4])) {
       mt_screen = mt_screen ? 0 : 1;
