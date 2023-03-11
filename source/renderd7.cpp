@@ -1,6 +1,9 @@
 #include <regex>
+#include <renderd7/external/nvid.hpp>
 #include <renderd7/log.hpp>
+#include <renderd7/npi_intro.hpp>
 #include <renderd7/renderd7.hpp>
+#include <renderd7/renderd7_logo.hpp>
 
 #define TICKS_PER_MSEC 268111.856
 
@@ -12,12 +15,14 @@ float animtime;
 bool isndspinit = false;
 bool running = true;
 std::stack<std::unique_ptr<RenderD7::Scene>> RenderD7::Scene::scenes;
+std::unique_ptr<RenderD7::Scene> tmpFadeS;
 std::stack<std::unique_ptr<RenderD7::Ovl>> overlays;
 bool usedbgmsg = false;
 std::string dspststus = "Not Initialisized!";
 
 int cobj___;
 int maxobj__;
+bool rd7_do_splash = false;
 
 // INI::INIFile cfgfile;
 std::unique_ptr<INI::INIFile> cfgfile = nullptr;
@@ -86,13 +91,80 @@ float dtm;
 bool fadeout = false, fadein = false, fadeout2 = false, fadein2 = false;
 int fadealpha = 0;
 int fadecolor = 0;
-
+bool waitFade = false;
+bool FadeExit = false;
+bool SceneFadeWait = false;
 // Sercices
 int sv_gfx = 0;
 int sv_dsp = 0;
 int sv_cfgu = 0;
 int sv_apt = 0;
 int sv_romfs = 0;
+
+std::vector<std::string> string_to_lines(std::string input_str) {
+  std::vector<std::string> lines;
+  std::stringstream ss(input_str);
+  std::string line;
+  while (std::getline(ss, line)) {
+    lines.push_back(line);
+  }
+  return lines;
+}
+
+void Npifade() {
+  if (fadein) {
+    if (fadealpha < 255) {
+      RenderD7::OnScreen(Top);
+      RenderD7::Draw::Rect(0, 0, RenderD7::IsRD7SR() ? 800 : 400, 240,
+                           ((fadealpha << 24) | 0x00000000));
+      RenderD7::OnScreen(Bottom);
+      RenderD7::Draw::Rect(0, 0, 320, 240, ((fadealpha << 24) | 0x00000000));
+      fadealpha += 3;
+    } else {
+      fadein = false;
+    }
+  } else if (fadeout) {
+    if (fadealpha > 0) {
+      RenderD7::OnScreen(Top);
+      RenderD7::Draw::Rect(0, 0, RenderD7::IsRD7SR() ? 800 : 400, 240,
+                           ((fadealpha << 24) | 0x00000000));
+      RenderD7::OnScreen(Bottom);
+      RenderD7::Draw::Rect(0, 0, 320, 240, ((fadealpha << 24) | 0x00000000));
+      fadealpha -= 3;
+    } else {
+      fadeout = false;
+    }
+  } else {
+    if (waitFade)
+      waitFade = false;
+    if (FadeExit)
+      running = false;
+    if (SceneFadeWait) {
+      RenderD7::Scene::scenes.push(std::move(tmpFadeS));
+      SceneFadeWait = false;
+    }
+    // No fade
+    RenderD7::OnScreen(Top);
+    RenderD7::Draw::Rect(0, 0, RenderD7::IsRD7SR() ? 800 : 400, 240,
+                         ((fadealpha << 24) | 0x00000000));
+    RenderD7::OnScreen(Bottom);
+    RenderD7::Draw::Rect(0, 0, 320, 240, ((fadealpha << 24) | 0x00000000));
+  }
+}
+
+void PushSplash() {
+  C2D_SpriteSheet sheet;
+  sheet = C2D_SpriteSheetLoadFromMem((void *)renderd7_logo, renderd7_logo_size);
+  C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
+  C2D_TargetClear(Top, DSEVENBLACK);
+  C2D_TargetClear(Bottom, DSEVENBLACK);
+  RenderD7::ClearTextBufs();
+  RenderD7::OnScreen(Top);
+  C2D_DrawImageAt(C2D_SpriteSheetGetImage(sheet, 0), 400 / 2 - 300 / 2,
+                  240 / 2 - 100 / 2, 0.5);
+  C3D_FrameEnd(0);
+  C2D_SpriteSheetFree(sheet);
+}
 
 std::string _FMT_(const std::string &fmt_str, ...) {
   va_list ap;
@@ -267,7 +339,11 @@ void RenderD7::Scene::doLogic(u32 hDown, u32 hHeld, u32 hUp,
 }
 
 void RenderD7::Scene::Load(std::unique_ptr<Scene> scene, bool fade) {
-  Scene::scenes.push(std::move(scene));
+  if (fade) {
+    tmpFadeS = std::move(scene);
+    SceneFadeWait = true;
+  } else
+    Scene::scenes.push(std::move(scene));
 }
 
 void RenderD7::Scene::Back() {
@@ -373,6 +449,20 @@ Result RenderD7::Init::Main(std::string app_name) {
   sv_apt = R_FAILED(res) ? 1 : 2;
   res = romfsInit();
   sv_romfs = R_FAILED(res) ? 1 : 2;
+
+  C3D_Init(C3D_DEFAULT_CMDBUF_SIZE);
+  C2D_Init(C2D_DEFAULT_MAX_OBJECTS);
+  C2D_Prepare();
+  Top = C2D_CreateScreenTarget(GFX_TOP, GFX_LEFT);
+  TopRight = C2D_CreateScreenTarget(GFX_TOP, GFX_RIGHT);
+  Bottom = C2D_CreateScreenTarget(GFX_BOTTOM, GFX_LEFT);
+  TextBuf = C2D_TextBufNew(4096);
+  Font = C2D_FontLoadSystem(CFG_REGION_USA);
+  printf("Graphical Interface\n");
+  last_tm = svcGetSystemTick();
+  if (rd7_do_splash)
+    PushSplash();
+
   res = cfguInit();
   sv_cfgu = R_FAILED(res) ? 1 : 2;
   printf("stuff\n");
@@ -465,16 +555,7 @@ Result RenderD7::Init::Main(std::string app_name) {
   printf("rd7sr\n");
   // consoleInit(GFX_BOTTOM, NULL);
   printf("csv\n");
-  C3D_Init(C3D_DEFAULT_CMDBUF_SIZE);
-  C2D_Init(C2D_DEFAULT_MAX_OBJECTS);
-  C2D_Prepare();
-  Top = C2D_CreateScreenTarget(GFX_TOP, GFX_LEFT);
-  TopRight = C2D_CreateScreenTarget(GFX_TOP, GFX_RIGHT);
-  Bottom = C2D_CreateScreenTarget(GFX_BOTTOM, GFX_LEFT);
-  TextBuf = C2D_TextBufNew(4096);
-  Font = C2D_FontLoadSystem(CFG_REGION_USA);
-  printf("Graphical Interface\n");
-  last_tm = svcGetSystemTick();
+
   // RenderD7::Msg::Display("RenderD7", "RenderD7 init success!\nWaiting for
   // MainLoop!", Top);
   return 0;
@@ -487,6 +568,19 @@ Result RenderD7::Init::Minimal(std::string app_name) {
   sv_gfx = 2;
   res_ = romfsInit();
   sv_romfs = R_FAILED(res_) ? 1 : 2;
+
+  osSetSpeedupEnable(true);
+  C3D_Init(C3D_DEFAULT_CMDBUF_SIZE);
+  C2D_Init(C2D_DEFAULT_MAX_OBJECTS);
+  C2D_Prepare();
+  Top = C2D_CreateScreenTarget(GFX_TOP, GFX_LEFT);
+  TopRight = C2D_CreateScreenTarget(GFX_TOP, GFX_RIGHT);
+  Bottom = C2D_CreateScreenTarget(GFX_BOTTOM, GFX_LEFT);
+  TextBuf = C2D_TextBufNew(4096);
+  Font = C2D_FontLoadSystem(CFG_REGION_USA);
+  if (rd7_do_splash)
+    PushSplash();
+
   // Check if citra
   s64 citracheck = 0;
   svcGetSystemInfo(&citracheck, 0x20000, 0);
@@ -569,16 +663,6 @@ Result RenderD7::Init::Minimal(std::string app_name) {
     if (consoleModel != 3)
       gfxSetWide(true);
   }
-
-  osSetSpeedupEnable(true);
-  C3D_Init(C3D_DEFAULT_CMDBUF_SIZE);
-  C2D_Init(C2D_DEFAULT_MAX_OBJECTS);
-  C2D_Prepare();
-  Top = C2D_CreateScreenTarget(GFX_TOP, GFX_LEFT);
-  TopRight = C2D_CreateScreenTarget(GFX_TOP, GFX_RIGHT);
-  Bottom = C2D_CreateScreenTarget(GFX_BOTTOM, GFX_LEFT);
-  TextBuf = C2D_TextBufNew(4096);
-  Font = C2D_FontLoadSystem(CFG_REGION_USA);
   return 0;
 }
 
@@ -691,8 +775,12 @@ void RenderD7::DrawTLBtns(std::vector<RenderD7::TLBtn> btns, u32 color,
 }
 
 void RenderD7::ExitApp() {
-  if (!rd7settings)
-    running = false;
+  if (!rd7settings) {
+    if (waitFade) {
+      FadeExit = true;
+    } else
+      running = false;
+  }
 }
 
 bool RenderD7::touchTObj(touchPosition touch, RenderD7::TObject button) {
@@ -931,20 +1019,18 @@ void RenderD7::FrameEnd() {
     RenderD7::DrawMetrikOvl();
   if (!shouldbe_disabled)
     OvlHandler();
-  /*if (d7_hHeld & KEY_R && d7_hDown & KEY_SELECT)
-
-  {
-          RenderD7::LoadSettings();
-  }*/
   lp++;
-
+  Npifade();
   C3D_FrameEnd(0);
 }
 
 RenderD7::RSettings::RSettings() {
+  RenderD7::FadeOut();
   cfgfile = std::make_unique<INI::INIFile>(cfgpath + "/config.ini");
   cfgfile->read(cfgstruct);
   rd7settings = true;
+  lines = string_to_lines(CHANGELOG);
+  calculate_screens(lines, screen_index, screens);
 }
 
 RenderD7::RSettings::~RSettings() { cfgfile->write(cfgstruct); }
@@ -1019,9 +1105,18 @@ void RenderD7::RSettings::Draw(void) const {
 
   } else if (m_state == RCLOG) {
     RenderD7::OnScreen(Top);
+    int start_index = screen_index * 9;
+    int end_index = std::min((int)lines.size(), start_index + 9);
 
     RenderD7::Draw::Rect(0, 21, 400, 220, RenderD7::Color::Hex("#eeeeee"));
-    RenderD7::Draw::Text(5, 30, 0.7f, DSEVENBLACK, std::string(CHANGELOG));
+    for (int i = start_index; i < end_index; i++) {
+      RenderD7::Draw::Text(5, 23 + 20 * (i - start_index), 0.7f, DSEVENBLACK,
+                           lines[i]);
+    }
+    RenderD7::Draw::Rect(0, 219, 400, 21, RenderD7::Color::Hex("#111111"));
+    RenderD7::Draw::Text(0, 220, 0.7f, RenderD7::Color::Hex("#ffffff"),
+                         "Site: " + std::to_string(screen_index + 1) + "/" +
+                             std::to_string(screens + 1));
 
     RenderD7::Draw::Rect(0, 0, 400, 21, RenderD7::Color::Hex("#111111"));
     RenderD7::Draw::Text(0, 0, 0.7f, DSEVENWHITE, "RenderD7->Changelog");
@@ -1140,7 +1235,21 @@ void RenderD7::RSettings::Logic(u32 hDown, u32 hHeld, u32 hUp,
     if (d7_hDown & KEY_B) {
       m_state = RSETTINGS;
     }
+    if (d7_hDown & KEY_R)
+      if (screen_index < screens)
+        screen_index++;
+    if (d7_hDown & KEY_L)
+      if (screen_index > 0)
+        screen_index--;
   }
+}
+
+void RenderD7::RSettings::calculate_screens(
+    const std::vector<std::string> &lines, int &screen_index, int &screens) {
+  int num_lines = lines.size();
+  screens = (num_lines + 8) / 9; // round up to nearest multiple of 9
+  screen_index = 0;
+  screens -= 1;
 }
 
 void RenderD7::LoadSettings() {
@@ -1150,3 +1259,50 @@ void RenderD7::LoadSettings() {
 void RenderD7::AddOvl(std::unique_ptr<RenderD7::Ovl> overlay) {
   overlays.push(std::move(overlay));
 }
+
+void RenderD7::DoNpiIntro() {
+  auto images = LoadMemNVID(npi_intro, npi_intro_size);
+  int c = 0;
+  float xc = 0;
+  RenderD7::Image img;
+  uint64_t lastT = osGetTime();
+  while (c < 59) {
+    shouldbe_disabled = true;
+    cnttttt = 0;
+    C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
+    C2D_TargetClear(Top, RenderD7::Color::Hex("#000000"));
+    C2D_TargetClear(Bottom, RenderD7::Color::Hex("#000000"));
+    RenderD7::ClearTextBufs();
+    RenderD7::OnScreen(Top);
+
+    img.LoadPixels(images[c]->w, images[c]->h, images[c]->bpp, images[c]->pBuf);
+    img.Draw(0, 0);
+    xc += osGetTime() - lastT;
+    lastT = osGetTime();
+    if (xc > 24 / 60) {
+      c++;
+      xc = 0;
+    }
+    if (c > (int)(images.size() - 1))
+      c = 0;
+    C3D_FrameEnd(0);
+  }
+}
+
+void RenderD7::FadeIn() {
+  if (!waitFade) {
+    fadein = true;
+    fadealpha = 0;
+    waitFade = true;
+  }
+}
+
+void RenderD7::FadeOut() {
+  if (!waitFade) {
+    fadeout = true;
+    fadealpha = 255;
+    waitFade = true;
+  }
+}
+
+void RenderD7::FadeDisplay() { Npifade(); }

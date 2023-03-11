@@ -5,6 +5,20 @@
 #include <renderd7/external/stb_image.h>
 extern bool usedbgmsg;
 
+void convert24to32(unsigned char *inputImage, int width, int height,
+                   unsigned char *outputImage) {
+  for (int y = 0; y < height; y++) {
+    for (int x = 0; x < width; x++) {
+      int i = (y * width + x) * 3;    // index of current pixel in input image
+      int j = (y * width + x) * 4;    // index of current pixel in output image
+      outputImage[j] = inputImage[i]; // copy red channel
+      outputImage[j + 1] = inputImage[i + 1]; // copy green channel
+      outputImage[j + 2] = inputImage[i + 2]; // copy blue channel
+      outputImage[j + 3] = 255; // set alpha channel to 255 (fully opaque)
+    }
+  }
+}
+
 static u32 GetNextPowerOf2(u32 v) {
   v--;
   v |= v >> 1;
@@ -281,4 +295,46 @@ void Image::LoadJpg(std::string path) {
   IMG_LoadImageFile(&this->img, path.c_str());
   loadet = true;
 }
+
+void Image::LoadPixels(int w, int h, int bpp, void *buffer) {
+  if (loadet) {
+    C3D_TexDelete(this->img.tex);
+    loadet = false;
+  }
+  unsigned width, height;
+  width = w;
+  height = h;
+  uint8_t *ImageBuffer = new uint8_t[w * h * 4];
+
+  if (bpp == 3)
+    convert24to32((uint8_t *)buffer, width, height, ImageBuffer);
+
+  img.tex = new C3D_Tex;
+  img.subtex =
+      new Tex3DS_SubTexture({(u16)width, (u16)height, 0.0f, 1.0f,
+                             width / 512.0f, 1.0f - (height / 512.0f)});
+
+  C3D_TexInit(img.tex, 512, 512, GPU_RGBA8);
+  C3D_TexSetFilter(img.tex, GPU_LINEAR, GPU_LINEAR);
+  img.tex->border = 0xFFFFFFFF;
+  C3D_TexSetWrap(img.tex, GPU_CLAMP_TO_BORDER, GPU_CLAMP_TO_BORDER);
+
+  for (u32 x = 0; x < width && x < 512; x++) {
+    for (u32 y = 0; y < height && y < 512; y++) {
+      const u32 dstPos = ((((y >> 3) * (512 >> 3) + (x >> 3)) << 6) +
+                          ((x & 1) | ((y & 1) << 1) | ((x & 2) << 1) |
+                           ((y & 2) << 2) | ((x & 4) << 2) | ((y & 4) << 3))) *
+                         4;
+
+      const u32 srcPos = (y * width + x) * 4;
+      ((uint8_t *)img.tex->data)[dstPos + 0] = ImageBuffer[srcPos + 3];
+      ((uint8_t *)img.tex->data)[dstPos + 1] = ImageBuffer[srcPos + 2];
+      ((uint8_t *)img.tex->data)[dstPos + 2] = ImageBuffer[srcPos + 1];
+      ((uint8_t *)img.tex->data)[dstPos + 3] = ImageBuffer[srcPos + 0];
+    }
+  }
+  delete[] ImageBuffer;
+  loadet = true;
+}
+
 } // namespace RenderD7
