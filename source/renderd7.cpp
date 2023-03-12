@@ -114,22 +114,12 @@ std::vector<std::string> string_to_lines(std::string input_str) {
 void Npifade() {
   if (fadein) {
     if (fadealpha < 255) {
-      RenderD7::OnScreen(Top);
-      RenderD7::Draw::Rect(0, 0, RenderD7::IsRD7SR() ? 800 : 400, 240,
-                           ((fadealpha << 24) | 0x00000000));
-      RenderD7::OnScreen(Bottom);
-      RenderD7::Draw::Rect(0, 0, 320, 240, ((fadealpha << 24) | 0x00000000));
       fadealpha += 3;
     } else {
       fadein = false;
     }
   } else if (fadeout) {
     if (fadealpha > 0) {
-      RenderD7::OnScreen(Top);
-      RenderD7::Draw::Rect(0, 0, RenderD7::IsRD7SR() ? 800 : 400, 240,
-                           ((fadealpha << 24) | 0x00000000));
-      RenderD7::OnScreen(Bottom);
-      RenderD7::Draw::Rect(0, 0, 320, 240, ((fadealpha << 24) | 0x00000000));
       fadealpha -= 3;
     } else {
       fadeout = false;
@@ -144,25 +134,28 @@ void Npifade() {
       SceneFadeWait = false;
     }
     // No fade
-    RenderD7::OnScreen(Top);
-    RenderD7::Draw::Rect(0, 0, RenderD7::IsRD7SR() ? 800 : 400, 240,
-                         ((fadealpha << 24) | 0x00000000));
-    RenderD7::OnScreen(Bottom);
-    RenderD7::Draw::Rect(0, 0, 320, 240, ((fadealpha << 24) | 0x00000000));
   }
+  RenderD7::OnScreen(Top);
+  RenderD7::Draw::Rect(0, 0, RenderD7::IsRD7SR() ? 800 : 400, 240,
+                       ((fadealpha << 24) | 0x00000000));
+  RenderD7::OnScreen(Bottom);
+  RenderD7::Draw::Rect(0, 0, 320, 240, ((fadealpha << 24) | 0x00000000));
 }
 
 void PushSplash() {
   C2D_SpriteSheet sheet;
   sheet = C2D_SpriteSheetLoadFromMem((void *)renderd7_logo, renderd7_logo_size);
-  C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
-  C2D_TargetClear(Top, DSEVENBLACK);
-  C2D_TargetClear(Bottom, DSEVENBLACK);
-  RenderD7::ClearTextBufs();
-  RenderD7::OnScreen(Top);
-  C2D_DrawImageAt(C2D_SpriteSheetGetImage(sheet, 0), 400 / 2 - 300 / 2,
-                  240 / 2 - 100 / 2, 0.5);
-  C3D_FrameEnd(0);
+  // Display for 2 Sec
+  for (int x = 0; x < 120; x++) {
+    C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
+    C2D_TargetClear(Top, DSEVENBLACK);
+    C2D_TargetClear(Bottom, DSEVENBLACK);
+    RenderD7::ClearTextBufs();
+    RenderD7::OnScreen(Top);
+    C2D_DrawImageAt(C2D_SpriteSheetGetImage(sheet, 0), 400 / 2 - 300 / 2,
+                    240 / 2 - 100 / 2, 0.5);
+    C3D_FrameEnd(0);
+  }
   C2D_SpriteSheetFree(sheet);
 }
 
@@ -700,8 +693,6 @@ bool RenderD7::IsRD7SR() { return gfxIsWide(); }
 
 void RenderD7::Exit::Main() {
   cfgfile->write(cfgstruct);
-  if (RenderD7::Threads::threadrunning)
-    RenderD7::Threads::Exit();
   C2D_TextBufDelete(TextBuf);
   C2D_Fini();
   C3D_Fini();
@@ -713,8 +704,6 @@ void RenderD7::Exit::Main() {
 
 void RenderD7::Exit::Minimal() {
   cfgfile->write(cfgstruct);
-  if (RenderD7::Threads::threadrunning)
-    RenderD7::Threads::Exit();
   C2D_TextBufDelete(TextBuf);
   C2D_Fini();
   C3D_Fini();
@@ -887,13 +876,6 @@ bool RenderD7::IsNdspInit() {
   }
 }
 
-void RenderD7::DrawList1(RenderD7::ScrollList1 &l, float txtsize,
-                         C3D_RenderTarget *t) {
-  RenderD7::OnScreen(t);
-  RenderD7::Draw::Rect(0, 0, 400, 240, RenderD7::Color::Hex("#dddddd"));
-  RenderD7::Draw::Text(0, 0, 0.8f, RenderD7::Color::Hex("#ffffff"), l.Text);
-}
-
 std::string priv_fmt_bytes(int bytes) {
   char out[32];
 
@@ -1017,15 +999,17 @@ int lp = 0;
 void RenderD7::FrameEnd() {
   if (metrikd && !shouldbe_disabled)
     RenderD7::DrawMetrikOvl();
-  if (!shouldbe_disabled)
+  if (!shouldbe_disabled) {
     OvlHandler();
+  }
   lp++;
   Npifade();
+
   C3D_FrameEnd(0);
 }
 
 RenderD7::RSettings::RSettings() {
-  RenderD7::FadeOut();
+  RenderD7::FadeIn();
   cfgfile = std::make_unique<INI::INIFile>(cfgpath + "/config.ini");
   cfgfile->read(cfgstruct);
   rd7settings = true;
@@ -1125,8 +1109,7 @@ void RenderD7::RSettings::Draw(void) const {
     RenderD7::OnScreen(Bottom);
     RenderD7::Draw::Rect(0, 0, 320, 240, RenderD7::Color::Hex("#eeeeee"));
     RenderD7::Draw::Text(0, 0, 0.7f, RenderD7::Color::Hex("#111111"),
-                         "Press B to Get back!\ntxty: " +
-                             std::to_string(txtposy));
+                         "Press B to Get back!");
 
   } else if (m_state == RINFO) {
     std::string rd7ver = RENDERD7VSTRING;
@@ -1190,25 +1173,24 @@ void RenderD7::RSettings::Logic(u32 hDown, u32 hHeld, u32 hUp,
     }
     if (d7_hDown & KEY_TOUCH && RenderD7::touchTObj(d7_touch, buttons[1])) {
       m_state = RCLOG;
-      txtposy = 0;
     }
     if (d7_hDown & KEY_TOUCH && RenderD7::touchTObj(d7_touch, buttons[2])) {
       metrikd = metrikd ? false : true;
       cfgstruct["metrik-settings"]["enableoverlay"] = metrikd ? "1" : "0";
     }
-    if (d7_hDown & KEY_TOUCH && RenderD7::touchTObj(d7_touch, buttons[3]) &&
+    /*if (d7_hDown & KEY_TOUCH && RenderD7::touchTObj(d7_touch, buttons[3]) &&
         !metrikd) {
       cfgstruct["settings"]["forceFrameRate"] = Kbd(2, SWKBD_TYPE_NUMPAD);
       // C3D_FrameRate(RenderD7::Convert::StringtoFloat(
       // cfgstruct["settings"]["forceFrameRate"]));
-    }
+    }*/
     if (d7_hDown & KEY_TOUCH && RenderD7::touchTObj(d7_touch, buttons[4])) {
       mt_screen = mt_screen ? 0 : 1;
       cfgstruct["metrik-settings"]["screen"] = mt_screen ? "1" : "0";
     }
-    if (d7_hDown & KEY_TOUCH && RenderD7::touchTObj(d7_touch, buttons[5])) {
+    /*if (d7_hDown & KEY_TOUCH && RenderD7::touchTObj(d7_touch, buttons[5])) {
       RenderD7::AddOvl(std::make_unique<RenderD7::DSP_NF>());
-    }
+    }*/
     if (d7_hDown & KEY_TOUCH && RenderD7::touchTObj(d7_touch, buttons[6])) {
       m_state = RINFO;
     }
@@ -1261,6 +1243,38 @@ void RenderD7::AddOvl(std::unique_ptr<RenderD7::Ovl> overlay) {
 }
 
 void RenderD7::DoNpiIntro() {
+  // May be stream in future
+  /*NVID_Stream* stream = new NVID_Stream(npi_intro, npi_intro_size);
+  int c = 0;
+  float xc = 0;
+  NVID_Image nimg;
+  RenderD7::Image img;
+  uint64_t lastT = osGetTime();
+  stream->ReadNext(nimg);
+  while(true)
+  {
+    shouldbe_disabled = true;
+    cnttttt = 0;
+    C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
+    C2D_TargetClear(Top, RenderD7::Color::Hex("#000000"));
+    C2D_TargetClear(Bottom, RenderD7::Color::Hex("#000000"));
+    RenderD7::ClearTextBufs();
+    RenderD7::OnScreen(Top);
+
+    img.LoadPixels(nimg.w, nimg.h, nimg.bpp, nimg.pBuf);
+    img.Draw(0, 0);
+    xc += osGetTime() - lastT;
+    lastT = osGetTime();
+    if (xc > 24 / 60) {
+      c++;
+      if(!stream->ReadNext(nimg))
+        break;
+      xc = 0;
+    }
+    if (c > 59)
+      break;
+    C3D_FrameEnd(0);
+  }*/
   auto images = LoadMemNVID(npi_intro, npi_intro_size);
   int c = 0;
   float xc = 0;
@@ -1289,7 +1303,7 @@ void RenderD7::DoNpiIntro() {
   }
 }
 
-void RenderD7::FadeIn() {
+void RenderD7::FadeOut() {
   if (!waitFade) {
     fadein = true;
     fadealpha = 0;
@@ -1297,7 +1311,7 @@ void RenderD7::FadeIn() {
   }
 }
 
-void RenderD7::FadeOut() {
+void RenderD7::FadeIn() {
   if (!waitFade) {
     fadeout = true;
     fadealpha = 255;

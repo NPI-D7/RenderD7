@@ -6,7 +6,7 @@
 
 static std::vector<Thread> threads;
 
-void Tasks::create(ThreadFunc entrypoint) {
+void RenderD7::Tasks::create(ThreadFunc entrypoint) {
   s32 prio = 0;
   svcGetThreadPriority(&prio, CUR_THREAD_HANDLE);
   Thread thread = threadCreate((ThreadFunc)entrypoint, NULL, 64 * 1024,
@@ -14,7 +14,7 @@ void Tasks::create(ThreadFunc entrypoint) {
   threads.push_back(thread);
 }
 
-void Tasks::destroy(void) {
+void RenderD7::Tasks::destroy(void) {
   for (u32 i = 0; i < threads.size(); i++) {
     threadJoin(threads.at(i), U64_MAX);
     threadFree(threads.at(i));

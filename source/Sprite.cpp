@@ -22,7 +22,7 @@ void RenderD7::Sprite::SetRotation(float rotation) {
 void RenderD7::Sprite::Rotate(float speed) {
   C2D_SpriteRotateDegrees(&this->sprite, speed);
 }
-float RenderD7::Sprite::getHeigh() { return this->sprite.params.pos.h; }
+float RenderD7::Sprite::getHeight() { return this->sprite.params.pos.h; }
 float RenderD7::Sprite::getWidth() { return this->sprite.params.pos.w; }
 float RenderD7::Sprite::getPosX() { return this->sprite.params.pos.x; }
 float RenderD7::Sprite::getPosY() { return this->sprite.params.pos.y; }
