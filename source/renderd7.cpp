@@ -387,7 +387,7 @@ bool RenderD7::MainLoop() {
   RenderD7::Scene::doDraw();
   RenderD7::Scene::doLogic(d7_hDown, d7_hHeld, d7_hUp, d7_touch);
   cnttttt++;
-  if (cnttttt > 90) {
+  if (cnttttt > 2) {
     shouldbe_disabled = false;
     cnttttt = 0;
   }
@@ -769,6 +769,14 @@ void RenderD7::ExitApp() {
       FadeExit = true;
     } else
       running = false;
+  } else {
+    // Normally Forbidden
+    fadein = false;
+    waitFade = false;
+    RenderD7::FadeIn();
+    RenderD7::AddOvl(std::make_unique<RenderD7::Toast>(
+        "RenderD7", "Exiting in Settings is Not Allowed!\nPress B to Get Out "
+                    "and then Exit."));
   }
 }
 
@@ -1001,14 +1009,15 @@ void RenderD7::FrameEnd() {
     RenderD7::DrawMetrikOvl();
   if (!shouldbe_disabled) {
     OvlHandler();
+    Npifade();
   }
   lp++;
-  Npifade();
 
   C3D_FrameEnd(0);
 }
 
 RenderD7::RSettings::RSettings() {
+  aptSetHomeAllowed(false);
   RenderD7::FadeIn();
   cfgfile = std::make_unique<INI::INIFile>(cfgpath + "/config.ini");
   cfgfile->read(cfgstruct);
@@ -1017,7 +1026,10 @@ RenderD7::RSettings::RSettings() {
   calculate_screens(lines, screen_index, screens);
 }
 
-RenderD7::RSettings::~RSettings() { cfgfile->write(cfgstruct); }
+RenderD7::RSettings::~RSettings() {
+  cfgfile->write(cfgstruct);
+  aptSetHomeAllowed(false);
+}
 
 std::vector<std::string> StrHelper(std::string input) {
   std::string ss(input);
@@ -1167,6 +1179,9 @@ void RenderD7::RSettings::Logic(u32 hDown, u32 hHeld, u32 hUp,
     mtscreenstate = mt_screen ? "Bottom" : "Top";
     if (d7_hDown & KEY_TOUCH && RenderD7::touchTObj(d7_touch, buttons[0]) &&
         !metrikd) {
+      RenderD7::AddOvl(std::make_unique<RenderD7::Toast>(
+          "RenderD7",
+          "RenderD7-Super-Reselution Does not\nWork Correctly yet!"));
       RenderD7::ToggleRD7SR();
       cfgstruct["settings"]["super-reselution"] =
           rd7_superreselution ? "1" : "0";
