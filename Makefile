@@ -112,16 +112,12 @@ doc:
 	@doxygen Doxyfile
 
 dist-bin: all
-	@tar --exclude=*~ -cjf $(TARGET)-$(VERSION).tar.bz2 include lib
+	@tar --exclude=*~ -cjf $(TARGET).tar.bz2 include lib
 
 dist-src:
-	@tar --exclude=*~ -cjf $(TARGET)-src-$(VERSION).tar.bz2 include $(SOURCES) Makefile
+	@tar --exclude=*~ -cjf $(TARGET)-src.tar.bz2 include $(SOURCES) Makefile
 
 dist: dist-src dist-bin
-
-install: dist-bin
-	mkdir -p $(DEPSDIR)$(DEVKITPRO)/libctru
-	bzip2 -cd $(TARGET)-$(VERSION).tar.bz2 | tar -xf - -C $(DEPSDIR)$(DEVKITPRO)/libctru
 
 lib:
 	@[ -d $@ ] || mkdir -p $@
