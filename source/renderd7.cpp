@@ -387,7 +387,8 @@ bool RenderD7::MainLoop() {
   RenderD7::Scene::doDraw();
   RenderD7::Scene::doLogic(d7_hDown, d7_hHeld, d7_hUp, d7_touch);
   cnttttt++;
-  if (cnttttt > 2) {
+  //Disably Overlays For one Frame
+  if (cnttttt > 1) {
     shouldbe_disabled = false;
     cnttttt = 0;
   }

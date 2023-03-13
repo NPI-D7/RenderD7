@@ -1,0 +1,19 @@
+--atlas -f rgba -z auto
+
+ui_elements/high_volume.png
+ui_elements/mid_volume.png
+ui_elements/low_volume.png
+ui_elements/speaker_v1.png
+ui_elements/no_sound.png
+ui_elements/speaker.png
+
+ui_elements/wifi_connected.png
+ui_elements/wifi_disconnected.png
+ui_elements/wifi_off.png
+
+ui_elements/good_connection.png
+ui_elements/mid_connection.png
+ui_elements/bad_connection.png
+ui_elements/no_connection.png
+
+ui_elements/headphones.png
