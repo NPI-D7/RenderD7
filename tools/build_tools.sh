@@ -1,3 +1,4 @@
+#!/bin/bash
 #Build Tools
 echo "Generate Directorys"
 mkdir -p bin

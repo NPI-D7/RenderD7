@@ -1,42 +1,26 @@
-# <img alt="LOGO" src="https://github.com/NPI-D7/RenderD7/blob/main/logo.png" height="90">
-RenderD7 is now LibRenderD7.
-### Installation
-Download a Package From Releses Page
-`https://github.com/NPI-D7/RenderD7/releases/download/v0.9.3/renderd7.tar.bz2 -o renderd7.tar.bz2`
-Then Extract it to your Libraries Path
-`bzip2 -cd renderd7.tar.bz2 | tar -xf - -C path_to_your_libs`
-Finally put `-lrenderd7` to the First Place and add the path_to_your_libs
-```
-LIBS	:= -lrenderd7 -lcurl -lstdc++ -lm -lcitro2d -lcitro3d -lctru
-
-#---------------------------------------------------------------------------------
-# list of directories containing libraries, this must be the top level containing
-# include and lib
-#---------------------------------------------------------------------------------
-LIBDIRS	:= $(PORTLIBS) $(CTRULIB) ../path_to_your_libs
-```
-Make sure that `-lrenderd7` is before `-lcitro2d`, `-lcitro3d`, `-lctru`.
-Here an example tree
-```
-Example-App
-├── gfx
-├── libs
-│   ├── include
-│   │   ├── rd7.hpp
-│   │   └── renderd7
-│   └── lib
-│       ├── librenderd7.a
-│       └── librenderd7d.a
-├── Makefile
-├── romfs
-│   └── gfx
-└── src
-    └── main.cpp
-```
-# Credits
-- NPI-D7
-  - Tobi-D7 Main Dev
-
-Some Icons are From
-https://icons8.de/
-See Subfolder Readmes
+# RenderD7 Technologys // State: 0.9.4-pre1
+|Name                                     |FullName                     |Version|Implemented                                  |Removed|Last Updated|Description                                                                           |
+|-----------------------------------------|-----------------------------|------|---------------------------------------------|-------|------------|--------------------------------------------------------------------------------------|
+|rd7sr                                    |RenderD7 Super Reselution    |r1    |0.7                                          |0.9.4  |0.7.3       |Feature to use 800px mode in RenderD7 Removed cause it caused to much problems        |
+|rd7fc                                    |RenderD7 Frame Check         |r2    |0.7.2                                        |0.9.4  |0.7.3       |Feature that fixed the Crash on Second C3D_FrameEnd ... Replaced by rd7sm             |
+|rd7fs                                    |RenderD7 Filesystem          |r1    |0.8.1                                        |---    |0.8.2       |C++ 17 <filesystem> based impl to scan Directorys instantly                           |
+|rd7cr                                    |RenderD7 Core                |r32   |0.3                                          |---    |0.9.4       |RenderD7 Core Module wich Controls Everything                                         |
+|rd7sm                                    |RenderD7 Security Manager    |r1    |0.9.4                                        |---    |0.9.4       |Security Controler to prevent RenderD7 from Crashing / for Debugging                  |
+|rd7ds                                    |RenderD7 Directorysystem     |r12   |0.3                                          |0.9.4  |0.8         |The Old way of Directory Scanning using dirent.h (very slow and buggy)                |
+|rd7bp                                    |RenderD7 Bitmap Printer      |r14   |0.8.0-pre2                                   |---    |0.9.1       |Cpu based System to Render Bitmap Images and Render them into a C3D Texture (slow)    |
+|rd7nv                                    |RenderD7 NvidApi             |r3    |0.9.2                                        |---    |0.9.3       |Npi-Nvid-Api Based Video Renderer for RenderD7 (it like gifs for splashscreens)       |
+|rd7hc                                    |RenderD7 Hex-Color           |r2    |0.3                                          |---    |0.9.1       |RenderD7 Hexadecimal Color Convertation (got very fast in 0.9.1)                      |
+|rd7ls                                    |RenderD7 Languagesystem      |r1    |0.3                                          |---    |0.3         |Load Languages from romfs/<lang>/appJson.json                                         |
+|rd7se                                    |RenderD7 Sound Efefcts       |r2    |0.3.0                                        |---    |0.6.0       |Simple way to play wav files as sfx                                                   |
+|rd7sc                                    |RenderD7 Steal Console       |r2    |0.8.1                                        |---    |0.9         |This Simple Module Redirects the sdtout into a stringstream                           |
+|rd7if                                    |RenderD7 Interface           |r17   |0.7                                          |---    |0.9.4       |Interface of RendreD7 Settings/Toasts                                                 |
+|rd7mo                                    |RenderD7 Metrik Overlay      |r5    |0.7                                          |---    |0.9.4       |Simple Overlay that Displays System Metriks                                           |
+|rd7or                                    |RenderD7 Over Render         |r2    |0.7.3                                        |---    |0.9.4       |Over Render is used for Overlays and Toasts                                           |
+|rd7ta                                    |RenderD7 Toast Animation     |r1    |0.8.1                                        |---    |0.9.4       |Simple whay to push Toasts to Over Render                                             |
+|rd7mc                                    |RenderD7 Metrik2Csv          |r1    |0.7.2                                        |0.7.3  |0.7.2       |System that Saves the Metriks to a Csv every second. removed cause slow sd write speed|
+|rd7rd                                    |RenderD7 Result Decoder      |r1    |0.8.3                                        |---    |0.8.3       |Decode libctru Result Error Codes directly on the 3ds                                 |
+|rd7ts                                    |RenderD7 Thread System       |r3    |0.6.01                                       |---    |0.6.1       |Create threads                                                                        |
+|rd7st                                    |RenderD7 Secure Tasks        |r2    |0.8.4                                        |---    |0.9.3       |Create threads, which get 100%ly exitted by rd7sm                                     |
+|rd7cm                                    |RenderD7 Scene Manager       |r2    |0.3                                          |---    |0.7         |Create Scenes that get stacked (can cause crashes without rd7sm)                      |
+|rd72d                                    |RenderD7 2D Draw             |r22   |0.1                                          |---    |0.9.4       |Draw Texts / Sprites / Images / Animated Sprites                                      |
+|rd7ft                                    |RenderD7 Function Trace      |r1    |0.9.4                                        |---    |0.9.4       |Trace the time of Functions / Trace the time between two points in code               |
