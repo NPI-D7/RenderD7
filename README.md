@@ -2,7 +2,7 @@
 RenderD7 is now LibRenderD7.
 ### Installation
 Download a Package From Releses Page
-`https://github.com/NPI-D7/RenderD7/releases/download/v0.9.3/renderd7.tar.bz2 -o renderd7.tar.bz2`
+`https://github.com/NPI-D7/RenderD7/releases/download/v0.9.4/renderd7.tar.bz2 -o renderd7.tar.bz2`
 Then Extract it to your Libraries Path
 `bzip2 -cd renderd7.tar.bz2 | tar -xf - -C path_to_your_libs`
 Finally put `-lrenderd7` to the First Place and add the path_to_your_libs
