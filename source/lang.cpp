@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+
 static nlohmann::json appJson;
 
 std::string RenderD7::Lang::getSys() {
@@ -68,7 +69,7 @@ std::string RenderD7::Lang::get(const std::string &key) {
   if (!appJson.contains(key))
     return key;
 
-  return appJson.at(key).get_ref<const std::string &>();
+  return appJson.at(key).get<std::string>();
 }
 
 void RenderD7::Lang::load(const std::string &lang) {
@@ -77,7 +78,7 @@ void RenderD7::Lang::load(const std::string &lang) {
   if (access(("romfs:/lang/" + lang + "/app.json").c_str(), F_OK) == 0) {
     values = fopen(("romfs:/lang/" + lang + "/app.json").c_str(), "rt");
     if (values) {
-      appJson = nlohmann::json::parse(values, nullptr, false);
+      appJson = nlohmann::json::parse(values);
       fclose(values);
     }
     if (appJson.is_discarded())
@@ -87,7 +88,7 @@ void RenderD7::Lang::load(const std::string &lang) {
   } else {
     values = fopen("romfs:/lang/en/app.json", "rt");
     if (values) {
-      appJson = nlohmann::json::parse(values, nullptr, false);
+      appJson = nlohmann::json::parse(values);
       fclose(values);
     }
     if (appJson.is_discarded())

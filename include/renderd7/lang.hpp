@@ -1,6 +1,8 @@
 #pragma once
-#include <renderd7/external/json.hpp>
+// clang-format off
 #include <string>
+#include <renderd7/external/json.hpp>
+// clang-format on
 
 namespace RenderD7 {
 namespace Lang {
