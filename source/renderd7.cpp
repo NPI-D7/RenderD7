@@ -393,7 +393,6 @@ Result RenderD7::Init::Main(std::string app_name) {
     CFGU_GetSystemModel(&consoleModel);
     cfguExit();
   }
-  printf("cfgu\n");
 
   rd7_security->SafeInit(aptInit, aptExit);
   rd7_security->SafeInit(romfsInit, romfsExit);
@@ -408,14 +407,13 @@ Result RenderD7::Init::Main(std::string app_name) {
   Bottom = C2D_CreateScreenTarget(GFX_BOTTOM, GFX_LEFT);
   TextBuf = C2D_TextBufNew(4096);
   Font = C2D_FontLoadSystem(CFG_REGION_USA);
-  printf("Graphical Interface\n");
+  
   last_tm = svcGetSystemTick();
   RenderD7::Ftrace::Beg("rd7-core", "do_splash");
   if (rd7_do_splash)
     PushSplash();
   RenderD7::Ftrace::End("rd7-core", "do_splash");
 
-  printf("stuff\n");
   if (cobj___) {
     maxobj__ = cobj___;
   }
@@ -427,7 +425,7 @@ Result RenderD7::Init::Main(std::string app_name) {
   cfgpath += D_app_name;
   std::filesystem::create_directories(cfgpath.c_str());
   bool renew = false;
-  printf("folderset\n");
+
   if (FS::FileExist(cfgpath + "/config.ini")) {
     cfgfile = std::make_unique<INI::INIFile>(cfgpath + "/config.ini");
     cfgfile->read(cfgstruct);
@@ -435,7 +433,7 @@ Result RenderD7::Init::Main(std::string app_name) {
     if (version != CFGVER)
       renew = true;
   }
-  printf("vercheck\n");
+  
   if (!FS::FileExist(cfgpath + "/config.ini") || renew) {
     cfgfile = std::make_unique<INI::INIFile>(cfgpath + "/config.ini");
     cfgfile->read(cfgstruct);
@@ -454,22 +452,19 @@ Result RenderD7::Init::Main(std::string app_name) {
   }
   cfgfile = std::make_unique<INI::INIFile>(cfgpath + "/config.ini");
   cfgfile->read(cfgstruct);
-  ////C3D_FrameRate(RenderD7::Convert::StringtoFloat(Fps));
+  
   metrikd = RenderD7::Convert::FloatToBool(RenderD7::Convert::StringtoFloat(
       cfgstruct["metrik-settings"]["enableoverlay"]));
   mt_txtSize =
       RenderD7::Convert::StringtoFloat(cfgstruct["metrik-settings"]["txtSize"]);
   mt_screen =
       RenderD7::Convert::StringtoInt(cfgstruct["metrik-settings"]["Screen"]);
-  printf("read\n");
   // Check if citra
   s64 citracheck = 0;
   svcGetSystemInfo(&citracheck, 0x20000, 0);
   is_citra = citracheck ? true : false;
-  printf("citra\n");
   // Speedup
   osSetSpeedupEnable(true);
-  printf("boost\n");
   RenderD7::Ftrace::End("rd7-core", f2s(RenderD7::Init::Main));
   // RenderD7::Msg::Display("RenderD7", "RenderD7 init success!\nWaiting for
   // MainLoop!", Top);
@@ -511,7 +506,6 @@ Result RenderD7::Init::Minimal(std::string app_name) {
   cfgpath += D_app_name;
   std::filesystem::create_directories(cfgpath.c_str());
   bool renew = false;
-  printf("folderset\n");
   if (FS::FileExist(cfgpath + "/config.ini")) {
     cfgfile = std::make_unique<INI::INIFile>(cfgpath + "/config.ini");
     cfgfile->read(cfgstruct);
@@ -519,7 +513,6 @@ Result RenderD7::Init::Minimal(std::string app_name) {
     if (version != CFGVER)
       renew = true;
   }
-  printf("vercheck\n");
   if (!FS::FileExist(cfgpath + "/config.ini") || renew) {
     cfgfile = std::make_unique<INI::INIFile>(cfgpath + "/config.ini");
     cfgfile->read(cfgstruct);
@@ -536,18 +529,16 @@ Result RenderD7::Init::Minimal(std::string app_name) {
     cfgstruct["metrik-settings"]["txtSize"] = "0.7f";
     cfgfile->write(cfgstruct);
   }
-  if (renew)
-    printf("renew\n");
+
   cfgfile = std::make_unique<INI::INIFile>(cfgpath + "/config.ini");
   cfgfile->read(cfgstruct);
-  // C3D_FrameRate(RenderD7::Convert::StringtoFloat(Fps));
+
   metrikd = RenderD7::Convert::FloatToBool(RenderD7::Convert::StringtoFloat(
       cfgstruct["metrik-settings"]["enableoverlay"]));
   mt_txtSize =
       RenderD7::Convert::StringtoFloat(cfgstruct["metrik-settings"]["txtSize"]);
   mt_screen =
       RenderD7::Convert::StringtoInt(cfgstruct["metrik-settings"]["Screen"]);
-  printf("boost\n");
   return 0;
 }
 
