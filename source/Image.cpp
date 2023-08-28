@@ -1,7 +1,5 @@
 #include <renderd7/Image.hpp>
-#include <renderd7/Ovl.hpp>
-#include <renderd7/Toast.hpp>
-
+#include <renderd7/ToastsV2.hpp>
 #include <renderd7/external/stb_image.h>
 extern bool usedbgmsg;
 
@@ -278,8 +276,8 @@ void RenderD7::Image::LoadFromBitmap(BMP bitmap) {
 
   if (error) {
     std::cout << "BMP decoding error " << error << std::endl;
-    RenderD7::AddOvl(std::make_unique<RenderD7::Toast>(
-        "Bmp - Error", "Code: " + std::to_string(error)));
+    RenderD7::PushMessage(
+        RenderD7::Message("Bmp - Error", "Code: " + std::to_string(error)));
   }
 }
 

@@ -3,8 +3,6 @@
 #include <renderd7/FileSystem.hpp>
 // Debugging
 #include <memory>
-#include <renderd7/Ovl.hpp>
-#include <renderd7/Toast.hpp>
 #include <renderd7/stringtool.hpp>
 
 #include <filesystem>

@@ -2,10 +2,12 @@
 #include <renderd7/log.hpp>
 #include <renderd7/renderd7.hpp>
 #include <renderd7/renderd7_logo.hpp>
+#include <renderd7/ToastsV2.hpp>
 
 #define D7_NOTHING 0x00000000
 #define CFGVER "6"
 
+// Lot of internal stuff here
 bool isndspinit = false;
 bool running = true;
 std::stack<std::unique_ptr<RenderD7::Scene>> RenderD7::Scene::scenes;
@@ -13,7 +15,6 @@ std::unique_ptr<RenderD7::Scene> tmpFadeS;
 /// @brief  Supports Multiple Overlays
 std::vector<std::unique_ptr<RenderD7::Ovl>> overlays;
 /// @brief Displays Overlays step by step from first 2 last
-std::vector<std::unique_ptr<RenderD7::Ovl>> toast_overlays;
 std::string dspststus = "Not Initialisized!";
 
 int cobj___;
@@ -78,6 +79,8 @@ C3D_RenderTarget *Bottom;
 u64 delta_time;
 u64 last_tm;
 float dtm;
+
+bool rd7_debugging = false;
 
 // Lets define them to prevent from red lines in vscode lol
 #ifndef V_TIME
@@ -203,7 +206,7 @@ void RenderD7::Init::NdspFirm() {
     dspststus = "Initialisized success!";
   } else {
     dspststus = "Not found: dspfirm.cdc";
-    RenderD7::AddToast(std::make_unique<RenderD7::DSP_NF>());
+    RenderD7::PushMessage(RenderD7::Message("RenderD7", "dspfirm.cdc not found!\nUnable to play sounds!"));
   }
 }
 
@@ -743,40 +746,7 @@ void RenderD7::DrawMetrikOvl() {
   RenderD7::Draw::Text(0, infoy, mt_txtSize, mt_txtcolor, info);
 }
 
-RenderD7::DSP_NF::DSP_NF() {}
-
-void RenderD7::DSP_NF::Draw(void) const {
-  RenderD7::OnScreen(Top);
-  RenderD7::Draw::Rect(0, msgposy, 400, 70, RenderD7::Color::Hex("#111111"));
-  RenderD7::Draw::Rect(0, msgposy, 400, 25, RenderD7::Color::Hex("#222222"));
-  RenderD7::Draw::Text(2, msgposy + 3, 0.7f, RenderD7::Color::Hex("#ffffff"),
-                       "RenderD7: Warning!");
-  RenderD7::Draw::Text(2, msgposy + 30, 0.6f, RenderD7::Color::Hex("#ffffff"),
-                       "You can't use Sound effects because the "
-                       "file\n<<sdmc:/3ds/dspfirm.cdc>> was not found!");
-}
-
-void RenderD7::DSP_NF::Logic() {
-  this->delay++ /*=(int)RenderD7::GetDeltaTime()*/;
-  if (msgposy > 170 && delay < 5 * 60)
-    msgposy-- /*=(int)RenderD7::GetDeltaTime()*/;
-
-  if (delay >= 5 * 60) {
-    msgposy++ /*=(int)RenderD7::GetDeltaTime*/;
-    if (msgposy > 400)
-      this->Kill();
-  }
-}
-
 void OvlHandler() {
-  for (size_t i = 0; i < toast_overlays.size(); i++) {
-    if (toast_overlays[i]->IsKilled())
-      toast_overlays.erase(toast_overlays.begin() + i);
-  }
-  if ((int)toast_overlays.size() > 0) {
-    toast_overlays[0]->Draw();
-    toast_overlays[0]->Logic();
-  }
   for (size_t i = 0; i < overlays.size(); i++) {
     overlays[i]->Draw();
     overlays[i]->Logic();
@@ -787,9 +757,9 @@ void OvlHandler() {
 
 void RenderD7::FrameEnd() {
   C3D_FrameBegin(2);
-  if (metrikd)
+  //if (metrikd)
     RenderD7::DrawMetrikOvl();
-
+  RenderD7::ProcessMessages();
   RenderD7::Ftrace::Beg("rd7oh", f2s(OvlHandler));
   OvlHandler();
   RenderD7::Ftrace::End("rd7oh", f2s(OvlHandler));
@@ -834,6 +804,8 @@ void RenderD7::RSettings::Draw(void) const {
     RenderD7::Draw::Text(
         0, 70, 0.7f, DSEVENBLACK,
         "Current: " + std::to_string(RenderD7::Memory::GetCurrent()) + "b");
+    RenderD7::Draw::Text(0, 90, 0.7f, DSEVENBLACK,
+                         "Delta: " + std::to_string(RenderD7::GetDeltaTime()));
     RenderD7::OnScreen(Bottom);
     std::string verc = "Config Version: ";
     verc += CFGVER;
@@ -1072,10 +1044,6 @@ void RenderD7::LoadSettings() {
 
 void RenderD7::AddOvl(std::unique_ptr<RenderD7::Ovl> overlay) {
   overlays.push_back(std::move(overlay));
-}
-
-void RenderD7::AddToast(std::unique_ptr<RenderD7::Ovl> overlay) {
-  toast_overlays.push_back(std::move(overlay));
 }
 
 void RenderD7::FadeOut() {

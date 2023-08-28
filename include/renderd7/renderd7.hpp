@@ -40,7 +40,6 @@
 #include <renderd7/SpriteAnimation.hpp>
 #include <renderd7/Tasks.hpp>
 #include <renderd7/Time.hpp>
-#include <renderd7/Toast.hpp>
 #include <renderd7/bmp.hpp>
 #include <renderd7/bmpconverter.hpp>
 #include <renderd7/external/lodepng.h>
@@ -52,7 +51,8 @@
 
 #define RENDERD7VSTRING "0.9.5"
 #define CHANGELOG                                                              \
-  "0.9.5: Remove Npi Intro and NVID Api\n"                                     \
+  "0.9.5: Remove Npi Intro and NVID Api\nReplace Toasts System with "          \
+  "ToastsV2\n  aka MessageHandler\nLots of Optimisations\n"                    \
   "0.9.4: Implement new Security System\n To prevent from crashes\nImplement " \
   "Functiontrace for better\nTiming Tests\nImplement MemAlloc Tracker (only "  \
   "size)\nAdd some new Overlays (not functional yet)\nComplete Rewrite of "    \
@@ -224,23 +224,6 @@ public:
 
 /// @brief Show Up the RenderD7-Settings Menu
 void LoadSettings();
-
-/// @brief DspNotFound Error Toast (Deprectated)
-class DSP_NF : public RenderD7::Ovl {
-public:
-  /// @brief Constructor
-  DSP_NF();
-  /// @brief Override for Draw
-  void Draw(void) const override;
-  /// @brief Override for Logic
-  void Logic() override;
-
-private:
-  /// @param msgposy Y Position of Toast
-  int msgposy = 240;
-  /// @param delay Delay of Toast
-  int delay = 0;
-};
 
 /// @brief Get A Rendom Int
 /// @param b From

@@ -1,7 +1,7 @@
 #include <renderd7/BitmapPrinter.hpp>
-#include <renderd7/Ovl.hpp>
-#include <renderd7/Toast.hpp>
+#include <renderd7/ToastsV2.hpp>
 #include <renderd7/stringtool.hpp>
+
 
 extern bool shouldbe_disabled;
 extern std::string csvpc;
@@ -22,7 +22,7 @@ bool RenderD7::BitmapPrinter::DecodeFile(std::string file) {
   unsigned error = bitmap.read(file.c_str());
 
   if (error) {
-    RenderD7::AddOvl(std::make_unique<RenderD7::Toast>(
+    RenderD7::PushMessage(RenderD7::Message(
         "BitmapPrinter", "Error Code: " + std::to_string(error)));
     return false;
   }
@@ -34,7 +34,7 @@ void RenderD7::BitmapPrinter::DrawPixel(int x, int y, u8 b, u8 g, u8 r, u8 a) {
   unsigned error =
       bitmap.set_pixel(x, bitmap.bmp_info_header.height - y, b, g, r, a);
   if (error) {
-    RenderD7::AddOvl(std::make_unique<RenderD7::Toast>(
+    RenderD7::PushMessage(RenderD7::Message(
         "BitmapPrinter->Pixel", "Error Code: " + std::to_string(error)));
   }
 }
@@ -43,7 +43,7 @@ void RenderD7::BitmapPrinter::DrawRect(int x, int y, int w, int h, u8 line_w,
   unsigned error = bitmap.draw_rectangle(
       x, bitmap.bmp_info_header.height - y - h, w, h, b, g, r, a, line_w);
   if (error) {
-    RenderD7::AddOvl(std::make_unique<RenderD7::Toast>(
+    RenderD7::PushMessage(RenderD7::Message(
         "BitmapPrinter->Rect", "Error Code: " + std::to_string(error)));
   }
 }
@@ -53,7 +53,7 @@ void RenderD7::BitmapPrinter::DrawRectFilled(int x, int y, int w, int h, u8 b,
   unsigned error = bitmap.fill_region(x, bitmap.bmp_info_header.height - h - y,
                                       w, h, b, g, r, a);
   if (error) {
-    RenderD7::AddOvl(std::make_unique<RenderD7::Toast>(
+    RenderD7::PushMessage(RenderD7::Message(
         "BitmapPrinter->RectF", "Error Code: " + std::to_string(error)));
   }
 }
@@ -236,8 +236,8 @@ void RenderD7::BitmapPrinter::Benchmark() {
       std::string outname =
           csvpc + "/benchmark_" + RenderD7::GetTimeStr() + ".png";
       this->SavePng(outname);
-      RenderD7::AddOvl(std::make_unique<RenderD7::Toast>(
-          "Benchmark", "Saved to: \n" + outname));
+      RenderD7::PushMessage(
+          RenderD7::Message("Benchmark", "Saved to: \n" + outname));
       benchmark = false;
     }
     uint64_t currentTime = svcGetSystemTick();
