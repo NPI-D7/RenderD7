@@ -23,9 +23,6 @@ do
     ../../tools/bin/file2array "${file}" "${name}"
 done
 
-echo "Convert Npi-Intro to C++ Code"
-../../tools/bin/file2array ../splash/npi_intro.nvid npi_intro
-
 echo "Fix The Output of file2array"
 for file in ./*.cpp
 do

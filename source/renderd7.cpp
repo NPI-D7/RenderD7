@@ -1,12 +1,10 @@
 #include <regex>
-#include <renderd7/external/nvid.hpp>
 #include <renderd7/log.hpp>
-#include <renderd7/npi_intro.hpp>
 #include <renderd7/renderd7.hpp>
 #include <renderd7/renderd7_logo.hpp>
 
 #define D7_NOTHING 0x00000000
-#define CFGVER "5"
+#define CFGVER "6"
 
 bool isndspinit = false;
 bool running = true;
@@ -80,6 +78,14 @@ C3D_RenderTarget *Bottom;
 u64 delta_time;
 u64 last_tm;
 float dtm;
+
+// Lets define them to prevent from red lines in vscode lol
+#ifndef V_TIME
+#define V_TIME "0"
+#endif
+#ifndef V_STRING
+#define V_STRING "0"
+#endif
 
 // Screen Fade
 bool fadeout = false, fadein = false, fadeout2 = false, fadein2 = false;
@@ -419,9 +425,7 @@ Result RenderD7::Init::Main(std::string app_name) {
   D_app_name = app_name;
   cfgpath = "sdmc:/RenderD7/Apps/";
   cfgpath += D_app_name;
-  mkdir("sdmc:/RenderD7/", 0777);
-  mkdir("sdmc:/RenderD7/Apps", 0777);
-  mkdir(cfgpath.c_str(), 0777);
+  std::filesystem::create_directories(cfgpath.c_str());
   bool renew = false;
   printf("folderset\n");
   if (FS::FileExist(cfgpath + "/config.ini")) {
@@ -435,6 +439,7 @@ Result RenderD7::Init::Main(std::string app_name) {
   if (!FS::FileExist(cfgpath + "/config.ini") || renew) {
     cfgfile = std::make_unique<INI::INIFile>(cfgpath + "/config.ini");
     cfgfile->read(cfgstruct);
+    cfgstruct.clear();
     cfgstruct["info"]["version"] = CFGVER;
     cfgstruct["info"]["renderd7ver"] = RENDERD7VSTRING;
     cfgstruct["settings"]["doscreentimeout"] = "0";
@@ -442,10 +447,8 @@ Result RenderD7::Init::Main(std::string app_name) {
     cfgstruct["settings"]["renderer"] = "c3d_c2d";
     cfgstruct["metrik-settings"]["enableoverlay"] = "0";
     cfgstruct["metrik-settings"]["Screen"] = "0";
-    cfgstruct["metrik-settings"]["txtColor"] = "#ffffff";
-    cfgstruct["metrik-settings"]["txtColorA"] = "255";
-    cfgstruct["metrik-settings"]["ColorA"] = "255";
-    cfgstruct["metrik-settings"]["Color"] = "#000000";
+    cfgstruct["metrik-settings"]["txtColor"] = "#ffffffff";
+    cfgstruct["metrik-settings"]["Color"] = "#aa000000";
     cfgstruct["metrik-settings"]["txtSize"] = "0.7f";
     cfgfile->write(cfgstruct);
   }
@@ -454,13 +457,6 @@ Result RenderD7::Init::Main(std::string app_name) {
   ////C3D_FrameRate(RenderD7::Convert::StringtoFloat(Fps));
   metrikd = RenderD7::Convert::FloatToBool(RenderD7::Convert::StringtoFloat(
       cfgstruct["metrik-settings"]["enableoverlay"]));
-  mt_txtcolor =
-      RenderD7::Color::Hex(cfgstruct["metrik-settings"]["txtColor"],
-                           (u8)RenderD7::Convert::StringtoFloat(
-                               cfgstruct["metrik-settings"]["txtColorA"]));
-  mt_color = RenderD7::Color::Hex(cfgstruct["metrik-settings"]["Color"],
-                                  (u8)RenderD7::Convert::StringtoFloat(
-                                      cfgstruct["metrik-settings"]["ColorA"]));
   mt_txtSize =
       RenderD7::Convert::StringtoFloat(cfgstruct["metrik-settings"]["txtSize"]);
   mt_screen =
@@ -513,9 +509,7 @@ Result RenderD7::Init::Minimal(std::string app_name) {
   }
   cfgpath = "sdmc:/RenderD7/Apps/";
   cfgpath += D_app_name;
-  mkdir("sdmc:/RenderD7/", 0777);
-  mkdir("sdmc:/RenderD7/Apps", 0777);
-  mkdir(cfgpath.c_str(), 0777);
+  std::filesystem::create_directories(cfgpath.c_str());
   bool renew = false;
   printf("folderset\n");
   if (FS::FileExist(cfgpath + "/config.ini")) {
@@ -529,6 +523,7 @@ Result RenderD7::Init::Minimal(std::string app_name) {
   if (!FS::FileExist(cfgpath + "/config.ini") || renew) {
     cfgfile = std::make_unique<INI::INIFile>(cfgpath + "/config.ini");
     cfgfile->read(cfgstruct);
+    cfgstruct.clear();
     cfgstruct["info"]["version"] = CFGVER;
     cfgstruct["info"]["renderd7ver"] = RENDERD7VSTRING;
     cfgstruct["settings"]["doscreentimeout"] = "0";
@@ -536,10 +531,8 @@ Result RenderD7::Init::Minimal(std::string app_name) {
     cfgstruct["settings"]["renderer"] = "c3d_c2d";
     cfgstruct["metrik-settings"]["enableoverlay"] = "0";
     cfgstruct["metrik-settings"]["Screen"] = "0";
-    cfgstruct["metrik-settings"]["txtColor"] = "#ffffff";
-    cfgstruct["metrik-settings"]["txtColorA"] = "255";
-    cfgstruct["metrik-settings"]["ColorA"] = "255";
-    cfgstruct["metrik-settings"]["Color"] = "#000000";
+    cfgstruct["metrik-settings"]["txtColor"] = "#ffffffff";
+    cfgstruct["metrik-settings"]["Color"] = "#aa000000";
     cfgstruct["metrik-settings"]["txtSize"] = "0.7f";
     cfgfile->write(cfgstruct);
   }
@@ -550,13 +543,6 @@ Result RenderD7::Init::Minimal(std::string app_name) {
   // C3D_FrameRate(RenderD7::Convert::StringtoFloat(Fps));
   metrikd = RenderD7::Convert::FloatToBool(RenderD7::Convert::StringtoFloat(
       cfgstruct["metrik-settings"]["enableoverlay"]));
-  mt_txtcolor =
-      RenderD7::Color::Hex(cfgstruct["metrik-settings"]["txtColor"],
-                           (u8)RenderD7::Convert::StringtoFloat(
-                               cfgstruct["metrik-settings"]["txtColorA"]));
-  mt_color = RenderD7::Color::Hex(cfgstruct["metrik-settings"]["Color"],
-                                  (u8)RenderD7::Convert::StringtoFloat(
-                                      cfgstruct["metrik-settings"]["ColorA"]));
   mt_txtSize =
       RenderD7::Convert::StringtoFloat(cfgstruct["metrik-settings"]["txtSize"]);
   mt_screen =
@@ -1106,65 +1092,6 @@ void RenderD7::AddOvl(std::unique_ptr<RenderD7::Ovl> overlay) {
 
 void RenderD7::AddToast(std::unique_ptr<RenderD7::Ovl> overlay) {
   toast_overlays.push_back(std::move(overlay));
-}
-
-void RenderD7::DoNpiIntro() {
-  // May be stream in future
-  /*NVID_Stream* stream = new NVID_Stream(npi_intro, npi_intro_size);
-  int c = 0;
-  float xc = 0;
-  NVID_Image nimg;
-  RenderD7::Image img;
-  uint64_t lastT = osGetTime();
-  stream->ReadNext(nimg);
-  while(true)
-  {
-    C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
-    C2D_TargetClear(Top, RenderD7::Color::Hex("#000000"));
-    C2D_TargetClear(Bottom, RenderD7::Color::Hex("#000000"));
-    RenderD7::ClearTextBufs();
-    RenderD7::OnScreen(Top);
-
-    img.LoadPixels(nimg.w, nimg.h, nimg.bpp, nimg.pBuf);
-    img.Draw(0, 0);
-    xc += osGetTime() - lastT;
-    lastT = osGetTime();
-    if (xc > 24 / 60) {
-      c++;
-      if(!stream->ReadNext(nimg))
-        break;
-      xc = 0;
-    }
-    if (c > 59)
-      break;
-    C3D_FrameEnd(0);
-  }*/
-  RenderD7::Ftrace::Beg("rd7-core", "load_nvid");
-  auto images = LoadMemNVID(npi_intro, npi_intro_size);
-  RenderD7::Ftrace::End("rd7-core", "load_nvid");
-  int c = 0;
-  float xc = 0;
-  RenderD7::Image img;
-  uint64_t lastT = osGetTime();
-  while (c < 59) {
-    C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
-    C2D_TargetClear(Top, RenderD7::Color::Hex("#000000"));
-    C2D_TargetClear(Bottom, RenderD7::Color::Hex("#000000"));
-    RenderD7::ClearTextBufs();
-    RenderD7::OnScreen(Top);
-
-    img.LoadPixels(images[c]->w, images[c]->h, images[c]->bpp, images[c]->pBuf);
-    img.Draw(0, 0);
-    xc += osGetTime() - lastT;
-    lastT = osGetTime();
-    if (xc > 24 / 60) {
-      c++;
-      xc = 0;
-    }
-    if (c > (int)(images.size() - 1))
-      c = 0;
-    C3D_FrameEnd(0);
-  }
 }
 
 void RenderD7::FadeOut() {

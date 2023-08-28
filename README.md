@@ -32,6 +32,23 @@ Example-App
 └── src
     └── main.cpp
 ```
+# Back to Old Usage aka Submodule (0.9.5+)
+If you want to use RenderD7 as Submodule run
+`git submodule add https://github.com/NPI-D7/RenderD7`
+
+And to Use Add this to make file
+```
+# Make Sure to Change this paths if your Submodule
+# is located somewhere else
+RENDERD7_SRC := RenderD7/source RenderD7/external
+RENDERD7_INC := RenderD7/include
+```
+Now you need to add it to your sources and includes
+```
+SOURCES		:=	source $(RENDERD7_SRC)
+INCLUDES	:=	source $(RENDERD7_INC)
+```
+Example from rd7tf
 # Credits
 - NPI-D7
   - Tobi-D7 Main Dev

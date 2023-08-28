@@ -50,13 +50,14 @@
 #include <renderd7/stringtool.hpp>
 #include <renderd7/thread.hpp>
 
-#define RENDERD7VSTRING "0.9.4"
+#define RENDERD7VSTRING "0.9.5"
 #define CHANGELOG                                                              \
+  "0.9.5: Remove Npi Intro and NVID Api\n"                                     \
   "0.9.4: Implement new Security System\n To prevent from crashes\nImplement " \
   "Functiontrace for better\nTiming Tests\nImplement MemAlloc Tracker (only "  \
   "size)\nAdd some new Overlays (not functional yet)\nComplete Rewrite of "    \
   "Overlay System\nFixed the FrameEnd Crash\nNew System to get Hardware "      \
-  "Info\nRemoved RD7SR\n0.9.3: Completly Documanted Everything\nFix typo "     \
+  "Info\nRemoved RD7SR\n0.9.3: Completly Documented Everything\nFix typo "     \
   "in "                                                                        \
   "Sprite::getHeight()\nRemove Deprecated/Useless Stuff\n0.9.2: Add "          \
   "NpiSplashVideo\nNvid Support(v0.0.1)\nAdd "                                 \
@@ -266,8 +267,6 @@ void DrawMetrikOvl();
 /// @return success ?
 bool DrawImageFromSheet(RenderD7::Sheet *sheet, size_t index, float x, float y,
                         float scaleX = 1.0, float scaleY = 1.0);
-/// @brief Display the Npi-D7 Video Intro (NVID)
-void DoNpiIntro();
 /// @brief Fade In
 /// @param duration Duration in Frames
 void FadeIn();
