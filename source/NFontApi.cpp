@@ -6,6 +6,8 @@
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include <renderd7/external/stb_image_write.h>
 
+#include <fstream>
+
 RenderD7::NFontApi::NFontApi() {}
 
 RenderD7::NFontApi::~NFontApi() {}
@@ -14,13 +16,16 @@ void RenderD7::NFontApi::LoadTTF(std::string path) {
   /////READ FILE
   unsigned char *buffer;
   long size = 0;
-  FILE *ttf__ = fopen(path.c_str(), "rb");
-  fseek(ttf__, 0, SEEK_END);
-  size = ftell(ttf__);
-  fseek(ttf__, 0, SEEK_SET);
+  std::fstream ttf__(path, std::ios::in | std::ios::binary);
+  if(!ttf__.is_open()) {
+    return; // Add Error Handler in future
+  }
+  ttf__.seekg(0, std::ios::end);
+  size = ttf__.tellg();
+  ttf__.seekg(0, std::ios::beg);
   buffer = (unsigned char *)malloc(size);
-  fread(buffer, size, 1, ttf__);
-  fclose(ttf__);
+  ttf__.read(reinterpret_cast<char*>(buffer), size);
+  ttf__.close();
   /////Setup Font
   if (!stbtt_InitFont(&font, buffer, 0)) {
     printf("failed\n");

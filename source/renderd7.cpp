@@ -666,14 +666,7 @@ void RenderD7::DrawSTObject(std::vector<RenderD7::TObject> tobject,
 }
 
 bool RenderD7::FS::FileExist(const std::string &path) {
-  FILE *test = fopen(path.c_str(), "r");
-  if (test != NULL) {
-    fclose(test);
-
-    return true;
-  }
-
-  return false;
+  return std::filesystem::exists(path);
 }
 
 bool RenderD7::IsNdspInit() {

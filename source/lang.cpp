@@ -1,8 +1,7 @@
 #include <3ds.h>
 #include <renderd7/lang.hpp>
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
+#include <fstream>
+#include <filesystem>
 
 static nlohmann::json appJson;
 
@@ -73,26 +72,27 @@ std::string RenderD7::Lang::get(const std::string &key) {
 }
 
 void RenderD7::Lang::load(const std::string &lang) {
-  FILE *values;
+  std::fstream values;
 
-  if (access(("romfs:/lang/" + lang + "/app.json").c_str(), F_OK) == 0) {
-    values = fopen(("romfs:/lang/" + lang + "/app.json").c_str(), "rt");
-    if (values) {
+  if(std::filesystem::is_character_file("romfs:/lang/" + lang + "/app.json")) {
+    values.open("romfs:/lang/" + lang + "/app.json", std::ios::in);
+    if(values.is_open()) {
       appJson = nlohmann::json::parse(values);
-      fclose(values);
     }
-    if (appJson.is_discarded())
+    values.close();
+    if(appJson.is_discarded()) {
       appJson = {};
+    }
     return;
-
   } else {
-    values = fopen("romfs:/lang/en/app.json", "rt");
-    if (values) {
+    values.open("romfs:/lang/en/app.json", std::ios::in);
+    if(values.is_open()) {
       appJson = nlohmann::json::parse(values);
-      fclose(values);
     }
-    if (appJson.is_discarded())
+    values.close();
+    if(appJson.is_discarded()) {
       appJson = {};
+    }
     return;
   }
 }

@@ -1,5 +1,6 @@
 #include <renderd7/log.hpp>
-
+#include <fstream>
+#include <filesystem>
 #include <memory>
 
 std::string Log::format(const std::string &fmt_str, ...) {
@@ -28,12 +29,12 @@ void Log::Init(const char *filename) {
   printf("%s\n", filename);
   std::string fn = filename;
   std::string name = fn + ".txt";
-  this->filename = name.c_str();
-  if ((access(name.c_str(), F_OK) == 0)) {
-
+  this->filename = name;
+  if(std::filesystem::exists(name)) {
+    // Do nothing
   } else {
-    FILE *logfile = fopen((name.c_str()), "w");
-    fclose(logfile);
+    std::fstream f(name, std::ios::out);
+    f.close();
   }
 }
 

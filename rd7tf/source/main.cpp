@@ -8,6 +8,8 @@ int main() {
   RenderD7::Ftrace::Beg("app", f2s(RenderD7::LoadSettings));
   RenderD7::LoadSettings();
   RenderD7::Ftrace::End("app", f2s(RenderD7::LoadSettings));
+  sound snd("romfs:/thesound.wav", 0);
+  snd.play();
   RenderD7::Ftrace::End("app", "app_init");
   while (RenderD7::MainLoop()) {
     RenderD7::Ftrace::Beg("app", "app_mainloop");

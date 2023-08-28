@@ -1,9 +1,8 @@
 #include <renderd7/sound.hpp>
 
-#include <cstdio>
-#include <cstdlib>
-#include <cstring>
+#include <fstream>
 #include <string>
+#include <cstring>
 
 extern bool isndspinit;
 using std::string;
@@ -31,19 +30,20 @@ sound::sound(const string &path, int channel, bool toloop) {
     ndspSetOutputCount(2); // Num of buffers
 
     // Reading wav file
-    FILE *fp = fopen(path.c_str(), "rb");
+    std::fstream fp(path, std::ios::in | std::ios::binary);
 
-    if (!fp) {
+    if (!fp.is_open()) {
       printf("Could not open the WAV file: %s\n", path.c_str());
       return;
     }
 
     WavHeader wavHeader;
-    size_t read = fread(&wavHeader, 1, sizeof(wavHeader), fp);
+    fp.read(reinterpret_cast<char*>(&wavHeader), sizeof(WavHeader));
+    size_t read = fp.tellg();
     if (read != sizeof(wavHeader)) {
       // Short read.
       printf("WAV file header is too short: %s\n", path.c_str());
-      fclose(fp);
+      fp.close();
       return;
     }
 
@@ -52,7 +52,7 @@ sound::sound(const string &path, int channel, bool toloop) {
     if (memcmp(wavHeader.magic, RIFF_magic, sizeof(wavHeader.magic)) != 0) {
       // Incorrect magic number.
       printf("Wrong file format.\n");
-      fclose(fp);
+      fp.close();
       return;
     }
 
@@ -61,19 +61,20 @@ sound::sound(const string &path, int channel, bool toloop) {
         (wavHeader.bits_per_sample != 8 && wavHeader.bits_per_sample != 16)) {
       // Unsupported WAV file.
       printf("Corrupted wav file.\n");
-      fclose(fp);
+      fp.close();
       return;
     }
 
     // Get the file size.
-    fseek(fp, 0, SEEK_END);
-    dataSize = ftell(fp) - sizeof(wavHeader);
+    fp.seekg(0, std::ios::end);
+    dataSize = fp.tellg();
+    dataSize -= sizeof(WavHeader);
 
     // Allocating and reading samples
     data = static_cast<u8 *>(linearAlloc(dataSize));
-    fseek(fp, 44, SEEK_SET);
-    fread(data, 1, dataSize, fp);
-    fclose(fp);
+    fp.seekg(44, std::ios::beg);
+    fp.read(reinterpret_cast<char*>(data), dataSize);
+    fp.close();
     dataSize /= 2; // FIXME: 16-bit or stereo?
 
     // Find the right format
