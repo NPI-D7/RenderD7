@@ -16,5 +16,5 @@ std::string get(const std::string &key);
 /// @brief Load A Language json
 /// @param lang The Language Key [en], [de], etc, or getSys()
 void load(const std::string &lang);
-} // namespace Lang
-} // namespace RenderD7
+}  // namespace Lang
+}  // namespace RenderD7

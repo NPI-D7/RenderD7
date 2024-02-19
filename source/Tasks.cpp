@@ -1,8 +1,8 @@
-#include <renderd7/Tasks.hpp>
-
 #include <3ds.h>
 #include <stdio.h>
 #include <string.h>
+
+#include <renderd7/Tasks.hpp>
 
 static std::vector<Thread> threads;
 

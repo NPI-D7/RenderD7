@@ -18,12 +18,13 @@ namespace RenderD7 {
 namespace Ftrace {
 /// @brief Result of FTrace
 struct FTRes {
-  std::string group;     ///< Group of the Trace
-  std::string func_name; ///< Function Name
+  std::string group;      ///< Group of the Trace
+  std::string func_name;  ///< Function Name
 
-  uint64_t time_start; ///< when started
-  uint64_t time_end;   ///< when stopped
-  float time_of;       ///< stop - start (how long)
+  uint64_t time_start;  ///< when started
+  uint64_t time_end;    ///< when stopped
+  float time_of;        ///< stop - start (how long)
+  bool is_ovl;          ///< is displayed in overlay?
 };
 
 /// @brief Map of Traces
@@ -48,5 +49,5 @@ inline void End(std::string group, std::string func_name) {
       rd7_traces[trace_id].time_end / (float)TICKS_PER_MSEC -
       rd7_traces[trace_id].time_start / (float)TICKS_PER_MSEC);
 }
-} // namespace Ftrace
-} // namespace RenderD7
+}  // namespace Ftrace
+}  // namespace RenderD7

@@ -5,7 +5,7 @@
 namespace RenderD7 {
 /// @brief StealConsole Class
 class StealConsole {
-public:
+ public:
   /// @brief Constructor
   StealConsole();
   /// @brief Deconstructor
@@ -14,8 +14,8 @@ public:
   /// @return Stdout as string
   std::string GetStdout();
 
-private:
+ private:
   /// @param stolen_stdout Stolen Stdout
   std::stringstream stolen_stdout;
 };
-} // namespace RenderD7
+}  // namespace RenderD7

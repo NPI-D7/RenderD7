@@ -1,0 +1,9 @@
+title: RenderD7
+description: 
+files:
+  - "include/*.hpp"
+  - "include/renderd7/*.hpp"
+  - "include/renderd7/music/*.hpp"
+  - "include/*.h"
+  - "include/renderd7/*.h"
+  - "include/renderd7/music/*.h"

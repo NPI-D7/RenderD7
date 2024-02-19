@@ -1,12 +1,13 @@
-#include <fstream>
-#include <memory>
-#include <renderd7/Time.hpp>
 #include <stdarg.h>
 #include <stdio.h>
 #include <string.h>
-#include <string>
 #include <time.h>
 #include <unistd.h>
+
+#include <fstream>
+#include <memory>
+#include <renderd7/Time.hpp>
+#include <string>
 
 std::string RenderD7::FormatString(std::string fmt_str, ...) {
   va_list ap;

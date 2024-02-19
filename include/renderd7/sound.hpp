@@ -1,11 +1,12 @@
 #pragma once
 
 #include <3ds.h>
+
 #include <string>
 
 /** Sound Class */
 class sound {
-public:
+ public:
   /// \brief Construct new Soundeffect
   /// \param path Path to the .wav file
   /// \param channel the channel 1-23
@@ -18,7 +19,7 @@ public:
   /// @brief Stop the sound
   void stop();
 
-private:
+ private:
   /// \param dataSize Size of the filedata
   u32 dataSize;
   /// \param waveBuf For ndsp

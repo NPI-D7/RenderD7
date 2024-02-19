@@ -13,4 +13,4 @@ namespace RenderD7 {
 /// @brief Begin Drawing On Specific Screen
 /// @param target The Screen Target (Top, Bottom or TopTight)
 void OnScreen(C3D_RenderTarget *target);
-} // namespace RenderD7
+}  // namespace RenderD7

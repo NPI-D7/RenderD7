@@ -21,4 +21,4 @@ std::string StealConsole::GetStdout() {
   }
   return "";
 }
-} // namespace RenderD7
+}  // namespace RenderD7

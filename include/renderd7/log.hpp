@@ -1,13 +1,14 @@
 #pragma once
-#include <fstream>
 #include <stdarg.h>
-#include <string>
 #include <time.h>
 #include <unistd.h>
 
+#include <fstream>
+#include <string>
+
 /// @brief Log Class
 class Log {
-public:
+ public:
   /// @brief Constructor
   Log();
   /// @brief Deconstructor
@@ -27,7 +28,7 @@ public:
   /// @return Formatted String
   std::string format(const std::string &fmt_str, ...);
 
-private:
+ private:
   /// \param filename the name of the logfile
   std::string filename;
 };

@@ -1,5 +1,3 @@
-// FileSystem based on libphyfs based on
-// https://github.com/TurtleP/3ds-examples/blob/fs/physfs/fs/physfs/include/filesystem.h
 #pragma once
 #include <string>
 #include <vector>
@@ -19,5 +17,8 @@ struct Entry {
 /// @param path The Path of the Directory
 /// @return The Vector of found Entrys
 std::vector<RenderD7::FileSystem::Entry> GetDirContent(std::string path);
-} // namespace FileSystem
-} // namespace RenderD7
+std::string GetParentPath(std::string path, std::string mount_point);
+std::vector<Entry> GetDirContentsExt(
+    std::string &path, const std::vector<std::string> &extensions);
+}  // namespace FileSystem
+}  // namespace RenderD7

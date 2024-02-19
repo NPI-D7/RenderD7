@@ -1,33 +1,31 @@
-#include <renderd7/sound.hpp>
-
-#include <fstream>
-#include <string>
 #include <cstring>
-
-extern bool isndspinit;
+#include <fstream>
+#include <renderd7/internal_db.hpp>
+#include <renderd7/sound.hpp>
+#include <string>
 using std::string;
 
 // Reference: http://yannesposito.com/Scratch/en/blog/2010-10-14-Fun-with-wav/
 typedef struct _WavHeader {
-  char magic[4];   // "RIFF"
-  u32 totallength; // Total file length, minus 8.
-  char wavefmt[8]; // Should be "WAVEfmt "
-  u32 format;      // 16 for PCM format
-  u16 pcm;         // 1 for PCM format
-  u16 channels;    // Channels
-  u32 frequency;   // Sampling frequency
+  char magic[4];    // "RIFF"
+  u32 totallength;  // Total file length, minus 8.
+  char wavefmt[8];  // Should be "WAVEfmt "
+  u32 format;       // 16 for PCM format
+  u16 pcm;          // 1 for PCM format
+  u16 channels;     // Channels
+  u32 frequency;    // Sampling frequency
   u32 bytes_per_second;
   u16 bytes_by_capture;
   u16 bits_per_sample;
-  char data[4]; // "data"
+  char data[4];  // "data"
   u32 bytes_in_data;
 } WavHeader;
 static_assert(sizeof(WavHeader) == 44, "WavHeader size is not 44 bytes.");
 
 sound::sound(const string &path, int channel, bool toloop) {
-  if (isndspinit) {
+  if (rd7i_is_ndsp) {
     ndspSetOutputMode(NDSP_OUTPUT_STEREO);
-    ndspSetOutputCount(2); // Num of buffers
+    ndspSetOutputCount(2);  // Num of buffers
 
     // Reading wav file
     std::fstream fp(path, std::ios::in | std::ios::binary);
@@ -38,7 +36,7 @@ sound::sound(const string &path, int channel, bool toloop) {
     }
 
     WavHeader wavHeader;
-    fp.read(reinterpret_cast<char*>(&wavHeader), sizeof(WavHeader));
+    fp.read(reinterpret_cast<char *>(&wavHeader), sizeof(WavHeader));
     size_t read = fp.tellg();
     if (read != sizeof(wavHeader)) {
       // Short read.
@@ -73,9 +71,9 @@ sound::sound(const string &path, int channel, bool toloop) {
     // Allocating and reading samples
     data = static_cast<u8 *>(linearAlloc(dataSize));
     fp.seekg(44, std::ios::beg);
-    fp.read(reinterpret_cast<char*>(data), dataSize);
+    fp.read(reinterpret_cast<char *>(data), dataSize);
     fp.close();
-    dataSize /= 2; // FIXME: 16-bit or stereo?
+    dataSize /= 2;  // FIXME: 16-bit or stereo?
 
     // Find the right format
     u16 ndspFormat;
@@ -104,7 +102,7 @@ sound::sound(const string &path, int channel, bool toloop) {
 }
 
 sound::~sound() {
-  if (isndspinit) {
+  if (rd7i_is_ndsp) {
     waveBuf.data_vaddr = 0;
     waveBuf.nsamples = 0;
     waveBuf.looping = false;
@@ -118,18 +116,16 @@ sound::~sound() {
 }
 
 void sound::play() {
-  if (isndspinit) {
-    if (!data)
-      return;
+  if (rd7i_is_ndsp) {
+    if (!data) return;
     DSP_FlushDataCache(data, dataSize);
     ndspChnWaveBufAdd(chnl, &waveBuf);
   }
 }
 
 void sound::stop() {
-  if (isndspinit) {
-    if (!data)
-      return;
+  if (rd7i_is_ndsp) {
+    if (!data) return;
     ndspChnWaveBufClear(chnl);
   }
 }

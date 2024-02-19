@@ -1,6 +1,29 @@
-# <img alt="LOGO" src="https://github.com/NPI-D7/RenderD7/blob/main/logo.png" height="90">
-RenderD7 is now LibRenderD7.
-### Installation
+# <img alt="LOGO" src="https://github.com/NPI-D7/RenderD7/raw/main/logo.png" height="90">
+# RenderD7 as Submodule (0.9.5+)
+To use RenderD7 just use this command: `git submodule add https://github.com/NPI-D7/RenderD7` and add `-b v0.9.5` for example for a specific version.
+
+
+And in Your Project Makefile add this
+```
+# Make Sure to Change this paths if your Submodule
+# is located somewhere else
+RENDERD7_SRC := RenderD7/source RenderD7/external
+RENDERD7_INC := RenderD7/include
+# Libraries used for RenderD7
+# if you already use -lm, -lctru etc place a # before -lm
+RENDERD7_LIBS := -lmpg123 -lvorbisidec -logg  -lcurl -lm -lcitro2dd -lcitro3d -lctru
+RENDERD7_FLAGS := -DRENDERD7_MUSICDEC=1 -DRENDERD7_MEMTRACK=1
+```
+Now you need to add it to your sources and includes
+```
+SOURCES		:=	source $(RENDERD7_SRC)
+INCLUDES	:=	source $(RENDERD7_INC)
+```
+Finally append `$(RENDERD7_FLAGS)` to your `CFLAGS`
+
+Example from rd7tf
+Keep in mind that -DRENDERD7_MUSICDEC=1 requires `-lmpg123 -lvorbisidec -logg`
+### Installation (0.8.0-0.9.4) (OUTDATED)
 Download a Package From Releses Page
 `https://github.com/NPI-D7/RenderD7/releases/download/v0.9.4/renderd7.tar.bz2 -o renderd7.tar.bz2`
 Then Extract it to your Libraries Path
@@ -32,23 +55,6 @@ Example-App
 └── src
     └── main.cpp
 ```
-# Back to Old Usage aka Submodule (0.9.5+)
-If you want to use RenderD7 as Submodule run
-`git submodule add https://github.com/NPI-D7/RenderD7`
-
-And to Use Add this to make file
-```
-# Make Sure to Change this paths if your Submodule
-# is located somewhere else
-RENDERD7_SRC := RenderD7/source RenderD7/external
-RENDERD7_INC := RenderD7/include
-```
-Now you need to add it to your sources and includes
-```
-SOURCES		:=	source $(RENDERD7_SRC)
-INCLUDES	:=	source $(RENDERD7_INC)
-```
-Example from rd7tf
 # Credits
 - NPI-D7
   - Tobi-D7 Main Dev

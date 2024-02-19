@@ -10,4 +10,4 @@ std::string FormatString(std::string fmt_str, ...);
 /// @brief Get Current Time as String
 /// @return Time-String
 std::string GetTimeStr(void);
-} // namespace RenderD7
+}  // namespace RenderD7

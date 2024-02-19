@@ -1,15 +1,15 @@
 #pragma once
 
-#include <renderd7/Sheet.hpp>
-#include <renderd7/Sprite.hpp>
-
 #include <citro2d.h>
 #include <citro3d.h>
+
+#include <renderd7/Sheet.hpp>
+#include <renderd7/Sprite.hpp>
 
 namespace RenderD7 {
 /// @brief SpriteSheetAnimation Class
 class SpriteSheetAnimation : public RenderD7::Sprite {
-public:
+ public:
   /// @brief Constructor
   SpriteSheetAnimation();
   /// @brief Deconstructor
@@ -26,7 +26,7 @@ public:
   /// @param timespeed Speed of the animation
   void Play(float timespeed);
 
-private:
+ private:
   /// @param images Count of Images
   size_t images;
   /// @param imgs Another Count of images ???
@@ -38,4 +38,4 @@ private:
   /// @param time Total Time from frame_finish
   float time;
 };
-} // namespace RenderD7
+}  // namespace RenderD7

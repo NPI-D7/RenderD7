@@ -9,11 +9,11 @@
 namespace RenderD7 {
 /// @brief Sprite Class
 class Sprite {
-public:
+ public:
   /// \brief Construct Sprite
-  Sprite();
+  Sprite() = default;
   /// \brief Deconstruct Sprite
-  ~Sprite();
+  ~Sprite() = default;
   /// \brief Load a Sprite From SpriteSheet
   /// \param sheet the Sheet to load from.(RenderD7::Sheet)
   /// \param index the number of the Sprite in the Sheet
@@ -55,10 +55,10 @@ public:
   /// @return Y Position
   float getPosY();
 
-private:
+ private:
   /// @param tint ImageTint (unused)
   C2D_ImageTint tint;
   /// @param sprite The Sprite
   C2D_Sprite sprite;
 };
-} // namespace RenderD7
+}  // namespace RenderD7

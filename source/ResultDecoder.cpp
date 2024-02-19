@@ -1,6 +1,10 @@
+#include <filesystem>
+#include <fstream>
 #include <map>
 #include <renderd7/ResultDecoder.hpp>
 #include <sstream>
+
+extern std::string D_app_name;
 
 static std::map<int, std::string> modules = {
     {0, "common"},
@@ -194,17 +198,21 @@ static std::map<int, std::string> descfs = {
 };
 
 static std::map<int, std::string> descsrv = {
-    {5, "Invalid string length (service name length is zero or longer than 8 "
-        "chars)."},
-    {6, "Access to service denied (requested a service the application does "
-        "not have access to)."},
-    {7, "String size does not match contents (service name contains unexpected "
-        "null byte)."},
+    {5,
+     "Invalid string length (service name length is zero or longer than 8 "
+     "chars)."},
+    {6,
+     "Access to service denied (requested a service the application does "
+     "not have access to)."},
+    {7,
+     "String size does not match contents (service name contains unexpected "
+     "null byte)."},
 };
 
 static std::map<int, std::string> descnwm = {
-    {2, "This error usually indicates the wifi chipset in the console is dying "
-        "or dead."},
+    {2,
+     "This error usually indicates the wifi chipset in the console is dying "
+     "or dead."},
 };
 
 static std::map<int, std::string> descam = {
@@ -214,8 +222,9 @@ static std::map<int, std::string> descam = {
     {39, "Invalid title version."},
     {43, "Database doesn\"t exist, or it failed to open."},
     {44, "Trying to uninstall system-app."},
-    {106, "Invalid signature/CIA. Usually happens when developer UNITINFO is "
-          "enabled in Luma3DS."},
+    {106,
+     "Invalid signature/CIA. Usually happens when developer UNITINFO is "
+     "enabled in Luma3DS."},
     {393, "Invalid database."},
 };
 
@@ -224,32 +233,42 @@ static std::map<int, std::string> deschttp = {
 };
 
 static std::map<int, std::string> descnim = {
-    {1, "Invalid string IPC paramater (non null terminated at its indicated "
-        "length)."},
-    {12, "Invalid country code returned by CFG module reading config save "
-         "0xB0000."},
-    {13, "Zero string length console serial number or '000000000000000' "
-         "returned by CFG's SecureInfoGetSerialNo."},
-    {18, "General data reading error of NIM's .dat files from its system save, "
-         "bad data or bad data lengths."},
-    {22, "General invalid data or length of data returned from nintendo "
-         "servers. (Only applicable for some operations)"},
-    {25, "IntegrityVerificationSeed is waiting on servers to be synced into "
-         "console. Can't processed with online services without sync being "
-         "completed first over IPC request."},
-    {26, "Unavailable/unaccessable IntegrityVerificationSeed on Nintendo "
-         "servers. May happen if NIM is told to import "
-         "IntegrityVerificationSeed from servers at any time other than after "
-         "the successful System Transfer reboot."},
-    {27, "Invalid country language code returned by CFG module reading config "
-         "save 0xA0002."},
-    {37, "Service is in Standby Mode. (eShop ban? General service is down? "
-         "This caused by a server response flag on account information. "
-         "Account is not referring to NNID.)"},
+    {1,
+     "Invalid string IPC paramater (non null terminated at its indicated "
+     "length)."},
+    {12,
+     "Invalid country code returned by CFG module reading config save "
+     "0xB0000."},
+    {13,
+     "Zero string length console serial number or '000000000000000' "
+     "returned by CFG's SecureInfoGetSerialNo."},
+    {18,
+     "General data reading error of NIM's .dat files from its system save, "
+     "bad data or bad data lengths."},
+    {22,
+     "General invalid data or length of data returned from nintendo "
+     "servers. (Only applicable for some operations)"},
+    {25,
+     "IntegrityVerificationSeed is waiting on servers to be synced into "
+     "console. Can't processed with online services without sync being "
+     "completed first over IPC request."},
+    {26,
+     "Unavailable/unaccessable IntegrityVerificationSeed on Nintendo "
+     "servers. May happen if NIM is told to import "
+     "IntegrityVerificationSeed from servers at any time other than after "
+     "the successful System Transfer reboot."},
+    {27,
+     "Invalid country language code returned by CFG module reading config "
+     "save 0xA0002."},
+    {37,
+     "Service is in Standby Mode. (eShop ban? General service is down? "
+     "This caused by a server response flag on account information. "
+     "Account is not referring to NNID.)"},
     {39, "HTTP Status non 200. (Only applicable for some operations)"},
     {40, "General XML read/write error while processing Auto Delivery XMLs."},
-    {41, "General XML read/write error while processing Auto Delivery XMLs. "
-         "(Stubbed virtual call was called)"},
+    {41,
+     "General XML read/write error while processing Auto Delivery XMLs. "
+     "(Stubbed virtual call was called)"},
     {58,
      "Invalid NPNS token returned by CFG module reading config save 0xF0006."},
     {67, "HTTP Status 404 while trying to download a game's seed."},
@@ -266,8 +285,9 @@ static std::map<int, std::string> descqtm = {
 
 // Need to Fix The Range based Values
 static std::map<int, std::string> descapplication = {
-    {0, "The application raised an error. Please consult the application's "
-        "source code or ask the author for assistance with it."},
+    {0,
+     "The application raised an error. Please consult the application's "
+     "source code or ask the author for assistance with it."},
     {1024, "0x01"},
 };
 
@@ -299,115 +319,115 @@ int ResultDecoder::GetModuleInt() { return R_MODULE(m_rescode); }
 std::string ResultDecoder::GetDescription() {
   std::string res = "Desc Not Implemented!";
   switch (this->GetModuleInt()) {
-  case 0:
-    res = desccommon.at(this->GetDescriptionInt()) + " (" +
-          std::to_string(this->GetDescriptionInt()) + ")";
-    break;
-  case 1:
-    if ((desckernel.find(this->GetDescriptionInt()) == desckernel.end())) {
+    case 0:
       res = desccommon.at(this->GetDescriptionInt()) + " (" +
             std::to_string(this->GetDescriptionInt()) + ")";
-    } else {
-      res = desckernel.at(this->GetDescriptionInt()) + " (" +
-            std::to_string(this->GetDescriptionInt()) + ")";
-    }
-    break;
-  case 6:
-    if ((descos.find(this->GetDescriptionInt()) == descos.end())) {
-      res = desccommon.at(this->GetDescriptionInt()) + " (" +
-            std::to_string(this->GetDescriptionInt()) + ")";
-    } else {
-      res = descos.at(this->GetDescriptionInt()) + " (" +
-            std::to_string(this->GetDescriptionInt()) + ")";
-    }
-    break;
-  case 17:
-    if ((descfs.find(this->GetDescriptionInt()) == descfs.end())) {
-      res = desccommon.at(this->GetDescriptionInt()) + " (" +
-            std::to_string(this->GetDescriptionInt()) + ")";
-    } else {
-      res = descfs.at(this->GetDescriptionInt()) + " (" +
-            std::to_string(this->GetDescriptionInt()) + ")";
-    }
-    break;
-  case 25:
-    if ((descsrv.find(this->GetDescriptionInt()) == descsrv.end())) {
-      res = desccommon.at(this->GetDescriptionInt()) + " (" +
-            std::to_string(this->GetDescriptionInt()) + ")";
-    } else {
-      res = descsrv.at(this->GetDescriptionInt()) + " (" +
-            std::to_string(this->GetDescriptionInt()) + ")";
-    }
-    break;
-  case 27:
-    if ((descnwm.find(this->GetDescriptionInt()) == descnwm.end())) {
-      res = desccommon.at(this->GetDescriptionInt()) + " (" +
-            std::to_string(this->GetDescriptionInt()) + ")";
-    } else {
-      res = descnwm.at(this->GetDescriptionInt()) + " (" +
-            std::to_string(this->GetDescriptionInt()) + ")";
-    }
-    break;
-  case 32:
-    if ((descam.find(this->GetDescriptionInt()) == descam.end())) {
-      res = desccommon.at(this->GetDescriptionInt()) + " (" +
-            std::to_string(this->GetDescriptionInt()) + ")";
-    } else {
-      res = descam.at(this->GetDescriptionInt()) + " (" +
-            std::to_string(this->GetDescriptionInt()) + ")";
-    }
-    break;
-  case 40:
-    if ((deschttp.find(this->GetDescriptionInt()) == deschttp.end())) {
-      res = desccommon.at(this->GetDescriptionInt()) + " (" +
-            std::to_string(this->GetDescriptionInt()) + ")";
-    } else {
-      res = deschttp.at(this->GetDescriptionInt()) + " (" +
-            std::to_string(this->GetDescriptionInt()) + ")";
-    }
-    break;
-  case 52:
-    if ((descnim.find(this->GetDescriptionInt()) == descnim.end())) {
-      res = desccommon.at(this->GetDescriptionInt()) + " (" +
-            std::to_string(this->GetDescriptionInt()) + ")";
-    } else {
-      res = descnim.at(this->GetDescriptionInt()) + " (" +
-            std::to_string(this->GetDescriptionInt()) + ")";
-    }
-    break;
-  case 92:
-    if ((descmvd.find(this->GetDescriptionInt()) == descmvd.end())) {
-      res = desccommon.at(this->GetDescriptionInt()) + " (" +
-            std::to_string(this->GetDescriptionInt()) + ")";
-    } else {
-      res = descmvd.at(this->GetDescriptionInt()) + " (" +
-            std::to_string(this->GetDescriptionInt()) + ")";
-    }
-    break;
-  case 96:
-    if ((descqtm.find(this->GetDescriptionInt()) == descqtm.end())) {
-      res = desccommon.at(this->GetDescriptionInt()) + " (" +
-            std::to_string(this->GetDescriptionInt()) + ")";
-    } else {
-      res = descqtm.at(this->GetDescriptionInt()) + " (" +
-            std::to_string(this->GetDescriptionInt()) + ")";
-    }
-    break;
-  case 254:
-    if ((descapplication.find(this->GetDescriptionInt()) ==
-         descapplication.end())) {
-      res = desccommon.at(this->GetDescriptionInt()) + " (" +
-            std::to_string(this->GetDescriptionInt()) + ")";
-    } else {
-      res = descapplication.at(this->GetDescriptionInt()) + " (" +
-            std::to_string(this->GetDescriptionInt()) + ")";
-    }
-    break;
+      break;
+    case 1:
+      if ((desckernel.find(this->GetDescriptionInt()) == desckernel.end())) {
+        res = desccommon.at(this->GetDescriptionInt()) + " (" +
+              std::to_string(this->GetDescriptionInt()) + ")";
+      } else {
+        res = desckernel.at(this->GetDescriptionInt()) + " (" +
+              std::to_string(this->GetDescriptionInt()) + ")";
+      }
+      break;
+    case 6:
+      if ((descos.find(this->GetDescriptionInt()) == descos.end())) {
+        res = desccommon.at(this->GetDescriptionInt()) + " (" +
+              std::to_string(this->GetDescriptionInt()) + ")";
+      } else {
+        res = descos.at(this->GetDescriptionInt()) + " (" +
+              std::to_string(this->GetDescriptionInt()) + ")";
+      }
+      break;
+    case 17:
+      if ((descfs.find(this->GetDescriptionInt()) == descfs.end())) {
+        res = desccommon.at(this->GetDescriptionInt()) + " (" +
+              std::to_string(this->GetDescriptionInt()) + ")";
+      } else {
+        res = descfs.at(this->GetDescriptionInt()) + " (" +
+              std::to_string(this->GetDescriptionInt()) + ")";
+      }
+      break;
+    case 25:
+      if ((descsrv.find(this->GetDescriptionInt()) == descsrv.end())) {
+        res = desccommon.at(this->GetDescriptionInt()) + " (" +
+              std::to_string(this->GetDescriptionInt()) + ")";
+      } else {
+        res = descsrv.at(this->GetDescriptionInt()) + " (" +
+              std::to_string(this->GetDescriptionInt()) + ")";
+      }
+      break;
+    case 27:
+      if ((descnwm.find(this->GetDescriptionInt()) == descnwm.end())) {
+        res = desccommon.at(this->GetDescriptionInt()) + " (" +
+              std::to_string(this->GetDescriptionInt()) + ")";
+      } else {
+        res = descnwm.at(this->GetDescriptionInt()) + " (" +
+              std::to_string(this->GetDescriptionInt()) + ")";
+      }
+      break;
+    case 32:
+      if ((descam.find(this->GetDescriptionInt()) == descam.end())) {
+        res = desccommon.at(this->GetDescriptionInt()) + " (" +
+              std::to_string(this->GetDescriptionInt()) + ")";
+      } else {
+        res = descam.at(this->GetDescriptionInt()) + " (" +
+              std::to_string(this->GetDescriptionInt()) + ")";
+      }
+      break;
+    case 40:
+      if ((deschttp.find(this->GetDescriptionInt()) == deschttp.end())) {
+        res = desccommon.at(this->GetDescriptionInt()) + " (" +
+              std::to_string(this->GetDescriptionInt()) + ")";
+      } else {
+        res = deschttp.at(this->GetDescriptionInt()) + " (" +
+              std::to_string(this->GetDescriptionInt()) + ")";
+      }
+      break;
+    case 52:
+      if ((descnim.find(this->GetDescriptionInt()) == descnim.end())) {
+        res = desccommon.at(this->GetDescriptionInt()) + " (" +
+              std::to_string(this->GetDescriptionInt()) + ")";
+      } else {
+        res = descnim.at(this->GetDescriptionInt()) + " (" +
+              std::to_string(this->GetDescriptionInt()) + ")";
+      }
+      break;
+    case 92:
+      if ((descmvd.find(this->GetDescriptionInt()) == descmvd.end())) {
+        res = desccommon.at(this->GetDescriptionInt()) + " (" +
+              std::to_string(this->GetDescriptionInt()) + ")";
+      } else {
+        res = descmvd.at(this->GetDescriptionInt()) + " (" +
+              std::to_string(this->GetDescriptionInt()) + ")";
+      }
+      break;
+    case 96:
+      if ((descqtm.find(this->GetDescriptionInt()) == descqtm.end())) {
+        res = desccommon.at(this->GetDescriptionInt()) + " (" +
+              std::to_string(this->GetDescriptionInt()) + ")";
+      } else {
+        res = descqtm.at(this->GetDescriptionInt()) + " (" +
+              std::to_string(this->GetDescriptionInt()) + ")";
+      }
+      break;
+    case 254:
+      if ((descapplication.find(this->GetDescriptionInt()) ==
+           descapplication.end())) {
+        res = desccommon.at(this->GetDescriptionInt()) + " (" +
+              std::to_string(this->GetDescriptionInt()) + ")";
+      } else {
+        res = descapplication.at(this->GetDescriptionInt()) + " (" +
+              std::to_string(this->GetDescriptionInt()) + ")";
+      }
+      break;
 
-  default:
-    res = desccommon.at(this->GetDescriptionInt()) + " (" +
-          std::to_string(this->GetDescriptionInt()) + ")";
-    break;
+    default:
+      res = desccommon.at(this->GetDescriptionInt()) + " (" +
+            std::to_string(this->GetDescriptionInt()) + ")";
+      break;
   }
   return res;
 }
@@ -418,5 +438,24 @@ std::string ResultDecoder::GetSummary() {
   return res;
 }
 
+void RenderD7::ResultDecoder::WriteLog() {
+  std::string out_path = "sdmc:/RenderD7/Apps/" + D_app_name + "/resdec/";
+  std::filesystem::create_directories(out_path);
+  out_path += "/err_result_" + std::to_string(time(0)) + ".log";
+  std::ofstream out(out_path, std::ios::app);
+  out << "+-------------------\n";
+  out << "| Error: " << GetCode() << "\n";
+  out << "+-------------------\n";
+  out << "| Module: " << GetModule() << "\n";
+  out << "+-------------------\n";
+  out << "| Level: " << GetLevel() << "\n";
+  out << "+-------------------\n";
+  out << "| Summary: " << GetSummary() << "\n";
+  out << "+-------------------\n";
+  out << "| Description: " << GetDescription() << "\n";
+  out << "+-------------------\n";
+  out.close();
+}
+
 int ResultDecoder::GetSummaryInt() { return R_SUMMARY(m_rescode); }
-} // namespace RenderD7
+}  // namespace RenderD7

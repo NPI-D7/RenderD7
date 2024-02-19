@@ -19,5 +19,5 @@ float Get3dSliderLevel();
 /// @brief Get Current state of Sound Slider
 /// @return current SoundSlider state
 float GetSoundSliderLevel();
-} // namespace Hardware
-} // namespace RenderD7
+}  // namespace Hardware
+}  // namespace RenderD7

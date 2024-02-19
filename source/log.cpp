@@ -1,7 +1,7 @@
-#include <renderd7/log.hpp>
-#include <fstream>
 #include <filesystem>
+#include <fstream>
 #include <memory>
+#include <renderd7/log.hpp>
 
 std::string Log::format(const std::string &fmt_str, ...) {
   va_list ap;
@@ -30,7 +30,7 @@ void Log::Init(const char *filename) {
   std::string fn = filename;
   std::string name = fn + ".txt";
   this->filename = name;
-  if(std::filesystem::exists(name)) {
+  if (std::filesystem::exists(name)) {
     // Do nothing
   } else {
     std::fstream f(name, std::ios::out);

@@ -1,5 +1,6 @@
 #pragma once
 #include <3ds.h>
+
 #include <atomic>
 #include <functional>
 #include <renderd7/parameter.hpp>
@@ -11,7 +12,7 @@ using CTRU_Thread = Thread;
 
 namespace RenderD7 {
 class Thread {
-public:
+ public:
   /**
    * @brief Default constructor
    * @note This should only be called when calling m3d::Thread::initialize()
@@ -104,7 +105,7 @@ public:
    */
   static void sleep(int t_milliseconds);
 
-private:
+ private:
   struct ThreadData {
     RenderD7::Parameter m_parameter;
     std::function<void(RenderD7::Parameter)> m_function;
@@ -119,4 +120,4 @@ private:
   RenderD7::Thread::ThreadData m_data;
   CTRU_Thread m_thread;
 };
-} // namespace RenderD7
+}  // namespace RenderD7
