@@ -109,6 +109,8 @@ void TextFont(Font fnt) { rd7i_d2_fnt = fnt.ptr(); }
 
 void TextDefaultFont() { rd7i_d2_fnt = rd7i_base_font; }
 
+float TextGetSize() { return rd7i_d2_txt_size; }
+
 std::string TextShort(const std::string &in, int max_len) {
   return GetShortedText(in, max_len);
 }

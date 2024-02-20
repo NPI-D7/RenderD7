@@ -26,6 +26,7 @@ namespace RenderD7 {
 R7Vec2 GetTextDimensions(const std::string& text);
 void CustomTextSize(float size);
 void TextDefaultSize();
+float TextGetSize();
 std::string TextShort(const std::string& in, int max_len);
 // Overrite TextBox Size (by default Screenwidth x Text.h)
 void TextMaxBox(R7Vec2 size);

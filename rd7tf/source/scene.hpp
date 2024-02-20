@@ -28,5 +28,6 @@ class Sample : public RenderD7::Scene {
   mutable std::vector<std::string> names;
   mutable std::vector<std::string> files;
   mutable int sel;
+  mutable float txt_size = 0.5f;
   State state = State_Menu;
 };

@@ -272,6 +272,8 @@ Ovl_Metrik::Ovl_Metrik(bool* is_enabled, bool* screen, uint32_t* mt_color,
 }
 
 void Ovl_Metrik::Draw(void) const {
+  float tmp_txt = RenderD7::TextGetSize();
+  RenderD7::TextDefaultSize();
   if (i_screen[0]) {
     RenderD7::OnScreen(Bottom);
   } else {
@@ -332,6 +334,7 @@ void Ovl_Metrik::Draw(void) const {
                           R7Vec2(320, Hid::GetTouchPosition().y),
                           RenderD7::Color::Hex("#ff0000"));
   }
+  RenderD7::CustomTextSize(tmp_txt);
 }
 
 void Ovl_Metrik::Logic() {

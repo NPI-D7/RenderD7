@@ -242,7 +242,8 @@ bool Button(const std::string &label, R7Vec2 size) {
 
 void Checkbox(const std::string &label, bool &c) {
   if (!UI7CtxValidate()) return;
-  R7Vec2 cbs = R7Vec2(18, 18);
+  float sv = (RenderD7::TextGetSize()*40)*0.9;
+  R7Vec2 cbs = R7Vec2(sv, sv);
   R7Vec2 txtdim = RenderD7::GetTextDimensions(label);
   R7Vec2 inp = cbs + R7Vec2(txtdim.x + 5, 0);
   RD7Color bg = RD7Color_FrameBg;
@@ -307,6 +308,8 @@ void BrowserList(const std::vector<std::string> &entrys, int &selection,
                  RD7TextFlags txtflags, R7Vec2 size, int max_entrys) {
   if (!UI7CtxValidate()) return;
   if (selection < 0) return;
+  float tmp_txt = RenderD7::TextGetSize();
+  RenderD7::TextDefaultSize();
   R7Vec2 pos = GetCursorPos();
   if (pos.y + 15 * max_entrys > 230) max_entrys = (int)((230 - pos.y) / 15);
   if (size.x == 0) size.x = (rd7i_current_screen ? 400 : 320) - (pos.x * 2);
@@ -352,12 +355,14 @@ void BrowserList(const std::vector<std::string> &entrys, int &selection,
       RenderD7::Ftrace::End("app", "short_algo");
     }
   }
+  RenderD7::CustomTextSize(tmp_txt);
 }
 
 void InputText(const std::string &label, std::string &text,
                const std::string &hint) {
   if (!UI7CtxValidate()) return;
-  R7Vec2 cbs = R7Vec2(144, 18);
+  float sv = (RenderD7::TextGetSize()*40)*0.9;
+  R7Vec2 cbs = R7Vec2(144, sv);
   R7Vec2 txtdim = RenderD7::GetTextDimensions(label);
   R7Vec2 inp = cbs + R7Vec2(txtdim.x + 5, 0);
   RD7Color bg = RD7Color_FrameBg;
@@ -394,19 +399,20 @@ bool BeginMenu(const std::string &title, R7Vec2 size, UI7MenuFlags flags) {
     size.y = 240;
   }
   RD7TextFlags txtflags = 0;
+  float tbh = RenderD7::TextGetSize()*40;
   if (flags & UI7MenuFlags_NoTitlebar) titlebar = false;
   if (flags & UI7MenuFlags_TitleMid) txtflags = RD7TextFlags_AlignMid;
   RenderD7::Draw2::RFS(R7Vec2(0, 0), size,
                        RenderD7::StyleColor(RD7Color_Background));
   if (titlebar) {
-    RenderD7::Draw2::RFS(R7Vec2(0, 0), R7Vec2(size.x, 20),
+    RenderD7::Draw2::RFS(R7Vec2(0, 0), R7Vec2(size.x, tbh),
                          RenderD7::StyleColor(RD7Color_Header));
     RenderD7::TextColorByBg(RD7Color_Header);
     RenderD7::Draw2::Text(R7Vec2(5, 2), id->title, txtflags);
     RenderD7::UndoColorEdit(RD7Color_Text);
   }
 
-  SetCursorPos(R7Vec2(5, 25));
+  SetCursorPos(R7Vec2(5, tbh+5));
   return UI7CtxBeginMenu(title);
 }
 
