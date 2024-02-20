@@ -71,8 +71,8 @@ void CustomizeColor(RD7Color color, unsigned int custom);
 void ColorNew(RD7Color color, unsigned int new_color);
 void UndoColorEdit(RD7Color color);
 void UndoAllColorEdits();
-void ThemeLoad(const std::string& path);
-void ThemeSave(const std::string& path);
+void ThemeLoad(const std::string &path);
+void ThemeSave(const std::string &path);
 void ThemeDefault();
 namespace Color {
 /// @brief RGBA Class

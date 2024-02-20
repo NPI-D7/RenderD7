@@ -244,6 +244,8 @@ namespace RenderD7 {
 Ovl_Ftrace::Ovl_Ftrace(bool* is_enabled) { i_is_enabled = is_enabled; }
 
 void Ovl_Ftrace::Draw(void) const {
+  float tmp_txt = RenderD7::TextGetSize();
+  RenderD7::TextDefaultSize();
   RenderD7::OnScreen(Top);
   RenderD7::Draw2::RFS(R7Vec2(0, 0), R7Vec2(400, 20),
                        RenderD7::StyleColor(RD7Color_Background));
@@ -256,6 +258,7 @@ void Ovl_Ftrace::Draw(void) const {
     RenderD7::Draw2::Text(R7Vec2(295, 30 + i * 15),
                           RenderD7::MsTimeFmt(dt[i].time_of));
   }
+  RenderD7::CustomTextSize(tmp_txt);
 }
 
 void Ovl_Ftrace::Logic() {
@@ -357,6 +360,8 @@ Ovl_Keyboard::~Ovl_Keyboard() {
 }
 
 void Ovl_Keyboard::Draw(void) const {
+  float tmp_txt = RenderD7::TextGetSize();
+  RenderD7::TextDefaultSize();
   if (ft3 > 5) RenderD7::Hid::Unlock();
   auto key_table = keyboard_layout;
   if (mode == 1)
@@ -416,6 +421,7 @@ void Ovl_Keyboard::Draw(void) const {
     RenderD7::UndoColorEdit(RD7Color_Text);
   }
   if (ft3 > 5) RenderD7::Hid::Lock();
+  RenderD7::CustomTextSize(tmp_txt);
 }
 
 void Ovl_Keyboard::Logic() {

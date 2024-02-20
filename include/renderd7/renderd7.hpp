@@ -114,6 +114,7 @@ class RSettings : public RenderD7::Scene {
   std::string kbd_test;
   bool statemtold = false;
   bool stateftold = false;
+  float tmp_txt;
 
  public:
   /// @brief Constructor

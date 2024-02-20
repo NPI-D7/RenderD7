@@ -105,11 +105,11 @@ void Sample::Draw() const {
       UI7::Checkbox("RD7-Debug", rd7_debugging);
       UI7::InputText("Search", search__, "Tap Here");
       UI7::Label("Text Control:");
-      if(UI7::Button("text++")) txt_size+=0.01;
+      if (UI7::Button("text++")) txt_size += 0.01;
       UI7::SameLine();
-      if(UI7::Button("text--")) txt_size -= 0.01;
+      if (UI7::Button("text--")) txt_size -= 0.01;
       UI7::SameLine();
-      if(UI7::Button("def")) txt_size = 0.5;
+      if (UI7::Button("def")) txt_size = 0.5;
     }
     UI7::EndMenu();
   }

@@ -454,6 +454,8 @@ void RenderD7::FrameEnd() {
 }
 
 RenderD7::RSettings::RSettings() {
+  tmp_txt = RenderD7::TextGetSize();
+  RenderD7::TextDefaultSize();
   RenderD7::FadeIn();
   std::fstream cfg_ldr(rd7i_config_path + "/config.rc7", std::ios::in);
   cfg_ldr >> rd7i_config;
@@ -463,7 +465,7 @@ RenderD7::RSettings::RSettings() {
   stateftold = rd7i_ftraced;
 }
 
-RenderD7::RSettings::~RSettings() {}
+RenderD7::RSettings::~RSettings() { RenderD7::CustomTextSize(tmp_txt); }
 
 std::vector<std::string> StrHelper(std::string input) {
   std::string ss(input);
@@ -591,10 +593,10 @@ void RenderD7::RSettings::Draw(void) const {
     // List Bg
     for (int i = 0; i < 12; i++) {
       if ((i % 2 == 0))
-        RenderD7::Draw2::RFS(R7Vec2(0, 40 + (i) * 15), R7Vec2(400, 15),
+        RenderD7::Draw2::RFS(R7Vec2(0, 40 + (i)*15), R7Vec2(400, 15),
                              RenderD7::StyleColor(RD7Color_List0));
       else
-        RenderD7::Draw2::RFS(R7Vec2(0, 40 + (i) * 15), R7Vec2(400, 15),
+        RenderD7::Draw2::RFS(R7Vec2(0, 40 + (i)*15), R7Vec2(400, 15),
                              RenderD7::StyleColor(RD7Color_List1));
     }
 

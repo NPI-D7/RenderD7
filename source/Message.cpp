@@ -27,6 +27,8 @@ namespace RenderD7 {
 float GetDeltaTime();  // Extern from renderd7.cpp
 
 void ProcessMessages() {
+  float tmp_txt = RenderD7::TextGetSize();
+  RenderD7::TextDefaultSize();
   // Draw in ovl mode
   RenderD7::OnScreen(Top);
   float fol = anim_len - fade_outs;
@@ -82,6 +84,7 @@ void ProcessMessages() {
   // ReReverse ?? lol
   // Cause otherwise the Toasts will swap
   std::reverse(msg_lst.begin(), msg_lst.end());
+  RenderD7::CustomTextSize(tmp_txt);
 }
 
 void PushMessage(const Message &msg) {

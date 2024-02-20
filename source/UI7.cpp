@@ -242,7 +242,7 @@ bool Button(const std::string &label, R7Vec2 size) {
 
 void Checkbox(const std::string &label, bool &c) {
   if (!UI7CtxValidate()) return;
-  float sv = (RenderD7::TextGetSize()*40)*0.9;
+  float sv = (RenderD7::TextGetSize() * 40) * 0.9;
   R7Vec2 cbs = R7Vec2(sv, sv);
   R7Vec2 txtdim = RenderD7::GetTextDimensions(label);
   R7Vec2 inp = cbs + R7Vec2(txtdim.x + 5, 0);
@@ -273,10 +273,11 @@ void Label(const std::string &label, RD7TextFlags flags) {
   if (!UI7CtxValidate()) return;
   R7Vec2 textdim = RenderD7::GetTextDimensions(label);
   R7Vec2 pos = GetCursorPos();
+  float tbh = RenderD7::TextGetSize() * 40;
   // Remove some y offset cause texts have some offset
   UI7CtxCursorMove(textdim - R7Vec2(0, 4));
   RenderD7::TextColorByBg(
-      (pos.y + textdim.y < 20 ? RD7Color_Header : RD7Color_Background));
+      (pos.y + textdim.y < tbh ? RD7Color_Header : RD7Color_Background));
   RenderD7::Draw2::Text(pos, label, flags);
   RenderD7::UndoColorEdit(RD7Color_Text);
 }
@@ -361,7 +362,7 @@ void BrowserList(const std::vector<std::string> &entrys, int &selection,
 void InputText(const std::string &label, std::string &text,
                const std::string &hint) {
   if (!UI7CtxValidate()) return;
-  float sv = (RenderD7::TextGetSize()*40)*0.9;
+  float sv = (RenderD7::TextGetSize() * 40) * 0.9;
   R7Vec2 cbs = R7Vec2(144, sv);
   R7Vec2 txtdim = RenderD7::GetTextDimensions(label);
   R7Vec2 inp = cbs + R7Vec2(txtdim.x + 5, 0);
@@ -399,7 +400,7 @@ bool BeginMenu(const std::string &title, R7Vec2 size, UI7MenuFlags flags) {
     size.y = 240;
   }
   RD7TextFlags txtflags = 0;
-  float tbh = RenderD7::TextGetSize()*40;
+  float tbh = RenderD7::TextGetSize() * 40;
   if (flags & UI7MenuFlags_NoTitlebar) titlebar = false;
   if (flags & UI7MenuFlags_TitleMid) txtflags = RD7TextFlags_AlignMid;
   RenderD7::Draw2::RFS(R7Vec2(0, 0), size,
@@ -412,7 +413,7 @@ bool BeginMenu(const std::string &title, R7Vec2 size, UI7MenuFlags flags) {
     RenderD7::UndoColorEdit(RD7Color_Text);
   }
 
-  SetCursorPos(R7Vec2(5, tbh+5));
+  SetCursorPos(R7Vec2(5, tbh + 5));
   return UI7CtxBeginMenu(title);
 }
 
@@ -462,14 +463,9 @@ void Grid(const std::string &name, const R7Vec2 &size,
   UI7CtxCursorMove(size);
 }
 
-bool BeginTree(const std::string& text) {
-  
-  return false;
-}
+bool BeginTree(const std::string &text) { return false; }
 
-void EndTree() {
-
-}
+void EndTree() {}
 
 R7Vec2 GetCursorPos() {
   if (!UI7CtxValidate()) return R7Vec2();
