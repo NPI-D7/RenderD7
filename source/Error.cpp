@@ -7,7 +7,7 @@
 
 namespace RenderD7 {
 void Error(const std::string& msg) {
-  if (rd7i_graphics_on) {
+  /*if (rd7i_graphics_on) {
     C3D_FrameEnd(0);
     while (aptMainLoop()) {
       hidScanInput();
@@ -27,18 +27,18 @@ void Error(const std::string& msg) {
       C3D_FrameEnd(0);
     }
     exit(0);
-  } else {
-    gfxInitDefault();
-    consoleInit(GFX_TOP, NULL);
-    printf("RENDERD7 - ERROR MANAGER\n\n%s\n", msg.c_str());
-    printf("Press Start to Exit\n");
-    while (aptMainLoop()) {
-      hidScanInput();
-      if (hidKeysDown() & KEY_START) break;
-      gfxSwapBuffers();
-    }
-    gfxExit();
-    exit(0);
+  } else {*/
+  gfxInitDefault();
+  consoleInit(GFX_TOP, NULL);
+  printf("RENDERD7 - ERROR MANAGER\n\n%s\n", msg.c_str());
+  printf("Press Start to Exit\n");
+  while (aptMainLoop()) {
+    hidScanInput();
+    if (hidKeysDown() & KEY_START) break;
+    gfxSwapBuffers();
   }
+  gfxExit();
+  exit(0);
+  // }
 }
 }  // namespace RenderD7

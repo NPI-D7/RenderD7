@@ -25,27 +25,25 @@ static void Wave(int index, R7Vec2 position, R7Vec2 size, float time,
   y_position = std::min(y_position, position.y + size.y - (90 - shrink));
 
   if (dbg)
-    RenderD7::Draw2::TriangleLined(
+    DV2::TriangleLined(
         R7Vec2(x_position, y_position),
         R7Vec2(x_position + 300, y_position + (90 - shrink)),
         R7Vec2(x_position - 300, y_position + (90 - shrink)),
-        RenderD7::Color::RGBA(.94f - .17f * color_effect,
-                              .61f - .25f * color_effect,
-                              .36f + .38f * color_effect)
+        RD7::Color::RGBA(.94f - .17f * color_effect, .61f - .25f * color_effect,
+                         .36f + .38f * color_effect)
             .toRGBA());
   else
-    RenderD7::Draw2::TriangleSolid(
+    DV2::TriangleSolid(
         R7Vec2(x_position, y_position),
         R7Vec2(x_position + 300, y_position + (90 - shrink)),
         R7Vec2(x_position - 300, y_position + (90 - shrink)),
-        RenderD7::Color::RGBA(.94f - .17f * color_effect,
-                              .61f - .25f * color_effect,
-                              .36f + .38f * color_effect)
+        RD7::Color::RGBA(.94f - .17f * color_effect, .61f - .25f * color_effect,
+                         .36f + .38f * color_effect)
             .toRGBA());
 }
 
 void DrawWave(R7Vec2 position, R7Vec2 size, float time, bool dbg) {
-  RenderD7::Draw2::RectFilledSolid(position, size, 0xff64c9fd);
+  DV2::RectFilledSolid(position, size, 0xff64c9fd);
   int i = 0;
   for (; i < 44; i++) Wave(i, position, size, time, dbg);
 }
@@ -53,7 +51,7 @@ void DrawWave(R7Vec2 position, R7Vec2 size, float time, bool dbg) {
 R7Vec2 testv2 = R7Vec2(48, 48);
 
 Sample::Sample() {
-  auto t = RenderD7::FileSystem::GetDirContent("sdmc:/music/");
+  auto t = RD7::FileSystem::GetDirContent("sdmc:/music/");
   for (const auto& it : t) {
     names.push_back(it.name);
     files.push_back(it.path);
@@ -67,32 +65,32 @@ Sample::~Sample() {
 void Sample::Draw() const {
   // Draw Things to Screen:
   // Step 1 -> Select Screen
-  RenderD7::OnScreen(Top);
+  RD7::OnScreen(Top);
   // Step 2 -> Draw Things
   // The hbloader Triangle Wave
-  DrawWave(R7Vec2(0, 0), R7Vec2(400, 240), RenderD7::GetTime(),
-           debug_background);
+  DrawWave(R7Vec2(0, 0), R7Vec2(400, 240), RD7::GetTime(), debug_background);
   // For Example A Rect with Draw2 and StyleColorApi
   // And the RFS Wrapper for RectFilledSolid lol
-  /*RenderD7::Draw2::RFS(R7Vec2(0, 0), R7Vec2(400, 20),
-                       RenderD7::StyleColor(RD7Color_Header));
+  /*DV2::RFS(R7Vec2(0, 0), R7Vec2(400, 20),
+                       RD7::StyleColor(RD7Color_Header));
   // As the Top bar is Dark you need TextColor2
-  RenderD7::RedirectColor(RD7Color_Text, RD7Color_Text2);
-  RenderD7::Draw2::Text(R7Vec2(5, 2), "RenderD7 - Test Framework");
-  RenderD7::Draw2::Text(R7Vec2(395, 2), RENDERD7VSTRING,
+  RD7::RedirectColor(RD7Color_Text, RD7Color_Text2);
+  DV2::Text(R7Vec2(5, 2), "RenderD7 - Test Framework");
+  DV2::Text(R7Vec2(395, 2), RENDERD7VSTRING,
                         RD7TextFlags_AlignRight);
-  RenderD7::UndoColorEdit(RD7Color_Text);*/
+  RD7::UndoColorEdit(RD7Color_Text);*/
   if (UI7::BeginMenu("RenderD7 Test Framework")) {
     UI7::SetCursorPos(R7Vec2(395, 2));
-    UI7::Label(RenderD7::FormatBytes(RenderD7::Memory::GetCurrent()),
+    UI7::Label(RD7::FormatBytes(RD7::Memory::GetCurrent()),
                RD7TextFlags_AlignRight);
     UI7::RestoreCursor();
     if (state == State_Menu) {
       UI7::Label("Test App");
+      UI7::BrowserList(names, sel);
     }
     UI7::EndMenu();
   }
-  RenderD7::OnScreen(Bottom);
+  RD7::OnScreen(Bottom);
   if (UI7::BeginMenu("Control Center")) {
     if (state == State_Menu) {
       if (UI7::Button("RenderD7 Settings"))
@@ -116,14 +114,14 @@ void Sample::Draw() const {
 }
 
 void Sample::Logic() {
-  RenderD7::CustomTextSize(txt_size);
+  RD7::CustomTextSize(txt_size);
   for (const auto& it : shared_requests) {
     if (it.first == 1U) {
-      if (it.second) RenderD7::LoadSettings();
+      if (it.second) RD7::LoadSettings();
     } else if (it.first == 2U) {
       if (it.second)
-        RenderD7::PushMessage(RenderD7::Message(
-            "Test Message", "Button Bressed\nBest Msg Handler..."));
+        RD7::PushMessage(RD7::Message("Test Message",
+                                      "Button Bressed\nBest Msg Handler..."));
     } else if (it.first == 3U) {
       state = (State)it.second;
     }

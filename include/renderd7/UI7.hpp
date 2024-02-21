@@ -26,6 +26,9 @@ void Deinit();
 void Update();
 float GetTime();
 float GetDeltaTime();
+// Internal Function
+// Should not be used
+void Debug();
 
 bool Button(const std::string &label, R7Vec2 size = R7Vec2(0, 0));
 void Checkbox(const std::string &label, bool &c);

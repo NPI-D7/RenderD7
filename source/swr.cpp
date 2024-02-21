@@ -1,17 +1,17 @@
 #include <renderd7/external/stb_image.h>
 
 #include <renderd7/Color.hpp>
-#include <renderd7/nimg_engine.hpp>
+#include <renderd7/swr.hpp>
 
 namespace RenderD7 {
-NIMG_Engine::NIMG_Engine(int w, int h) { image = RenderD7::nimg(w, h); }
-NIMG_Engine::NIMG_Engine() { image = RenderD7::nimg(1, 1); }
+swr::swr(int w, int h) { image = RenderD7::nimg(w, h); }
+swr::swr() { image = RenderD7::nimg(1, 1); }
 
-NIMG_Engine::~NIMG_Engine() {
+swr::~swr() {
   // Do nothing
 }
 
-void NIMG_Engine::load_file(const std::string& path) {
+void swr::load_file(const std::string& path) {
   int w, h, c;
   uint8_t* dat = stbi_load(path.c_str(), &w, &h, &c, 4);
   image = nimg(w, h);
@@ -27,11 +27,11 @@ void NIMG_Engine::load_file(const std::string& path) {
   stbi_image_free(dat);
 }
 
-void NIMG_Engine::load_nimg(const std::string& path) {
+void swr::load_nimg(const std::string& path) {
   image = RenderD7::NIMG_Load(path);
 }
 
-void NIMG_Engine::draw_pixel(int x, int y, unsigned int color) {
+void swr::draw_pixel(int x, int y, unsigned int color) {
   if (x > image.width || x < 0 || y > image.height || y < 0) return;
   RenderD7::Color::RGBA splitter(color);
   image.pixel_buffer[((y * image.width + x) * 4) + 0] = splitter.m_r;
@@ -40,11 +40,14 @@ void NIMG_Engine::draw_pixel(int x, int y, unsigned int color) {
   image.pixel_buffer[((y * image.width + x) * 4) + 3] = splitter.m_a;
 }
 
-void NIMG_Engine::draw_rect(int x, int y, int w, int h, unsigned int color,
-                            int t) {}
+void swr::draw_rect(int x, int y, int w, int h, unsigned int color, int t) {
+  draw_line(x, y, x + w, y, color, t);
+  draw_line(x, y, x, y + h, color, t);
+  draw_line(x, y + h, x + w, y + h, color, t);
+  draw_line(x + w, y + h, x + w, y + h, color, t);
+}
 
-void NIMG_Engine::draw_rect_solid(int x, int y, int w, int h,
-                                  unsigned int color) {
+void swr::draw_rect_solid(int x, int y, int w, int h, unsigned int color) {
   for (int ix = x; ix < x + w; ix++) {
     for (int iy = y; iy < y + h; iy++) {
       draw_pixel(ix, iy, color);
@@ -52,7 +55,15 @@ void NIMG_Engine::draw_rect_solid(int x, int y, int w, int h,
   }
 }
 
-void NIMG_Engine::flip(bool h, bool v) {
+void swr::draw_line(int x1, int y1, int x2, int y2, unsigned int color, int t) {
+  for (int ix = x1; ix < x2 * t; ix++) {
+    for (int iy = y1; iy < y2 * t; iy++) {
+      draw_pixel(ix, iy, color);
+    }
+  }
+}
+
+void swr::flip(bool h, bool v) {
   const nimg _bak = image;
   if (h) {
     for (int x = 0; x < image.width; x++) {

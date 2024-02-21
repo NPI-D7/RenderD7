@@ -7,9 +7,9 @@
 // Use an Npi simplifier cause I am lazy
 #define reca_cc(x) reinterpret_cast<const char*>(x)
 #define reca_c(x) reinterpret_cast<char*>(x)
-#define pak32(q, w, e, r)                                       \
-  ((((q)&0xff) << 0) | (((w)&0xff) << 8) | (((e)&0xff) << 16) | \
-   (((r)&0xff) << 24))
+#define pak32(q, w, e, r)                                             \
+  ((((q) & 0xff) << 0) | (((w) & 0xff) << 8) | (((e) & 0xff) << 16) | \
+   (((r) & 0xff) << 24))
 
 // Stupid RLE Algorithm
 void npi_compress(std::vector<unsigned char>& ret,

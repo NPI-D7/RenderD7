@@ -5,10 +5,8 @@
 #include <renderd7/external/json.hpp>
 #include <renderd7/internal_db.hpp>
 
-// This is btw the default theme setup
-// RenderD7 StyleColor Api
-// not const cause const = error lol
-std::map<RD7Color, unsigned int> rd7i_color_map = {
+// Default Theme
+const std::map<RD7Color, unsigned int> rd7i_default_theme = {
     {RD7Color_Text, RGBA8(0, 0, 0, 255)},
     {RD7Color_Text2, RGBA8(255, 255, 255, 255)},  // For Background change or so
     {RD7Color_TextDisabled, RGBA8(170, 170, 170, 255)},
@@ -28,6 +26,10 @@ std::map<RD7Color, unsigned int> rd7i_color_map = {
     {RD7Color_FrameBgHovered, RGBA8(119, 119, 119, 255)},
     {RD7Color_Progressbar, RGBA8(0, 255, 0, 255)},
 };
+
+// RenderD7 StyleColor Api
+// not const cause const = error lol
+std::map<RD7Color, unsigned int> rd7i_color_map = rd7i_default_theme;
 
 std::map<RD7Color, unsigned int> rd7i_color_swap_map;
 
@@ -175,26 +177,7 @@ void RenderD7::ThemeSave(const std::string& path) {
   file.close();
 }
 
-void RenderD7::ThemeDefault() {
-  rd7i_color_map[RD7Color_Text] = RGBA8(0, 0, 0, 255);
-  rd7i_color_map[RD7Color_Text2] = RGBA8(255, 255, 255, 255);
-  rd7i_color_map[RD7Color_TextDisabled] = RGBA8(170, 170, 170, 255);
-  rd7i_color_map[RD7Color_Background] = RGBA8(238, 238, 238, 255);
-  rd7i_color_map[RD7Color_Header] = RGBA8(17, 17, 17, 255);
-  rd7i_color_map[RD7Color_Selector] = RGBA8(34, 34, 34, 255);
-  rd7i_color_map[RD7Color_SelectorFade] = RGBA8(90, 90, 90, 255);
-  rd7i_color_map[RD7Color_List0] = RGBA8(204, 204, 204, 255);
-  rd7i_color_map[RD7Color_List1] = RGBA8(187, 187, 187, 255);
-  rd7i_color_map[RD7Color_MessageBackground] = RGBA8(51, 51, 51, 255);
-  rd7i_color_map[RD7Color_Button] = RGBA8(17, 17, 17, 255);
-  rd7i_color_map[RD7Color_ButtonHovered] = RGBA8(34, 34, 34, 255);
-  rd7i_color_map[RD7Color_ButtonDisabled] = RGBA8(8, 8, 8, 255);
-  rd7i_color_map[RD7Color_ButtonActive] = RGBA8(42, 42, 42, 255);
-  rd7i_color_map[RD7Color_Checkmark] = RGBA8(42, 42, 42, 255);
-  rd7i_color_map[RD7Color_FrameBg] = RGBA8(85, 85, 85, 255);
-  rd7i_color_map[RD7Color_FrameBgHovered] = RGBA8(119, 119, 119, 255);
-  rd7i_color_map[RD7Color_Progressbar] = RGBA8(0, 255, 0, 255);
-}
+void RenderD7::ThemeDefault() { rd7i_color_map = rd7i_default_theme; }
 
 uint32_t RenderD7::Color::Hex(const std::string& color, uint8_t a) {
   if (color.length() < 7 ||

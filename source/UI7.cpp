@@ -65,6 +65,31 @@ struct UI7ID {
   int lt;
 };
 
+struct UI7OBJ {
+  UI7OBJ() {}
+  UI7OBJ(const R7Vec4 &i0, const int &i1) {
+    box = i0;
+    type = i1;
+    s = rd7i_current_screen;
+  }
+  void Debug() {
+    RenderD7::OnScreen(s ? Top : Bottom);
+    RenderD7::Draw2::TriangleLined(R7Vec2(box.x, box.y),
+                                   R7Vec2(box.x + box.z, box.y),
+                                   R7Vec2(box.x, box.y + box.w), 0xff0000ff);
+    RenderD7::Draw2::TriangleLined(
+        R7Vec2(box.x, box.y + box.w), R7Vec2(box.x + box.z, box.y),
+        R7Vec2(box.x + box.z, box.y + box.w), 0xff0000ff);
+  }
+  R7Vec4 box;
+  int type;
+  bool s = false;
+};
+
+std::vector<unsigned int> ui7i_debug_colors{
+    0x00000000,
+};
+
 struct UI7_Ctx {
   UI7_Ctx() {
     delta = 0.0f;
@@ -76,6 +101,7 @@ struct UI7_Ctx {
     cbackup = R7Vec2();
     in_menu = false;
     current_menu = UI7ID("");
+    debugging = true;
   }
   float delta;
   float time;
@@ -85,9 +111,11 @@ struct UI7_Ctx {
   R7Vec2 cbackup;
   R7Vec2 slc;
   bool in_menu;
+  bool debugging;
   UI7ID current_menu;
   std::map<std::string, R7Vec2> grid_mapping;
   std::unordered_map<std::string, UI7ID *> ids;
+  std::vector<UI7OBJ> objects;
 };
 
 UI7_Ctx *ui7_ctx;
@@ -125,6 +153,12 @@ void UI7CtxCursorMove(R7Vec2 size) {
   ui7_ctx->cursor.x = 5;
   ui7_ctx->cursor += R7Vec2(0, size.y + 5);
   ui7_ctx->slc += R7Vec2(size.x, 0);
+}
+
+void UI7CtxRegObj(const UI7OBJ &obj) {
+  if (!UI7CtxValidate()) return;
+  if (!ui7_ctx->debugging) return;
+  ui7_ctx->objects.push_back(obj);
 }
 
 UI7ID *UI7CtxNewID(const std::string &i) {
@@ -195,6 +229,7 @@ void Update() {
   ui7_ctx->time += ui7_ctx->delta;
   ui7_ctx->cursor = R7Vec2();
   UI7CtxClearIDs();
+  if (ui7_ctx->debugging) ui7_ctx->objects.clear();
 }
 
 float GetTime() {
@@ -219,8 +254,7 @@ bool Button(const std::string &label, R7Vec2 size) {
   }
   RD7Color btn = RD7Color_Button;
   R7Vec2 pos = GetCursorPos();
-
-  UI7CtxCursorMove(size);
+  UI7CtxRegObj(UI7OBJ(R7Vec4(pos, size), 0));
 
   if (RenderD7::Hid::IsEvent("touch", RenderD7::Hid::Up) &&
       InBox(RenderD7::Hid::GetLastTouchPosition(), pos, size)) {
@@ -237,6 +271,7 @@ bool Button(const std::string &label, R7Vec2 size) {
   RenderD7::TextColorByBg(btn);
   RenderD7::Draw2::Text(pos, label);
   RenderD7::UndoColorEdit(RD7Color_Text);
+  UI7CtxCursorMove(size);
   return ret;
 }
 
@@ -265,8 +300,11 @@ void Checkbox(const std::string &label, bool &c) {
   if (c == true) {
     RenderD7::Draw2::RFS(pos + R7Vec2(2, 2), cbs - R7Vec2(4, 4),
                          RenderD7::StyleColor(RD7Color_Checkmark));
+    UI7CtxRegObj(UI7OBJ(R7Vec4(pos + R7Vec2(2, 2), cbs - R7Vec2(4, 4)), 2));
   }
   RenderD7::Draw2::Text(pos + R7Vec2(cbs.x + 5, 1), label);
+  UI7CtxRegObj(UI7OBJ(R7Vec4(pos, cbs + R7Vec2(txtdim.x + 5, 0)), 0));
+  UI7CtxRegObj(UI7OBJ(R7Vec4(pos, cbs), 1));
 }
 
 void Label(const std::string &label, RD7TextFlags flags) {
@@ -274,6 +312,11 @@ void Label(const std::string &label, RD7TextFlags flags) {
   R7Vec2 textdim = RenderD7::GetTextDimensions(label);
   R7Vec2 pos = GetCursorPos();
   float tbh = RenderD7::TextGetSize() * 40;
+  if (flags & RD7TextFlags_AlignRight) {
+    UI7CtxRegObj(UI7OBJ(R7Vec4(pos - R7Vec2(textdim.x, 0), textdim), 0));
+  } else {
+    UI7CtxRegObj(UI7OBJ(R7Vec4(pos, textdim), 0));
+  }
   // Remove some y offset cause texts have some offset
   UI7CtxCursorMove(textdim - R7Vec2(0, 4));
   RenderD7::TextColorByBg(
@@ -301,6 +344,7 @@ void Image(RenderD7::Image *img) {
   if (!UI7CtxValidate()) return;
   R7Vec2 pos = GetCursorPos();
   UI7CtxCursorMove(R7Vec2(img->get_size().x, img->get_size().y));
+  UI7CtxRegObj(UI7OBJ(R7Vec4(pos, img->get_size()), 0));
 
   RenderD7::Draw2::Image(img, pos);
 }
@@ -414,6 +458,7 @@ bool BeginMenu(const std::string &title, R7Vec2 size, UI7MenuFlags flags) {
   }
 
   SetCursorPos(R7Vec2(5, tbh + 5));
+
   return UI7CtxBeginMenu(title);
 }
 
@@ -486,6 +531,15 @@ void RestoreCursor() {
 void SameLine() {
   if (!UI7CtxValidate()) return;
   ui7_ctx->cursor = ui7_ctx->slc;
+}
+
+void Debug() {
+  if (!UI7CtxValidate()) return;
+  if (ui7_ctx->debugging) {
+    for (size_t i = 0; i < ui7_ctx->objects.size(); i++) {
+      ui7_ctx->objects[i].Debug();
+    }
+  }
 }
 
 }  // namespace UI7

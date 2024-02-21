@@ -10,6 +10,9 @@
 #include <renderd7/Timer.hpp>
 #include <renderd7/UI7.hpp>
 #include <renderd7/global_db.hpp>
-#include <renderd7/nimg_engine.hpp>
 #include <renderd7/renderd7.hpp>
 #include <renderd7/sound.hpp>
+#include <renderd7/swr.hpp>
+
+namespace RD7 = RenderD7;
+namespace DV2 = RenderD7::Draw2;

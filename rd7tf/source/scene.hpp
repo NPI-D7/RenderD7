@@ -2,7 +2,7 @@
 
 #include <rd7.hpp>
 
-class Sample : public RenderD7::Scene {
+class Sample : public RD7::Scene {
  public:
   enum State {
     State_Menu,
