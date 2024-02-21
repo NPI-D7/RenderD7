@@ -594,10 +594,10 @@ void RenderD7::RSettings::Draw(void) const {
     // List Bg
     for (int i = 0; i < 12; i++) {
       if ((i % 2 == 0))
-        RenderD7::Draw2::RFS(R7Vec2(0, 40 + (i) * 15), R7Vec2(400, 15),
+        RenderD7::Draw2::RFS(R7Vec2(0, 40 + (i)*15), R7Vec2(400, 15),
                              RenderD7::StyleColor(RD7Color_List0));
       else
-        RenderD7::Draw2::RFS(R7Vec2(0, 40 + (i) * 15), R7Vec2(400, 15),
+        RenderD7::Draw2::RFS(R7Vec2(0, 40 + (i)*15), R7Vec2(400, 15),
                              RenderD7::StyleColor(RD7Color_List1));
     }
 

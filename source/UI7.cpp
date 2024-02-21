@@ -65,6 +65,19 @@ struct UI7ID {
   int lt;
 };
 
+std::vector<unsigned int> ui7i_debug_colors{
+    0xff0000ff,  // lvl 0
+    0xff3344ff,  // lvl 1
+    0xffff44ff,  // lvl 2
+    0xffff4422,  // lvl 3
+};
+
+unsigned int UI7CtxDebugCol(int lvl) {
+  if (lvl < 0) return 0;
+  if (lvl >= (int)ui7i_debug_colors.size()) return 0;
+  return ui7i_debug_colors[lvl];
+}
+
 struct UI7OBJ {
   UI7OBJ() {}
   UI7OBJ(const R7Vec4 &i0, const int &i1) {
@@ -74,20 +87,17 @@ struct UI7OBJ {
   }
   void Debug() {
     RenderD7::OnScreen(s ? Top : Bottom);
+    auto clr = UI7CtxDebugCol(type);
     RenderD7::Draw2::TriangleLined(R7Vec2(box.x, box.y),
                                    R7Vec2(box.x + box.z, box.y),
-                                   R7Vec2(box.x, box.y + box.w), 0xff0000ff);
-    RenderD7::Draw2::TriangleLined(
-        R7Vec2(box.x, box.y + box.w), R7Vec2(box.x + box.z, box.y),
-        R7Vec2(box.x + box.z, box.y + box.w), 0xff0000ff);
+                                   R7Vec2(box.x, box.y + box.w), clr);
+    RenderD7::Draw2::TriangleLined(R7Vec2(box.x, box.y + box.w),
+                                   R7Vec2(box.x + box.z, box.y),
+                                   R7Vec2(box.x + box.z, box.y + box.w), clr);
   }
   R7Vec4 box;
   int type;
   bool s = false;
-};
-
-std::vector<unsigned int> ui7i_debug_colors{
-    0x00000000,
 };
 
 struct UI7_Ctx {
@@ -254,7 +264,7 @@ bool Button(const std::string &label, R7Vec2 size) {
   }
   RD7Color btn = RD7Color_Button;
   R7Vec2 pos = GetCursorPos();
-  UI7CtxRegObj(UI7OBJ(R7Vec4(pos, size), 0));
+  UI7CtxRegObj(UI7OBJ(R7Vec4(pos, size), 1));
 
   if (RenderD7::Hid::IsEvent("touch", RenderD7::Hid::Up) &&
       InBox(RenderD7::Hid::GetLastTouchPosition(), pos, size)) {
@@ -300,11 +310,11 @@ void Checkbox(const std::string &label, bool &c) {
   if (c == true) {
     RenderD7::Draw2::RFS(pos + R7Vec2(2, 2), cbs - R7Vec2(4, 4),
                          RenderD7::StyleColor(RD7Color_Checkmark));
-    UI7CtxRegObj(UI7OBJ(R7Vec4(pos + R7Vec2(2, 2), cbs - R7Vec2(4, 4)), 2));
+    UI7CtxRegObj(UI7OBJ(R7Vec4(pos + R7Vec2(2, 2), cbs - R7Vec2(4, 4)), 3));
   }
   RenderD7::Draw2::Text(pos + R7Vec2(cbs.x + 5, 1), label);
-  UI7CtxRegObj(UI7OBJ(R7Vec4(pos, cbs + R7Vec2(txtdim.x + 5, 0)), 0));
-  UI7CtxRegObj(UI7OBJ(R7Vec4(pos, cbs), 1));
+  UI7CtxRegObj(UI7OBJ(R7Vec4(pos, cbs + R7Vec2(txtdim.x + 5, 0)), 1));
+  UI7CtxRegObj(UI7OBJ(R7Vec4(pos, cbs), 2));
 }
 
 void Label(const std::string &label, RD7TextFlags flags) {
@@ -313,9 +323,9 @@ void Label(const std::string &label, RD7TextFlags flags) {
   R7Vec2 pos = GetCursorPos();
   float tbh = RenderD7::TextGetSize() * 40;
   if (flags & RD7TextFlags_AlignRight) {
-    UI7CtxRegObj(UI7OBJ(R7Vec4(pos - R7Vec2(textdim.x, 0), textdim), 0));
+    UI7CtxRegObj(UI7OBJ(R7Vec4(pos - R7Vec2(textdim.x, 0), textdim), 1));
   } else {
-    UI7CtxRegObj(UI7OBJ(R7Vec4(pos, textdim), 0));
+    UI7CtxRegObj(UI7OBJ(R7Vec4(pos, textdim), 1));
   }
   // Remove some y offset cause texts have some offset
   UI7CtxCursorMove(textdim - R7Vec2(0, 4));
@@ -344,7 +354,7 @@ void Image(RenderD7::Image *img) {
   if (!UI7CtxValidate()) return;
   R7Vec2 pos = GetCursorPos();
   UI7CtxCursorMove(R7Vec2(img->get_size().x, img->get_size().y));
-  UI7CtxRegObj(UI7OBJ(R7Vec4(pos, img->get_size()), 0));
+  UI7CtxRegObj(UI7OBJ(R7Vec4(pos, img->get_size()), 1));
 
   RenderD7::Draw2::Image(img, pos);
 }
@@ -458,6 +468,8 @@ bool BeginMenu(const std::string &title, R7Vec2 size, UI7MenuFlags flags) {
   }
 
   SetCursorPos(R7Vec2(5, tbh + 5));
+  UI7CtxRegObj(UI7OBJ(R7Vec4(R7Vec2(), size), 0));
+  if (titlebar) UI7CtxRegObj(UI7OBJ(R7Vec4(R7Vec2(), R7Vec2(size.x, tbh)), 1));
 
   return UI7CtxBeginMenu(title);
 }
