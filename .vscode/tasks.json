@@ -18,6 +18,20 @@
                 "kind": "build",
                 "isDefault": true
             }
+        },
+        {
+            "label": "Format",
+            "command": "python ${workspaceFolder}/clang-format.py",
+            "type": "shell",
+            "options": {
+                "cwd": "${workspaceFolder}/"
+            },
+            "presentation": {
+                "reveal": "always",
+                "panel": "new",
+                "focus": true
+            },
+            "problemMatcher": []
         }
     ]
 }

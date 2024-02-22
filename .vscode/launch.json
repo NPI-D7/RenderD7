@@ -2,13 +2,6 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Format Code",
-            "type": "debugpy",
-            "request": "launch",
-            "program": "${workspaceFolder}/clang-format.py",
-            "cwd": "${workspaceFolder}"
-        },
-        {
             "name": "(gdb) Launch",
             "type": "cppdbg",
             "request": "launch",

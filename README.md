@@ -1,4 +1,4 @@
-# <img alt="LOGO" src="https://github.com/NPI-D7/RenderD7/raw/main/logo.png" height="90">
+# <img alt="LOGO" src="https://dev.npid7.de/tobid7/RenderD7/raw/branch/main/logo.png" height="90">
 # RenderD7 as Submodule (0.9.5+)
 To use RenderD7 just use this command: `git submodule add https://github.com/NPI-D7/RenderD7` and add `-b v0.9.5` for example for a specific version.
 

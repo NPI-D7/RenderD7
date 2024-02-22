@@ -111,7 +111,7 @@ struct UI7_Ctx {
     cbackup = R7Vec2();
     in_menu = false;
     current_menu = UI7ID("");
-    debugging = true;
+    debugging = false;
   }
   float delta;
   float time;
@@ -552,6 +552,15 @@ void Debug() {
       ui7_ctx->objects[i].Debug();
     }
   }
+}
+
+bool &IsDebugging() {
+  if (!UI7CtxValidate()) {
+    // Return a Default Val
+    static bool t = false;
+    return t;
+  }
+  return ui7_ctx->debugging;
 }
 
 }  // namespace UI7

@@ -678,6 +678,7 @@ void RenderD7::RSettings::Draw(void) const {
         /// Request a state switch to state RSETTINGS
         shared_request[0x00000001] = RSETTINGS;
       }
+      UI7::Checkbox("Debug", UI7::IsDebugging());
       UI7::EndMenu();
     }
   } else if (m_state == RMCONFIG) {

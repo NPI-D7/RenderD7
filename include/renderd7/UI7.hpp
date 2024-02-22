@@ -26,6 +26,7 @@ void Deinit();
 void Update();
 float GetTime();
 float GetDeltaTime();
+bool &IsDebugging();
 // Internal Function
 // Should not be used
 void Debug();
