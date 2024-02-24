@@ -489,8 +489,7 @@ void Grid(const std::string &name, const R7Vec2 &size,
   R7Vec2 pos = GetCursorPos();
   R7Vec2 cpos(pos);
 
-  // Debug Grid
-  RenderD7::Draw2::Rect(pos, size, RenderD7::Color::Hex("#ff0000"), 1);
+  UI7CtxRegObj(UI7OBJ(R7Vec4(pos, size), 1));
 
   // Y-Offset
   int yoff = 0;
@@ -498,12 +497,13 @@ void Grid(const std::string &name, const R7Vec2 &size,
   pos += ui7_ctx->grid_mapping[UI7ID(name).real_id];
   for (size_t i = 0; i < num_entrys; i++) {
     R7Vec2 szs = display_func(data_array[i], pos);
-    RenderD7::Draw2::Text(pos + R7Vec2(4, 4), std::to_string(i));
+    UI7CtxRegObj(UI7OBJ(R7Vec4(pos, szs), 2));
+    if(ui7_ctx->debugging) RenderD7::Draw2::Text(pos + R7Vec2(4, 4), std::to_string(i));
     if (pos.x + (szs.x * 2) > (cpos.x + size.x) &&
-        pos.y + szs.y > cpos.y + size.y) {
-      if (ui7_ctx->grid_mapping[UI7ID(name).real_id].y == 0)
-        ui7_ctx->grid_mapping[UI7ID(name).real_id].y =
-            (cpos.y + size.y) / 2 - ((yoff + 1) * (szs.y + 4)) / 2;
+        pos.y + (szs.y*2) > cpos.y + size.y) {
+        if (ui7_ctx->grid_mapping[UI7ID(name).real_id].y == 0)
+          ui7_ctx->grid_mapping[UI7ID(name).real_id].y =
+            (cpos.y + size.y) / 2 - ((yoff+2) * (szs.y + 4)) / 2;
       break;
     } else if (pos.x + (szs.x * 2) > (cpos.x + size.x)) {
       if (ui7_ctx->grid_mapping[UI7ID(name).real_id].x == 0)

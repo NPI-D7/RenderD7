@@ -49,6 +49,12 @@ void DrawWave(R7Vec2 position, R7Vec2 size, float time, bool dbg) {
 }
 
 R7Vec2 testv2 = R7Vec2(48, 48);
+std::vector<int*> img;
+
+R7Vec2 display_icon(void* v, R7Vec2 p) {
+  DV2::RFS(p, testv2, 0xff00ffff);
+  return testv2;
+}
 
 Sample::Sample() {
   auto t = RD7::FileSystem::GetDirContent("sdmc:/music/");
@@ -56,9 +62,15 @@ Sample::Sample() {
     names.push_back(it.name);
     files.push_back(it.path);
   }
+  auto ti = new int;
+  ti[0] = 0;
+  for (int i = 0; i < 256; i++) {
+    img.push_back(ti);
+  }
 }
 
 Sample::~Sample() {
+  delete img[0];
   // Here you can clear your data
 }
 
@@ -85,8 +97,9 @@ void Sample::Draw() const {
                RD7TextFlags_AlignRight);
     UI7::RestoreCursor();
     if (state == State_Menu) {
-      UI7::Label("Test App");
-      UI7::BrowserList(names, sel);
+      UI7::Label("SZS: " + std::to_string(img.size()));
+      UI7::Grid("Images", R7Vec2(390, 180), display_icon, (void**)&img[0],
+                img.size());
     }
     UI7::EndMenu();
   }
@@ -101,6 +114,8 @@ void Sample::Draw() const {
       UI7::Checkbox("Debug BG", debug_background);
       UI7::SameLine();
       UI7::Checkbox("RD7-Debug", rd7_debugging);
+      UI7::SameLine();
+      UI7::Checkbox("UI7-Debug", UI7::IsDebugging());
       UI7::InputText("Search", search__, "Tap Here");
       UI7::Label("Text Control:");
       if (UI7::Button("text++")) txt_size += 0.01;
@@ -108,6 +123,10 @@ void Sample::Draw() const {
       if (UI7::Button("text--")) txt_size -= 0.01;
       UI7::SameLine();
       if (UI7::Button("def")) txt_size = 0.5;
+      UI7::Label("GridControl: ");
+      if(UI7::Button("icn++")) testv2 += R7Vec2(1, 1);
+      UI7::SameLine();
+      if(UI7::Button("icn--")) testv2 -= R7Vec2(1, 1);
     }
     UI7::EndMenu();
   }
