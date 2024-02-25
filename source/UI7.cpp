@@ -123,7 +123,6 @@ struct UI7_Ctx {
   bool in_menu;
   bool debugging;
   UI7ID current_menu;
-  std::map<std::string, R7Vec2> grid_mapping;
   std::unordered_map<std::string, UI7ID *> ids;
   std::vector<UI7OBJ> objects;
 };
@@ -476,44 +475,43 @@ bool BeginMenu(const std::string &title, R7Vec2 size, UI7MenuFlags flags) {
 
 void EndMenu() { UI7CtxEndMenu(); }
 
-void Grid(const std::string &name, const R7Vec2 &size,
-          R7Vec2 (*display_func)(void *, R7Vec2), void **data_array,
+void Grid(const std::string &name, const R7Vec2 &size, const R7Vec2 &entry_size,
+          void (*display_func)(void *, R7Vec2), void **data_array,
           size_t num_entrys) {
   if (!UI7CtxValidate()) return;
   if (num_entrys <= 0) return;
   if (data_array == nullptr) return;
-  if (ui7_ctx->grid_mapping.find(UI7ID(name).real_id) ==
-      ui7_ctx->grid_mapping.end())
-    ui7_ctx->grid_mapping[UI7ID(name).real_id] =
-        R7Vec2();  // Register id not exist
   R7Vec2 pos = GetCursorPos();
   R7Vec2 cpos(pos);
 
   UI7CtxRegObj(UI7OBJ(R7Vec4(pos, size), 1));
+  int neh = std::floor(size.x / (entry_size.x + 4));
+  int nev = std::floor(size.y / (entry_size.y + 4));
 
+  // Inside Grid Offset
+  R7Vec2 igoff = R7Vec2();
+  if (neh >= 2 && nev >= 2) {
+    igoff = R7Vec2(
+        ((size.x) / 2 - (((neh - 1) * (entry_size.x + 4)) + entry_size.x) / 2),
+        ((size.y) / 2 - ((nev - 1) * ((entry_size.y + 4)) + entry_size.y) / 2));
+  }
   // Y-Offset
   int yoff = 0;
 
-  pos += ui7_ctx->grid_mapping[UI7ID(name).real_id];
+  pos += igoff;
   for (size_t i = 0; i < num_entrys; i++) {
-    R7Vec2 szs = display_func(data_array[i], pos);
-    UI7CtxRegObj(UI7OBJ(R7Vec4(pos, szs), 2));
-    if(ui7_ctx->debugging) RenderD7::Draw2::Text(pos + R7Vec2(4, 4), std::to_string(i));
-    if (pos.x + (szs.x * 2) > (cpos.x + size.x) &&
-        pos.y + (szs.y*2) > cpos.y + size.y) {
-        if (ui7_ctx->grid_mapping[UI7ID(name).real_id].y == 0)
-          ui7_ctx->grid_mapping[UI7ID(name).real_id].y =
-            (cpos.y + size.y) / 2 - ((yoff+2) * (szs.y + 4)) / 2;
+    display_func(data_array[i], pos);
+    UI7CtxRegObj(UI7OBJ(R7Vec4(pos, entry_size), 2));
+    if (ui7_ctx->debugging)
+      RenderD7::Draw2::Text(pos + R7Vec2(4, 4), std::to_string(i));
+    if (pos.x + (entry_size.x * 2) > (cpos.x + size.x) &&
+        pos.y + (entry_size.y * 2) > cpos.y + size.y) {
       break;
-    } else if (pos.x + (szs.x * 2) > (cpos.x + size.x)) {
-      if (ui7_ctx->grid_mapping[UI7ID(name).real_id].x == 0)
-        ui7_ctx->grid_mapping[UI7ID(name).real_id].x =
-            (cpos.x + size.x) / 2 - ((i + 1) * (szs.x + 4)) / 2;
-      pos = R7Vec2(5 + ui7_ctx->grid_mapping[UI7ID(name).real_id].x,
-                   pos.y + szs.y + 4);
+    } else if (pos.x + (entry_size.x * 2) > (cpos.x + size.x)) {
+      pos = R7Vec2(5 + igoff.x, pos.y + entry_size.y + 4);
       yoff++;
     } else {
-      pos += R7Vec2(szs.x + 4, 0);
+      pos += R7Vec2(entry_size.x + 4, 0);
     }
   }
 

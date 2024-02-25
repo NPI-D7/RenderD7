@@ -51,10 +51,7 @@ void DrawWave(R7Vec2 position, R7Vec2 size, float time, bool dbg) {
 R7Vec2 testv2 = R7Vec2(48, 48);
 std::vector<int*> img;
 
-R7Vec2 display_icon(void* v, R7Vec2 p) {
-  DV2::RFS(p, testv2, 0xff00ffff);
-  return testv2;
-}
+void display_icon(void* v, R7Vec2 p) { DV2::RFS(p, testv2, 0xff00ffff); }
 
 Sample::Sample() {
   auto t = RD7::FileSystem::GetDirContent("sdmc:/music/");
@@ -98,8 +95,8 @@ void Sample::Draw() const {
     UI7::RestoreCursor();
     if (state == State_Menu) {
       UI7::Label("SZS: " + std::to_string(img.size()));
-      UI7::Grid("Images", R7Vec2(390, 180), display_icon, (void**)&img[0],
-                img.size());
+      UI7::Grid("Images", R7Vec2(390, 180), testv2, display_icon,
+                (void**)&img[0], img.size());
     }
     UI7::EndMenu();
   }
@@ -124,9 +121,9 @@ void Sample::Draw() const {
       UI7::SameLine();
       if (UI7::Button("def")) txt_size = 0.5;
       UI7::Label("GridControl: ");
-      if(UI7::Button("icn++")) testv2 += R7Vec2(1, 1);
+      if (UI7::Button("icn++")) testv2 += R7Vec2(1, 1);
       UI7::SameLine();
-      if(UI7::Button("icn--")) testv2 -= R7Vec2(1, 1);
+      if (UI7::Button("icn--")) testv2 -= R7Vec2(1, 1);
     }
     UI7::EndMenu();
   }

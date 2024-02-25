@@ -14,11 +14,10 @@
 - Removed Old Font/Text Handlers
 - Added UI7 (New UI Api)
 - Remove Old UI Api
-- Added Music Player (MP3, Vorbis)
 - Rewrite of RenderD7::Image
 - Internal Debugger/Database (IDB)
 - Removed BitmapPrinter
-- Added nimg and nimg_engine
+- Added nimg and swr(render2nimg | SoftwareRender)
 - Removed Old Error/Message Handler
 - GetTextSize (extra buffer) + New TextShorter
 - Require specific FLAG for Music/MemTrack
@@ -27,6 +26,7 @@
 - Remove INI reader
 - Python based clangformat script
 - Move some Init code into functions to not use twice
+- Added Font class
 ## 0.9.4
 - Implement new Security System To prevent from crashes
 - Implement Functiontrace for better Timing Tests

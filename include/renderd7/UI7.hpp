@@ -46,8 +46,8 @@ void InputText(const std::string &label, std::string &text,
 bool BeginMenu(const std::string &title, R7Vec2 size = R7Vec2(0, 0),
                UI7MenuFlags flags = 0);
 void EndMenu();
-void Grid(const std::string &name, const R7Vec2 &size,
-          R7Vec2 (*display_func)(void *, R7Vec2), void **data_array,
+void Grid(const std::string &name, const R7Vec2 &size, const R7Vec2 &entry_size,
+          void (*display_func)(void *, R7Vec2), void **data_array,
           size_t num_entrys);
 bool BeginTree(const std::string &text);
 void EndTree();
