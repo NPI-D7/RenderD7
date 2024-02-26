@@ -184,10 +184,6 @@ UI7ID *UI7CtxNewID(const std::string &i) {
 
 void UI7CtxClearIDs() {
   for (auto it = ui7_ctx->ids.begin(); it != ui7_ctx->ids.end();) {
-    if (it->second == nullptr) {
-      ++it;
-      continue;
-    }
     if (time(0) - it->second->lt > 5) {
       delete it->second;
       it = ui7_ctx->ids.erase(it);
@@ -223,9 +219,12 @@ void Init() {
 void Deinit() {
   // Dont deinit something not initialized
   // Please dont count how often init... was
-  // written wront by me :(
+  // written wrong by me :(
   if (!UI7CtxValidate()) return;
   ui7_ctx->is_activated = false;
+  for (auto &it : ui7_ctx->ids) {
+    delete it.second;
+  }
   delete ui7_ctx;
 }
 
@@ -518,9 +517,14 @@ void Grid(const std::string &name, const R7Vec2 &size, const R7Vec2 &entry_size,
   UI7CtxCursorMove(size);
 }
 
-bool BeginTree(const std::string &text) { return false; }
+bool BeginTree(const std::string &text) {
+  // TODO
+  return false;
+}
 
-void EndTree() {}
+void EndTree() {
+  // TODO
+}
 
 R7Vec2 GetCursorPos() {
   if (!UI7CtxValidate()) return R7Vec2();
