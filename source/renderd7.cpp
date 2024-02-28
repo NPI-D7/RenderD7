@@ -124,6 +124,7 @@ void rd7i_init_config() {
   rd7i_config_path = "sdmc:/RenderD7/Apps/";
   rd7i_config_path += rd7i_app_name;
   std::filesystem::create_directories(rd7i_config_path.c_str());
+  std::filesystem::create_directories("sdmc:/RenderD7/Reports");
   bool renew = false;
 
   if (RenderD7::FS::FileExist(rd7i_config_path + "/config.rc7")) {

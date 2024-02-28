@@ -85,6 +85,7 @@ struct UI7OBJ {
     type = i1;
     s = rd7i_current_screen;
   }
+  // Killer Function
   void Debug() {
     RenderD7::OnScreen(s ? Top : Bottom);
     auto clr = UI7CtxDebugCol(type);
