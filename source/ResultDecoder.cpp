@@ -2,9 +2,8 @@
 #include <fstream>
 #include <map>
 #include <renderd7/ResultDecoder.hpp>
+#include <renderd7/internal_db.hpp>
 #include <sstream>
-
-extern std::string D_app_name;
 
 static std::map<int, std::string> modules = {
     {0, "common"},
@@ -439,7 +438,7 @@ std::string ResultDecoder::GetSummary() {
 }
 
 void RenderD7::ResultDecoder::WriteLog() {
-  std::string out_path = "sdmc:/RenderD7/Apps/" + D_app_name + "/resdec/";
+  std::string out_path = "sdmc:/RenderD7/Apps/" + rd7i_app_name + "/resdec/";
   std::filesystem::create_directories(out_path);
   out_path += "/err_result_" + std::to_string(time(0)) + ".log";
   std::ofstream out(out_path, std::ios::app);
