@@ -1,5 +1,6 @@
 #pragma once
 
+#include <renderd7/Allocator.hpp>
 #include <renderd7/DrawV2.hpp>
 #include <renderd7/Error.hpp>
 #include <renderd7/FileSystem.hpp>
