@@ -136,9 +136,11 @@ void rd7i_init_config() {
   }
 
   if (!RenderD7::FS::FileExist(rd7i_config_path + "/config.rc7") || renew) {
-    std::fstream cfg_ldr(rd7i_config_path + "/config.rc7", std::ios::in);
-    cfg_ldr >> rd7i_config;
-    cfg_ldr.close();
+    if(renew) {
+      std::fstream cfg_ldr(rd7i_config_path + "/config.rc7", std::ios::in);
+      cfg_ldr >> rd7i_config;
+      cfg_ldr.close();
+    }
     rd7i_config.clear();
     rd7i_config["info"]["version"] = CFGVER;
     rd7i_config["info"]["renderd7ver"] = RENDERD7VSTRING;
