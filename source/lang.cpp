@@ -6,7 +6,7 @@
 
 static nlohmann::json appJson;
 
-std::string RenderD7::Lang::getSys() {
+std::string RenderD7::Lang::GetSys() {
   u8 language = 1;
   CFGU_GetSystemLanguage(&language);
 
@@ -39,13 +39,13 @@ std::string RenderD7::Lang::getSys() {
       return "zh-CN";  // Chinese (Simplified)
       break;
 
-      // case 7:
-      // 	return "ko"; // Korean
-      // 	break;
+    case 7:
+      return "ko";  // Korean
+      break;
 
-      // case 8:
-      // 	return "nl"; // Dutch
-      // 	break;
+    case 8:
+      return "nl";  // Dutch
+      break;
 
     case 9:
       return "pt";  // Portuguese
@@ -64,14 +64,16 @@ std::string RenderD7::Lang::getSys() {
       break;
   }
 }
-std::string RenderD7::Lang::get(const std::string &key) {
-  if (!appJson.contains(key)) return key;
-  return appJson.at(key).get<std::string>();
+std::string RenderD7::Lang::Get(const std::string &key) {
+  if(!appJson.contains("keys")) return "ERR-01";
+  nlohmann::json js = appJson["keys"];
+  if (!js.contains(key)) return key;
+  return js.at(key).get<std::string>();
 }
 
-void RenderD7::Lang::load(const std::string &lang) {
+void RenderD7::Lang::Load(const std::string &lang) {
   std::fstream values;
-  if (std::filesystem::is_character_file("romfs:/lang/" + lang + "/app.json")) {
+  if (std::filesystem::exists("romfs:/lang/" + lang + "/app.json")) {
     values.open("romfs:/lang/" + lang + "/app.json", std::ios::in);
     if (values.is_open()) {
       appJson = nlohmann::json::parse(values);
@@ -92,4 +94,25 @@ void RenderD7::Lang::load(const std::string &lang) {
     }
     return;
   }
+}
+
+std::string RenderD7::Lang::GetName() {
+  if (!appJson.contains("info")) return "";
+  nlohmann::json js = appJson["info"];
+  if (!js.contains("name")) return "Unknown";
+  return js.at("name").get<std::string>();
+}
+
+std::string RenderD7::Lang::GetAuthor() {
+  if (!appJson.contains("info")) return "";
+  nlohmann::json js = appJson["info"];
+  if (!js.contains("author")) return "Unknown";
+  return js.at("author").get<std::string>();
+}
+
+std::string RenderD7::Lang::GetShortcut() {
+  if (!appJson.contains("info")) return "";
+  nlohmann::json js = appJson["info"];
+  if (!js.contains("shortcut")) return "Unknown";
+  return js.at("shortcut").get<std::string>();
 }
