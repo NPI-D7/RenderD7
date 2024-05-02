@@ -46,6 +46,7 @@ void Npifade() {
     if (rd7i_fade_scene_wait) {
       RenderD7::Scene::scenes.push(std::move(rd7i_fade_scene));
       rd7i_fade_scene_wait = false;
+      RenderD7::FadeIn();
     }
     // No fade
   }
@@ -136,7 +137,7 @@ void rd7i_init_config() {
   }
 
   if (!RenderD7::FS::FileExist(rd7i_config_path + "/config.rc7") || renew) {
-    if(renew) {
+    if (renew) {
       std::fstream cfg_ldr(rd7i_config_path + "/config.rc7", std::ios::in);
       cfg_ldr >> rd7i_config;
       cfg_ldr.close();
@@ -227,6 +228,7 @@ void RenderD7::Scene::doLogic() {
 
 void RenderD7::Scene::Load(std::unique_ptr<Scene> scene, bool fade) {
   if (fade) {
+    RenderD7::FadeOut();
     rd7i_fade_scene = std::move(scene);
     rd7i_fade_scene_wait = true;
   } else
@@ -597,10 +599,10 @@ void RenderD7::RSettings::Draw(void) const {
     // List Bg
     for (int i = 0; i < 12; i++) {
       if ((i % 2 == 0))
-        RenderD7::Draw2::RFS(R7Vec2(0, 40 + (i)*15), R7Vec2(400, 15),
+        RenderD7::Draw2::RFS(R7Vec2(0, 40 + (i) * 15), R7Vec2(400, 15),
                              RenderD7::StyleColor(RD7Color_List0));
       else
-        RenderD7::Draw2::RFS(R7Vec2(0, 40 + (i)*15), R7Vec2(400, 15),
+        RenderD7::Draw2::RFS(R7Vec2(0, 40 + (i) * 15), R7Vec2(400, 15),
                              RenderD7::StyleColor(RD7Color_List1));
     }
 
