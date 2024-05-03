@@ -247,8 +247,9 @@ void Ovl_Ftrace::Draw(void) const {
   float tmp_txt = RenderD7::TextGetSize();
   RenderD7::TextDefaultSize();
   RenderD7::OnScreen(Top);
-  RenderD7::Draw2::RFS(R7Vec2(0, 0), R7Vec2(400, 20),
-                       RenderD7::StyleColor(RD7Color_Background));
+  RenderD7::Color::RGBA bg(RD7Color_Background);
+  bg.changeA(150);
+  RenderD7::Draw2::RFS(R7Vec2(0, 0), R7Vec2(400, 20), bg.toRGBA());
 
   std::vector<RenderD7::Ftrace::FTRes> dt;
   for (auto const& it : RenderD7::Ftrace::rd7_traces)
@@ -344,12 +345,14 @@ void Ovl_Metrik::Logic() {
   if (!i_is_enabled[0]) this->Kill();
 }
 
-Ovl_Keyboard::Ovl_Keyboard(std::string& ref, const std::string& hint,
-                           RD7Keyboard type) {
+Ovl_Keyboard::Ovl_Keyboard(std::string& ref, RD7KeyboardState& state,
+                           const std::string& hint, RD7Keyboard type) {
   // Blocks All Input outside of Keyboard
   // Doesnt work for Hidkeys down etc
   RenderD7::Hid::Lock();
   typed_text = &ref;
+  this->state = &state;
+  *this->state = RD7KeyboardState_None;
   str_bak = ref;
   ft3 = 0;
 }
@@ -439,8 +442,10 @@ void Ovl_Keyboard::Logic() {
       // Enter
     } else if (it.first == 0x05) {
       *typed_text = str_bak;
+      *state = RD7KeyboardState_Cancel;
       this->Kill();
     } else if (it.first == 0x06) {
+      *state = RD7KeyboardState_Confirm;
       this->Kill();
     } else if (it.first == 0x07) {
       // this->typed_text += '\t';  // Tab

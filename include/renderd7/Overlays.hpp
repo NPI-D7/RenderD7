@@ -3,6 +3,20 @@
 #include <renderd7/Ovl.hpp>
 #include <string>
 
+typedef int RD7Keyboard;
+
+enum RD7Keyboard_ {
+  RD7Keyboard_Default,
+  RD7Keyboard_Numpad,
+  RD7Keyboard_Password,
+};
+
+enum RD7KeyboardState {
+  RD7KeyboardState_None = 0,
+  RD7KeyboardState_Cancel = 1,
+  RD7KeyboardState_Confirm = 2,
+};
+
 namespace RenderD7 {
 class Ovl_Ftrace : public RenderD7::Ovl {
  public:
@@ -44,20 +58,12 @@ class Ovl_Metrik : public RenderD7::Ovl {
   float* i_txt_size;
 };
 
-typedef int RD7Keyboard;
-
-enum RD7Keyboard_ {
-  RD7Keyboard_Default,
-  RD7Keyboard_Numpad,
-  RD7Keyboard_Password,
-};
-
 class Ovl_Keyboard : public RenderD7::Ovl {
  public:
   /// @brief Constructor
   /// Keyboard Type not Supported for now
-  Ovl_Keyboard(std::string& ref, const std::string& hint = "",
-               RD7Keyboard type = 0);
+  Ovl_Keyboard(std::string& ref, RD7KeyboardState& state,
+               const std::string& hint = "", RD7Keyboard type = 0);
   /// @brief Deconstructor
   ~Ovl_Keyboard();
   /// @brief Override for Draw
@@ -70,6 +76,7 @@ class Ovl_Keyboard : public RenderD7::Ovl {
   // Pointer to useres String
   std::string* typed_text = nullptr;
   std::string str_bak;
+  RD7KeyboardState* state;
   int mode = 0;
   int ft3 = 0;
 };

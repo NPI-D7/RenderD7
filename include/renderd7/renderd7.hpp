@@ -28,6 +28,7 @@
 #include <renderd7/FunctionTrace.hpp>
 #include <renderd7/Hardware.hpp>
 #include <renderd7/Memory.hpp>
+#include <renderd7/Overlays.hpp>
 #include <renderd7/Ovl.hpp>
 #include <renderd7/ResultDecoder.hpp>
 #include <renderd7/Screen.hpp>
@@ -112,6 +113,7 @@ class RSettings : public RenderD7::Scene {
   /// @param mtscreenstate Screen the Overlay is Set to
   std::string mtscreenstate = "Top";
   std::string kbd_test;
+  RD7KeyboardState kbd_state;
   bool statemtold = false;
   bool stateftold = false;
   float tmp_txt;

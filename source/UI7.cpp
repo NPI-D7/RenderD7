@@ -421,6 +421,7 @@ void InputText(const std::string &label, std::string &text,
   R7Vec2 inp = cbs + R7Vec2(txtdim.x + 5, 0);
   RD7Color bg = RD7Color_FrameBg;
   auto id = UI7CtxNewID(label);
+  RD7KeyboardState kbd_state;  // tmp (goes out of scope)
 
   R7Vec2 pos = GetCursorPos();
 
@@ -429,7 +430,8 @@ void InputText(const std::string &label, std::string &text,
   if (RenderD7::Hid::IsEvent("touch", RenderD7::Hid::Up) &&
       InBox(RenderD7::Hid::GetLastTouchPosition(), pos, inp)) {
     bg = RD7Color_FrameBgHovered;
-    RenderD7::AddOvl(std::make_unique<RenderD7::Ovl_Keyboard>(text, hint));
+    RenderD7::AddOvl(
+        std::make_unique<RenderD7::Ovl_Keyboard>(text, kbd_state, hint));
   } else if (RenderD7::Hid::IsEvent("touch", RenderD7::Hid::Held) &&
              InBox(RenderD7::Hid::GetTouchPosition(), pos, inp)) {
     bg = RD7Color_FrameBgHovered;

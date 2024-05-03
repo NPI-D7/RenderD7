@@ -65,7 +65,7 @@ std::string RenderD7::Lang::GetSys() {
   }
 }
 std::string RenderD7::Lang::Get(const std::string &key) {
-  if(!appJson.contains("keys")) return "ERR-01";
+  if (!appJson.contains("keys")) return "ERR-01";
   nlohmann::json js = appJson["keys"];
   if (!js.contains(key)) return key;
   return js.at(key).get<std::string>();

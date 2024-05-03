@@ -1,6 +1,7 @@
 #pragma once
 
 #include <algorithm>
+#include <functional>
 #include <renderd7/DrawV2.hpp>
 #include <renderd7/R7Vec.hpp>
 #include <string>
