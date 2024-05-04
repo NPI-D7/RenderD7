@@ -30,10 +30,8 @@ std::string RenderD7::FileSystem::GetParentPath(std::string path,
   if (path.substr(path.length() - 1, 1) != "/") {
     tcl += "/";
   }
-  std::string res;
-  if (std::filesystem::exists(
-          std::filesystem::path(tcl).parent_path().parent_path()))
-    res = std::filesystem::path(tcl).parent_path().parent_path().string();
+  std::string res =
+      std::filesystem::path(tcl).parent_path().parent_path().string();
   if (res.length() > mount_point.length()) {
     return res;
   }
