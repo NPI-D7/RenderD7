@@ -2,7 +2,6 @@
 ## 0.9.5
 - Remove Npi Intro and NVID Api
 - Replace Toasts System with Message 
-- Lots of Optimisations
 - Added GetTime
 - Implement Draw2 Api
 - Implement RD7Color and R7Vec2
@@ -20,13 +19,16 @@
 - Added nimg and swr(render2nimg | SoftwareRender)
 - Removed Old Error/Message Handler
 - GetTextSize (extra buffer) + New TextShorter
-- Require specific FLAG for Music/MemTrack
+- Require specific FLAG for MemTrack
 - Replace all lodepng usage by stb_image
 - Move Asset Generator into single python script
 - Remove INI reader
 - Python based clangformat script
 - Move some Init code into functions to not use twice
 - Added Font class
+- Add LinearAllocator (for std)
+- Fix Crash in FilsSystem
+- Implement basic Theme System
 ## 0.9.4
 - Implement new Security System To prevent from crashes
 - Implement Functiontrace for better Timing Tests
