@@ -1,11 +1,6 @@
 #pragma once
 #include <3ds.h>
 
-#include <cstdint>
-#include <functional>
-#include <string>
-#include <vector>
-
 namespace RenderD7 {
 namespace Init {
 void Security();

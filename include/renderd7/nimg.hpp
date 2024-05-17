@@ -1,7 +1,7 @@
 #pragma once
 
 #include <cstdint>
-#include <iostream>
+#include <string>
 #include <vector>
 
 #define NPI_NIMG_ (uint32_t)0x4e494d47  // Magic: NIMG

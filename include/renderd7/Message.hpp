@@ -17,6 +17,9 @@ struct Message {
 
 void ProcessMessages();
 void PushMessage(const Message& msg);
+inline void PushMessage(const std::string& head, const std::string& msg) {
+  PushMessage(Message(head, msg));
+}
 // Config
 void SetMessageIdleStartFrame(int frame);
 void SetMessageTotalAnimationFrames(int total_frames);

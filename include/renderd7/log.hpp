@@ -1,9 +1,7 @@
 #pragma once
 #include <stdarg.h>
-#include <time.h>
 #include <unistd.h>
 
-#include <fstream>
 #include <string>
 
 /// @brief Log Class

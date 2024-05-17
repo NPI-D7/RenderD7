@@ -1,5 +1,4 @@
 #include <arpa/inet.h>
-#include <errno.h>
 #include <malloc.h>
 #include <stdarg.h>
 #include <stdio.h>
@@ -7,7 +6,6 @@
 #include <string.h>
 #include <unistd.h>
 
-#include <filesystem>
 #include <renderd7/FileSystem.hpp>
 #include <renderd7/external/json.hpp>
 #include <renderd7/renderd7.hpp>

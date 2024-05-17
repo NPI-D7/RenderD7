@@ -1,11 +1,7 @@
 #pragma once
 
-#include <algorithm>
-#include <functional>
 #include <renderd7/DrawV2.hpp>
 #include <renderd7/R7Vec.hpp>
-#include <string>
-#include <vector>
 
 // UI7: The new RenderD7 UI Standart based on
 // Draw2 (based on Citro2D)

@@ -6,7 +6,6 @@
 #include <renderd7/Image.hpp>
 #include <renderd7/R7Vec.hpp>
 #include <renderd7/font.hpp>
-#include <string>
 
 #define MAKEFLAG(x) (1 << x)
 

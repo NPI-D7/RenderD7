@@ -4,7 +4,6 @@
 #include <atomic>
 #include <functional>
 #include <renderd7/parameter.hpp>
-#include <string>
 
 using CTRU_Thread = Thread;
 

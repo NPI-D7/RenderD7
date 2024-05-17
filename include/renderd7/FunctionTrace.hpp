@@ -1,10 +1,7 @@
 #pragma once
 // Base includes
-#include <functional>
 #include <map>
-#include <memory>
 #include <string>
-#include <vector>
 // 3ds does not support std::chrono
 #include <3ds.h>
 

@@ -3,6 +3,7 @@
 #include <string.h>
 
 #include <renderd7/Tasks.hpp>
+#include <vector>
 
 static std::vector<Thread> threads;
 

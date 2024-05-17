@@ -8,7 +8,6 @@
 // Debugging
 #include <algorithm>
 #include <filesystem>
-#include <memory>
 #include <renderd7/stringtool.hpp>
 
 bool ___dir__predicate__(const RenderD7::FileSystem::Entry &lhs,

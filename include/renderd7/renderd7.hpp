@@ -1,18 +1,10 @@
 #pragma once
 /// c++ Includes
-#include <algorithm>
-#include <codecvt>
 #include <cstring>
-#include <filesystem>
-#include <functional>
-#include <iostream>
-#include <locale>
 #include <map>
 #include <memory>
-#include <random>
 #include <stack>
 #include <string>
-#include <vector>
 /// c includes
 #include <dirent.h>
 #include <stdio.h>

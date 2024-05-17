@@ -4,7 +4,6 @@
 #include <time.h>
 #include <unistd.h>
 
-#include <fstream>
 #include <memory>
 #include <renderd7/Time.hpp>
 #include <string>

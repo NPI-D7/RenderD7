@@ -1,8 +1,6 @@
 #pragma once
 #include <3ds.h>
 
-#include <vector>
-
 namespace RenderD7 {
 namespace Tasks {
 /// @brief Push A Task

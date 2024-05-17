@@ -1,6 +1,5 @@
 #include <citro2d.h>
 
-#include <algorithm>
 #include <renderd7/DrawV2.hpp>
 #include <renderd7/global_db.hpp>
 #include <renderd7/internal_db.hpp>

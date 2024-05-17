@@ -4,7 +4,6 @@
 
 #include <fstream>
 #include <renderd7/Error.hpp>
-#include <string>
 
 namespace RenderD7 {
 class Font {

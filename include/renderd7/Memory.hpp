@@ -1,7 +1,6 @@
 #pragma once
 
-#include <cstdint>
-#include <memory>
+#include <cstddef>
 
 namespace RenderD7 {
 namespace Memory {
