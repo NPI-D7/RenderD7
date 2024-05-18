@@ -3,6 +3,8 @@ rd7le/
 *.DS_Store*
 rd7tf/build
 rd7tf/rd7tf.*
+.cache/
+compile_commands.json
 
 # DOCS
 docs/*
