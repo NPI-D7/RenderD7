@@ -1,3 +1,21 @@
+/**
+ *   This file is part of RenderD7
+ *   Copyright (C) 2021-2024 NPI-D7, tobid7
+ *
+ *   This program is free software: you can redistribute it and/or modify
+ *   it under the terms of the GNU General Public License as published by
+ *   the Free Software Foundation, either version 3 of the License, or
+ *   (at your option) any later version.
+ *
+ *   This program is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *   GNU General Public License for more details.
+ *
+ *   You should have received a copy of the GNU General Public License
+ *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 #include <fstream>
 #include <iostream>
 #include <renderd7/nimg.hpp>
@@ -5,9 +23,9 @@
 // Use an Npi simplifier cause I am lazy
 #define reca_cc(x) reinterpret_cast<const char*>(x)
 #define reca_c(x) reinterpret_cast<char*>(x)
-#define pak32(q, w, e, r)                                             \
-  ((((q) & 0xff) << 0) | (((w) & 0xff) << 8) | (((e) & 0xff) << 16) | \
-   (((r) & 0xff) << 24))
+#define pak32(q, w, e, r)                                       \
+  ((((q)&0xff) << 0) | (((w)&0xff) << 8) | (((e)&0xff) << 16) | \
+   (((r)&0xff) << 24))
 
 // Stupid RLE Algorithm
 void npi_compress(std::vector<unsigned char>& ret,
