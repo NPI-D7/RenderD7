@@ -17,21 +17,20 @@
  */
 
 #include <renderd7/Hardware.hpp>
-#include <renderd7/Security.hpp>
+#include <renderd7/internal_db.hpp>
 
 // Os Specific includes
 #include <3ds.h>
 
-// RenderD7 Security
-extern bool isndspinit;
-
 void RenderD7::Hardware::Initialisize() {
-  rd7_security->SafeInit(mcuHwcInit, &mcuHwcExit);
-  rd7_security->SafeInit(ptmuInit, &ptmuExit);
+  mcuHwcInit();
+  atexit(mcuHwcExit);
+  ptmuInit();
+  atexit(ptmuExit);
 }
 
 bool RenderD7::Hardware::IsHeadphones() {
-  if (isndspinit) {
+  if (rd7i_is_ndsp) {
     bool inserted;
     DSP_GetHeadphoneStatus(&inserted);
     return inserted;

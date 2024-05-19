@@ -42,7 +42,6 @@
 #include <renderd7/Ovl.hpp>
 #include <renderd7/ResultDecoder.hpp>
 #include <renderd7/Screen.hpp>
-#include <renderd7/Security.hpp>
 #include <renderd7/Sheet.hpp>
 #include <renderd7/Sprite.hpp>
 #include <renderd7/SpriteAnimation.hpp>

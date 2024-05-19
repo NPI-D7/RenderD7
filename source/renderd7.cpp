@@ -36,6 +36,7 @@
 static void RD7i_ExitHook() {
   C2D_TextBufDelete(rd7i_text_buffer);
   C2D_TextBufDelete(rd7i_d2_dimbuf);
+  romfsExit();
 }
 
 std::vector<std::string> string_to_lines(std::string input_str) {
@@ -231,7 +232,8 @@ bool RenderD7::DrawImageFromSheet(RenderD7::Sheet *sheet, size_t index, float x,
 }
 void RenderD7::Init::NdspFirm() {
   if (access("sdmc:/3ds/dspfirm.cdc", F_OK) != -1) {
-    rd7_security->SafeInit(ndspInit, ndspExit);
+    ndspInit();
+    atexit(ndspExit);
     rd7i_is_ndsp = true;
   } else {
     RenderD7::PushMessage(RenderD7::Message(
@@ -336,24 +338,26 @@ Result RenderD7::Init::Main(std::string app_name) {
   rd7i_app_name = app_name;
   /// The only func that can be executed before Security
   RenderD7::Ftrace::Beg("rd7-core", f2s(RenderD7::Init::Main));
-  RenderD7::Init::Security();
 
-  rd7_security->SafeInit(gfxInitDefault, gfxExit);
+  gfxInitDefault();
+  atexit(gfxExit);
   // Speedup
   osSetSpeedupEnable(true);
   // consoleInit(GFX_TOP, NULL);
-  rd7_security->SafeInit(cfguInit, cfguExit);
+  cfguInit();
+  atexit(cfguExit);
   CFGU_SecureInfoGetRegion(&rd7i_system_region);
   CFGU_GetSystemModel(&rd7i_console_model);
 
-  rd7_security->SafeInit(aptInit, aptExit);
-  rd7_security->SafeInit(romfsInit, romfsExit);
+  aptInit();
+  atexit(aptExit);
+  romfsInit();
 
   C3D_Init(C3D_DEFAULT_CMDBUF_SIZE);
-  rd7_security->SafeExit(C3D_Fini);
+  atexit(C3D_Fini);
   C2D_Init((size_t)rd7_max_objects);
-  rd7_security->SafeExit(C2D_Fini);
-  rd7_security->SafeExit(RD7i_ExitHook);
+  atexit(C2D_Fini);
+  atexit(RD7i_ExitHook);
   C2D_Prepare();
   Top = C2D_CreateScreenTarget(GFX_TOP, GFX_LEFT);
   TopRight = C2D_CreateScreenTarget(GFX_TOP, GFX_RIGHT);
@@ -372,7 +376,7 @@ Result RenderD7::Init::Main(std::string app_name) {
   rd7i_init_input();
   rd7i_init_theme();
   UI7::Init();
-  rd7_security->SafeExit(UI7::Deinit);
+  atexit(UI7::Deinit);
   RenderD7::Ftrace::End("rd7-core", f2s(RenderD7::Init::Main));
   rd7i_running = true;
   return 0;
@@ -380,17 +384,17 @@ Result RenderD7::Init::Main(std::string app_name) {
 
 Result RenderD7::Init::Minimal(std::string app_name) {
   rd7i_app_name = app_name;
-  RenderD7::Init::Security();
 
-  rd7_security->SafeInit(gfxInitDefault, gfxExit);
-  rd7_security->SafeInit(romfsInit, romfsExit);
+  gfxInitDefault();
+  atexit(gfxExit);
+  romfsInit();
 
   osSetSpeedupEnable(true);
   C3D_Init(C3D_DEFAULT_CMDBUF_SIZE);
-  rd7_security->SafeExit(C3D_Fini);
+  atexit(C3D_Fini);
   C2D_Init((size_t)rd7_max_objects);
-  rd7_security->SafeExit(C2D_Fini);
-  rd7_security->SafeExit(RD7i_ExitHook);
+  atexit(C2D_Fini);
+  atexit(RD7i_ExitHook);
   C2D_Prepare();
   Top = C2D_CreateScreenTarget(GFX_TOP, GFX_LEFT);
   TopRight = C2D_CreateScreenTarget(GFX_TOP, GFX_RIGHT);
@@ -410,7 +414,7 @@ Result RenderD7::Init::Minimal(std::string app_name) {
   rd7i_init_input();
   rd7i_init_theme();
   UI7::Init();
-  rd7_security->SafeExit(UI7::Deinit);
+  atexit(UI7::Deinit);
   rd7i_running = true;
   return 0;
 }

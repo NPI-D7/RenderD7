@@ -230,7 +230,7 @@ void ServerThread(RenderD7::Parameter param) {
     return;
   }
   rd7i_idb_running = true;
-  rd7_security->SafeExit(KillIdbServer);
+  atexit(KillIdbServer);
   tcp_server server("0.0.0.0", 4727);
   int cmd = 0;
   while (true && !rd7i_idb_fp) {

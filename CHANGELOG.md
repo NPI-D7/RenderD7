@@ -29,6 +29,7 @@
 - Add LinearAllocator (for std)
 - Fix Crash in FilsSystem
 - Implement basic Theme System
+- Remove 0.9.4 Security
 ## 0.9.4
 - Implement new Security System To prevent from crashes
 - Implement Functiontrace for better Timing Tests

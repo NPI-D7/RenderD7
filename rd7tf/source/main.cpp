@@ -29,7 +29,7 @@ int main() {
   auto fnt = RD7::Font::New("romfs:/roboto_bold.bcfnt");
   RD7::TextFont(fnt);
   // IdbServer();
-  //RD7::Init::NdspFirm();
+  // RD7::Init::NdspFirm();
   RD7::Scene::Load(std::make_unique<Sample>());
   RD7::Ftrace::End("app", "app_init");
   while (RD7::MainLoop()) {

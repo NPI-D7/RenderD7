@@ -31,8 +31,8 @@ class Font {
   Font(const std::string& path) { Load(path); };
   ~Font() { Unload(); }
   using Ref = std::shared_ptr<Font>;
-  template<typename ...args>
-  inline static Ref New(args &&...a) {
+  template <typename... args>
+  inline static Ref New(args&&... a) {
     return std::make_shared<Font>(std::forward<args>(a)...);
   }
   void Load(const std::string& path) {
