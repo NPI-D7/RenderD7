@@ -21,15 +21,21 @@
 #include <citro2d.h>
 
 #include <fstream>
+#include <memory>
 #include <renderd7/Error.hpp>
 
 namespace RenderD7 {
 class Font {
  public:
   Font() = default;
-  Font(const std::string& path) { load(path); };
-  ~Font() { unload(); }
-  void load(const std::string& path) {
+  Font(const std::string& path) { Load(path); };
+  ~Font() { Unload(); }
+  using Ref = std::shared_ptr<Font>;
+  template<typename ...args>
+  inline static Ref New(args &&...a) {
+    return std::make_shared<Font>(std::forward<args>(a)...);
+  }
+  void Load(const std::string& path) {
     std::ifstream ft(path, std::ios::in | std::ios::binary);
     bool io = ft.is_open();
     ft.close();
@@ -37,8 +43,8 @@ class Font {
     fnt = C2D_FontLoad(path.c_str());
     RenderD7::InlineAssert(fnt, "Font could not be loaded!");
   }
-  C2D_Font ptr() { return fnt; }
-  void unload() {
+  C2D_Font Ptr() { return fnt; }
+  void Unload() {
     if (!fnt) return;
     C2D_FontFree(fnt);
     fnt = nullptr;

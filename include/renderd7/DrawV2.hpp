@@ -48,7 +48,7 @@ std::string TextShort(const std::string& in, int max_len);
 // Overrite TextBox Size (by default Screenwidth x Text.h)
 void TextMaxBox(R7Vec2 size);
 void TextDefaultBox();
-void TextFont(Font fnt);
+void TextFont(Font::Ref fnt);
 void TextDefaultFont();
 namespace Draw2 {
 void Rect(R7Vec2 pos, R7Vec2 size, unsigned int color, int t = 1);

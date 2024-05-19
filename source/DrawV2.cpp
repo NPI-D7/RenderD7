@@ -104,6 +104,7 @@ bool RD7I_FNT_VALID() {
 }
 
 namespace RenderD7 {
+// TODO: Fix wrong Width/Height on other fonts
 R7Vec2 GetTextDimensions(const std::string &text) {
   C2D_TextBufClear(rd7i_d2_dimbuf);
   float w = 0, h = 0;
@@ -122,7 +123,7 @@ void TextMaxBox(R7Vec2 size) { rd7i_d7_mwh = size; }
 
 void TextDefaultBox() { rd7i_d7_mwh = R7Vec2(0, 0); }
 
-void TextFont(Font fnt) { rd7i_d2_fnt = fnt.ptr(); }
+void TextFont(Font::Ref fnt) { rd7i_d2_fnt = fnt->Ptr(); }
 
 void TextDefaultFont() { rd7i_d2_fnt = rd7i_base_font; }
 
