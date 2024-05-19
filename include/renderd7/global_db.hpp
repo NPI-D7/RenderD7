@@ -21,6 +21,14 @@
 #include <renderd7/external/json.hpp>
 #include <renderd7/renderd7.hpp>
 
+namespace RenderD7 {
+namespace IDB {
+void Start();
+void Stop();
+void Restart();
+}  // namespace IDB
+}  // namespace RenderD7
+
 // Outdated HidApi (HidV2Patched)
 extern u32 d7_hDown;
 extern u32 d7_hHeld;

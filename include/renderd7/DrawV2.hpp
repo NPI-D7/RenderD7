@@ -49,6 +49,7 @@ std::string TextShort(const std::string& in, int max_len);
 void TextMaxBox(R7Vec2 size);
 void TextDefaultBox();
 void TextFont(Font::Ref fnt);
+void TextFontRestore();
 void TextDefaultFont();
 namespace Draw2 {
 void Rect(R7Vec2 pos, R7Vec2 size, unsigned int color, int t = 1);

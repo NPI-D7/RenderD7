@@ -18,8 +18,6 @@
 
 #include "scene.hpp"
 
-extern void IdbServer();
-
 int main() {
   rd7_enable_memtrack = true;
   rd7_do_splash = true;
@@ -28,7 +26,6 @@ int main() {
   RD7::FadeIn();
   auto fnt = RD7::Font::New("romfs:/roboto_bold.bcfnt");
   RD7::TextFont(fnt);
-  // IdbServer();
   // RD7::Init::NdspFirm();
   RD7::Scene::Load(std::make_unique<Sample>());
   RD7::Ftrace::End("app", "app_init");

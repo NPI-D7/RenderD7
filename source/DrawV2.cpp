@@ -25,6 +25,7 @@
 const float rd7i_d7_dts = 0.5f;
 float rd7i_d2_txt_size = rd7i_d7_dts;
 C2D_Font rd7i_d2_fnt = nullptr;
+C2D_Font rd7i_d2_fntb = nullptr;
 R7Vec2 rd7i_d7_mwh = R7Vec2(0, 0);
 std::map<std::string, float> rd7i_d2_ts;
 std::map<std::string, int> rd7i_d2_mln;
@@ -123,9 +124,24 @@ void TextMaxBox(R7Vec2 size) { rd7i_d7_mwh = size; }
 
 void TextDefaultBox() { rd7i_d7_mwh = R7Vec2(0, 0); }
 
-void TextFont(Font::Ref fnt) { rd7i_d2_fnt = fnt->Ptr(); }
+void TextFont(Font::Ref fnt) {
+  rd7i_d2_fntb = rd7i_d2_fnt;
+  rd7i_d2_fnt = fnt->Ptr();
+}
 
-void TextDefaultFont() { rd7i_d2_fnt = rd7i_base_font; }
+void TextFontRestore() {
+  // Create temp copy
+  // Restore other font
+  // Set other to temp
+  auto tmp = rd7i_d2_fnt;
+  rd7i_d2_fnt = rd7i_d2_fntb;
+  rd7i_d2_fntb = tmp;
+}
+
+void TextDefaultFont() {
+  rd7i_d2_fntb = rd7i_d2_fnt;
+  rd7i_d2_fnt = rd7i_base_font;
+}
 
 float TextGetSize() { return rd7i_d2_txt_size; }
 

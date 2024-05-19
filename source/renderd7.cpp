@@ -315,7 +315,6 @@ bool RenderD7::MainLoop() {
     RenderD7::Ftrace::End("rd7sm", f2s(RenderD7::Scene::doLogic));
   }
 
-  // Disably Overlays For one Frame
   RenderD7::Ftrace::End("rd7-core", f2s(RenderD7::MainLoop));
   return rd7i_running;
 }
@@ -485,6 +484,9 @@ void RenderD7::FrameEnd() {
 }
 
 RenderD7::RSettings::RSettings() {
+  // RenderD7 Settings is designed for
+  // System Font
+  RenderD7::TextDefaultFont();
   tmp_txt = RenderD7::TextGetSize();
   RenderD7::TextDefaultSize();
   RenderD7::FadeIn();
@@ -496,7 +498,10 @@ RenderD7::RSettings::RSettings() {
   stateftold = rd7i_ftraced;
 }
 
-RenderD7::RSettings::~RSettings() { RenderD7::CustomTextSize(tmp_txt); }
+RenderD7::RSettings::~RSettings() {
+  RenderD7::TextFontRestore();
+  RenderD7::CustomTextSize(tmp_txt);
+}
 
 std::vector<std::string> StrHelper(std::string input) {
   std::string ss(input);
@@ -538,7 +543,10 @@ void RenderD7::RSettings::Draw(void) const {
         shared_request[0x00000001] = RUI7;
       }
       if (UI7::Button("Overlays")) {
-        shared_request[0x00000001] = RMCONFIG;
+        shared_request[0x00000001] = ROVERLAYS;
+      }
+      if (UI7::Button("IDB")) {
+        shared_request[0x00000001] = RIDB;
       }
       if (UI7::Button("Back")) {
         shared_request[0x00000002] = 1U;
@@ -549,21 +557,32 @@ void RenderD7::RSettings::Draw(void) const {
       UI7::EndMenu();
     }
 
-  } else if (m_state == RSERVICES) {
+  } else if (m_state == RIDB) {
     RenderD7::OnScreen(Top);
-    RenderD7::Draw2::RFS(R7Vec2(0, 0), R7Vec2(400, 240),
-                         RenderD7::StyleColor(RD7Color_Background));
-    RenderD7::Draw2::RFS(R7Vec2(0, 0), R7Vec2(400, 20),
-                         RenderD7::StyleColor(RD7Color_Header));
-    RenderD7::TextColorByBg(RD7Color_Header);
-    RenderD7::Draw2::Text(R7Vec2(5, 2), "RenderD7 -> Security");
-    RenderD7::Draw2::Text(R7Vec2(395, 2), RENDERD7VSTRING,
-                          RD7TextFlags_AlignRight);
-    RenderD7::UndoColorEdit(RD7Color_Text);
+    if (UI7::BeginMenu("RenderD7 -> Debugger")) {
+      UI7::SetCursorPos(R7Vec2(395, 2));
+      UI7::Label(RENDERD7VSTRING, RD7TextFlags_AlignRight);
+      UI7::RestoreCursor();
+      UI7::Label("Server Running: " +
+                 std::string(rd7i_idb_running ? "true" : "false"));
+      UI7::EndMenu();
+    }
     RenderD7::OnScreen(Bottom);
-    RenderD7::Draw2::RFS(R7Vec2(0, 0), R7Vec2(320, 240),
-                         RenderD7::StyleColor(RD7Color_Background));
-    RenderD7::Draw2::Text(R7Vec2(5, 2), "Press \uE001 to go back!");
+    if (UI7::BeginMenu("Press \uE001 to go back!")) {
+      if (UI7::Button("Start Server")) {
+        RenderD7::IDB::Start();
+      }
+      UI7::SameLine();
+      if (UI7::Button("Stop Server")) {
+        RenderD7::IDB::Stop();
+      }
+      UI7::SameLine();
+      if (UI7::Button("Restart Server")) {
+        RenderD7::IDB::Restart();
+      }
+
+      UI7::EndMenu();
+    }
 
   } else if (m_state == RINFO) {
     std::string rd7ver = RENDERD7VSTRING;
@@ -711,7 +730,7 @@ void RenderD7::RSettings::Draw(void) const {
       UI7::Checkbox("Debug", UI7::IsDebugging());
       UI7::EndMenu();
     }
-  } else if (m_state == RMCONFIG) {
+  } else if (m_state == ROVERLAYS) {
     RenderD7::OnScreen(Top);
     if (UI7::BeginMenu("RenderD7 -> Metrik")) {
       UI7::SetCursorPos(R7Vec2(395, 2));
@@ -796,7 +815,12 @@ void RenderD7::RSettings::Logic() {
       m_state = RSETTINGS;
     }
   }
-  if (m_state == RSERVICES) {
+  if (m_state == ROVERLAYS) {
+    if (d7_hDown & KEY_B) {
+      m_state = RSETTINGS;
+    }
+  }
+  if (m_state == RIDB) {
     if (d7_hDown & KEY_B) {
       m_state = RSETTINGS;
     }

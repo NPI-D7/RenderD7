@@ -230,10 +230,11 @@ void ServerThread(RenderD7::Parameter param) {
     return;
   }
   rd7i_idb_running = true;
+  rd7i_idb_fp = false;
   atexit(KillIdbServer);
   tcp_server server("0.0.0.0", 4727);
   int cmd = 0;
-  while (true && !rd7i_idb_fp) {
+  while (!rd7i_idb_fp) {
     size_t r = server.rec(&cmd, sizeof(int));
     if (r == 0) {
       server.reconnect();
@@ -259,6 +260,7 @@ void ServerThread(RenderD7::Parameter param) {
     } else if (cmd == 3) {
       rd7i_reacttion(3);
       RenderD7::ExitApp();
+      rd7i_idb_fp = true;
     } else {
       rd7i_reacttion(1234);
     }
@@ -266,7 +268,21 @@ void ServerThread(RenderD7::Parameter param) {
   rd7i_idb_running = false;
 }
 
-void IdbServer() {
+namespace RenderD7 {
+namespace IDB {
+void Start() {
+  if (rd7i_idb_running) return;
   rd7i_idb_server.initialize(ServerThread);
   rd7i_idb_server.start(true);
 }
+void Stop() {
+  if (!rd7i_idb_running) return;
+  rd7i_idb_fp = true;
+  KillIdbServer();
+}
+void Restart() {
+  Stop();
+  Start();
+}
+}  // namespace IDB
+}  // namespace RenderD7

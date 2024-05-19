@@ -107,10 +107,6 @@ void Sample::Draw() const {
                         RD7TextFlags_AlignRight);
   RD7::UndoColorEdit(RD7Color_Text);*/
   if (UI7::BeginMenu("RenderD7 Test Framework")) {
-    UI7::SetCursorPos(R7Vec2(395, 2));
-    UI7::Label(RD7::FormatBytes(RD7::Memory::GetCurrent()),
-               RD7TextFlags_AlignRight);
-    UI7::RestoreCursor();
     if (state == State_Menu) {
       UI7::Label("SZS: " + std::to_string(img.size()));
       UI7::Grid("Images", R7Vec2(390, 180), testv2, display_icon,
