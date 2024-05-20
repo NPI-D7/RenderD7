@@ -32,6 +32,7 @@ enum UI7MenuFlags_ {
   UI7MenuFlags_None = 0,
   UI7MenuFlags_NoTitlebar = UI7MAKEFLAG(0),
   UI7MenuFlags_TitleMid = UI7MAKEFLAG(1),
+  UI7MenuFlags_ForceScrolling = MAKEFLAG(2),
 };
 
 namespace UI7 {
@@ -70,4 +71,5 @@ R7Vec2 GetCursorPos();
 void SetCursorPos(R7Vec2 cp);
 void RestoreCursor();
 void SameLine();
+float GetScrollingOffset();
 }  // namespace UI7

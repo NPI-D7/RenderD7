@@ -214,6 +214,7 @@ static bool rd7i_idb_fp = false;
 
 void KillIdbServer() {
   rd7i_idb_fp = true;
+  rd7i_idb_server.join(100);
   socExit();
 }
 

@@ -98,12 +98,10 @@ class RSettings : public RenderD7::Scene {
   /// @brief State (Define for Menus)
   enum RState {
     RSETTINGS,  // Main Settings Menu
-    RINFO,
-    RIDB,  // Internal Debugger
-    ROVERLAYS,
-    RFTRACE,  // FTRace Menu
-    RUI7,     // UI7 Menu
-    RCREDITS  // Unused?
+    RIDB,       // Internal Debugger
+    ROVERLAYS,  // Overlay Settings
+    RFTRACE,    // FTRace Menu
+    RUI7,       // UI7 Menu
   };
 
   /// @param shared_request Defines requests from Draw to Logic

@@ -522,12 +522,10 @@ void RenderD7::RSettings::Draw(void) const {
       UI7::SetCursorPos(R7Vec2(395, 2));
       UI7::Label(RENDERD7VSTRING, RD7TextFlags_AlignRight);
       UI7::RestoreCursor();
-
-      std::string verc = "Config Version: ";
-      verc += CFGVER;
-      UI7::Label(verc);
-      UI7::Label("Metrik Overlay: " + mtovlstate);
-      UI7::Label("Metrik Screen: " + mtscreenstate);
+      UI7::Label("Config Version: " + std::string(CFGVER));
+      UI7::Label("App: " + rd7i_app_name);
+      UI7::Label("RenderD7: " + std::string(RENDERD7VSTRING));
+      UI7::Label("Citra: " + std::string(rd7i_is_citra ? "true" : "false"));
       UI7::Label("Current: " + std::to_string(RenderD7::Memory::GetCurrent()) +
                  "b");
       UI7::Label("Delta: " + std::to_string(RenderD7::GetDeltaTime()));
@@ -584,35 +582,6 @@ void RenderD7::RSettings::Draw(void) const {
       UI7::EndMenu();
     }
 
-  } else if (m_state == RINFO) {
-    std::string rd7ver = RENDERD7VSTRING;
-    std::string rd7cfgver = CFGVER;
-    std::string citras = rd7i_is_citra ? "true" : "false";
-    std::string buildtime = V_RD7BTIME;
-    std::string commit = V_RD7CSTRING;
-    RenderD7::OnScreen(Top);
-    RenderD7::Draw2::RFS(R7Vec2(0, 0), R7Vec2(400, 240),
-                         RenderD7::StyleColor(RD7Color_Background));
-    RenderD7::Draw2::RFS(R7Vec2(0, 0), R7Vec2(400, 20),
-                         RenderD7::StyleColor(RD7Color_Header));
-    RenderD7::TextColorByBg(RD7Color_Header);
-    RenderD7::Draw2::Text(R7Vec2(5, 2), "RenderD7 -> Info");
-    RenderD7::Draw2::Text(R7Vec2(395, 2), RENDERD7VSTRING,
-                          RD7TextFlags_AlignRight);
-    RenderD7::UndoColorEdit(RD7Color_Text);
-    RenderD7::Draw2::Text(R7Vec2(0, 30), "App: " + rd7i_app_name);
-    RenderD7::Draw2::Text(R7Vec2(0, 45), "RenderD7: " + rd7ver);
-    RenderD7::Draw2::Text(R7Vec2(0, 60), "Config-Version: " + rd7cfgver);
-    RenderD7::Draw2::Text(R7Vec2(0, 75), "Citra: " + citras);
-    RenderD7::Draw2::Text(R7Vec2(0, 90), "RenderD7-Build-Time: \n" + buildtime);
-    RenderD7::Draw2::Text(R7Vec2(0, 120), "RenderD7-Commit: " + commit);
-    RenderD7::Draw2::Text(
-        R7Vec2(0, 135),
-        "RenderD7-Overlays: " + std::to_string(rd7i_overlays.size()));
-    RenderD7::OnScreen(Bottom);
-    RenderD7::Draw2::RFS(R7Vec2(0, 0), R7Vec2(320, 240),
-                         RenderD7::StyleColor(RD7Color_Background));
-    RenderD7::Draw2::Text(R7Vec2(5, 2), "Press \uE001 to go back!");
   } else if (m_state == RFTRACE) {
     RenderD7::OnScreen(Top);
     RenderD7::Draw2::RFS(R7Vec2(0, 0), R7Vec2(400, 240),
@@ -705,7 +674,7 @@ void RenderD7::RSettings::Draw(void) const {
       UI7::Label(RENDERD7VSTRING, RD7TextFlags_AlignRight);
       UI7::RestoreCursor();
       UI7::Label("Time: " + std::to_string(UI7::GetTime()));
-      UI7::Label("Delta: " + std::to_string(UI7::GetDeltaTime()));
+      UI7::Label("Delta: " + std::to_string(UI7::GetDeltaTime() * 1000.f));
       UI7::Label("Hid Down Touch: " +
                  std::to_string(Hid::IsEvent("touch", Hid::Down)));
       UI7::Label("Hid Held Touch: " +
@@ -722,7 +691,13 @@ void RenderD7::RSettings::Draw(void) const {
     }
 
     RenderD7::OnScreen(Bottom);
-    if (UI7::BeginMenu("Press \uE001 to go back!")) {
+    if (UI7::BeginMenu("Press \uE001 to go back!", R7Vec2(),
+                       UI7MenuFlags_ForceScrolling)) {
+      for (int i = 0; i < 20; i++) {
+        UI7::Label("Line: " + std::to_string(i));
+      }
+      UI7::Label("Scrolling Offset: " +
+                 std::to_string(UI7::GetScrollingOffset()));
       if (UI7::Button("Go back")) {
         /// Request a state switch to state RSETTINGS
         shared_request[0x00000001] = RSETTINGS;
@@ -732,10 +707,12 @@ void RenderD7::RSettings::Draw(void) const {
     }
   } else if (m_state == ROVERLAYS) {
     RenderD7::OnScreen(Top);
-    if (UI7::BeginMenu("RenderD7 -> Metrik")) {
+    if (UI7::BeginMenu("RenderD7 -> Overlays")) {
       UI7::SetCursorPos(R7Vec2(395, 2));
       UI7::Label(RENDERD7VSTRING, RD7TextFlags_AlignRight);
       UI7::RestoreCursor();
+      UI7::Label("Metrik Overlay: " + mtovlstate);
+      UI7::Label("Metrik Screen: " + mtscreenstate);
       UI7::EndMenu();
     }
 
@@ -792,8 +769,6 @@ void RenderD7::RSettings::Logic() {
   stateftold = rd7i_ftraced;
 
   if (m_state == RSETTINGS) {
-    mtovlstate = rd7i_metrikd ? "true" : "false";
-    mtscreenstate = rd7i_mt_screen ? "Bottom" : "Top";
     if (d7_hDown & KEY_B) {
       std::fstream cfg_wrt(rd7i_config_path + "/config.rc7", std::ios::out);
       rd7i_config["metrik-settings"]["enableoverlay"] = rd7i_metrikd;
@@ -805,17 +780,14 @@ void RenderD7::RSettings::Logic() {
       RenderD7::Scene::Back();
     }
   }
-  if (m_state == RINFO) {
-    if (d7_hDown & KEY_B) {
-      m_state = RSETTINGS;
-    }
-  }
   if (m_state == RUI7) {
     if (d7_hDown & KEY_B) {
       m_state = RSETTINGS;
     }
   }
   if (m_state == ROVERLAYS) {
+    mtovlstate = rd7i_metrikd ? "true" : "false";
+    mtscreenstate = rd7i_mt_screen ? "Bottom" : "Top";
     if (d7_hDown & KEY_B) {
       m_state = RSETTINGS;
     }

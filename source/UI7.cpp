@@ -33,7 +33,7 @@
 /// Independent of the main RenderD7 api
 #define TICKS_PER_MSEC 268111.856
 #include <3ds.h>
-#define __get_time() svcGetSystemTick() / TICKS_PER_MSEC
+#define __get_time() (float)svcGetSystemTick() / (float)TICKS_PER_MSEC
 #else
 #include <chrono>
 #define __get_time()                                        \
@@ -119,29 +119,40 @@ struct UI7OBJ {
   bool s = false;
 };
 
+struct UI7Menu {
+  UI7Menu() {}
+  UI7ID menuid;                   // menu ID
+  R7Vec2 cursor;                  // cursor
+  R7Vec2 cb;                      // backup cursor
+  R7Vec2 slc;                     // sameline cursor
+  float scrolling_offset = 0.f;   // For MenuScrolling
+  bool enable_scrolling = false;  // Menu Scrolling
+  float tbh;                      // TabBar Height
+
+  R7Vec2 ms;   // Max Size
+  R7Vec2 mdp;  // Mouse/Touch Initial pos
+  // For Smart Pointer
+  using Ref = std::shared_ptr<UI7Menu>;
+  static Ref New() { return std::make_shared<UI7Menu>(); }
+};
+
 struct UI7_Ctx {
   UI7_Ctx() {
     delta = 0.0f;
     time = 0.0f;
     is_activated = false;
     _last = 0;
-    cursor = R7Vec2();
-    slc = R7Vec2();
-    cbackup = R7Vec2();
     in_menu = false;
-    current_menu = UI7ID("");
     debugging = false;
   }
   float delta;
   float time;
   bool is_activated;
-  unsigned long long _last;
-  R7Vec2 cursor;
-  R7Vec2 cbackup;
-  R7Vec2 slc;
+  float _last;
   bool in_menu;
   bool debugging;
-  UI7ID current_menu;
+  std::map<std::string, UI7Menu::Ref> menus;
+  UI7Menu::Ref cm;
   std::unordered_map<std::string, UI7ID *> ids;
   std::vector<UI7OBJ> objects;
 };
@@ -161,8 +172,12 @@ bool UI7CtxInMenu() {
 
 bool UI7CtxBeginMenu(const std::string &lb) {
   if (!UI7CtxValidate()) return false;
-  if (UI7CtxInMenu()) return false;
-  ui7_ctx->current_menu = UI7ID(lb);
+  auto id = UI7ID(lb);
+  if (ui7_ctx->menus.find(id.ID()) == ui7_ctx->menus.end())
+    ui7_ctx->menus.insert(std::make_pair(id.ID(), UI7Menu::New()));
+  ui7_ctx->cm = ui7_ctx->menus[id.ID()];
+  ui7_ctx->cm->menuid = id;
+  ui7_ctx->cm->cursor = R7Vec2(0, 0);
   ui7_ctx->in_menu = true;
   return true;
 }
@@ -170,17 +185,17 @@ bool UI7CtxBeginMenu(const std::string &lb) {
 void UI7CtxEndMenu() {
   if (!UI7CtxValidate()) return;
   if (!UI7CtxInMenu()) return;
-  ui7_ctx->current_menu = UI7ID("");
+  ui7_ctx->cm = nullptr;
   ui7_ctx->in_menu = false;
 }
 
 void UI7CtxCursorMove(R7Vec2 size) {
   if (!UI7CtxValidate()) return;
   if (!UI7CtxInMenu()) return;
-  ui7_ctx->slc = ui7_ctx->cursor + R7Vec2(5, 0);
-  ui7_ctx->cursor.x = 5;
-  ui7_ctx->cursor += R7Vec2(0, size.y + 5);
-  ui7_ctx->slc += R7Vec2(size.x, 0);
+  ui7_ctx->cm->slc = ui7_ctx->cm->cursor + R7Vec2(size.x + 5, 0);
+  ui7_ctx->cm->cursor.x = 5;
+  ui7_ctx->cm->cursor += R7Vec2(0, size.y + 5);
+  ui7_ctx->cm->ms = R7Vec2(ui7_ctx->cm->slc.x, ui7_ctx->cm->cursor.y);
 }
 
 void UI7CtxRegObj(const UI7OBJ &obj) {
@@ -231,7 +246,7 @@ void Init() {
   ui7_ctx = new UI7_Ctx;
   ui7_ctx->delta = 0.0f;
   ui7_ctx->time = 0.0f;
-  ui7_ctx->cursor = R7Vec2(0, 0);
+  ui7_ctx->_last = __get_time();
   ui7_ctx->is_activated = true;
 }
 
@@ -244,17 +259,17 @@ void Deinit() {
   for (auto &it : ui7_ctx->ids) {
     delete it.second;
   }
+  ui7_ctx->menus.clear();
   delete ui7_ctx;
 }
 
 void Update() {
   // Dont do anithing without ctx;
   if (!UI7CtxValidate()) return;
-  unsigned long long current = __get_time();
-  ui7_ctx->delta = (float)((float)current - (float)ui7_ctx->_last) / 1000.f;
+  float current = __get_time();
+  ui7_ctx->delta = (current - ui7_ctx->_last) / 1000.f;
   ui7_ctx->_last = current;
   ui7_ctx->time += ui7_ctx->delta;
-  ui7_ctx->cursor = R7Vec2();
   UI7CtxClearIDs();
   if (ui7_ctx->debugging) ui7_ctx->objects.clear();
 }
@@ -281,7 +296,10 @@ bool Button(const std::string &label, R7Vec2 size) {
   }
   RD7Color btn = RD7Color_Button;
   R7Vec2 pos = GetCursorPos();
+  pos -= R7Vec2(0, ui7_ctx->cm->scrolling_offset);
   UI7CtxRegObj(UI7OBJ(R7Vec4(pos, size), 1));
+  UI7CtxCursorMove(size);
+  if (pos.y > 240 || pos.y < ui7_ctx->cm->tbh - 5) return false;
 
   if (RenderD7::Hid::IsEvent("touch", RenderD7::Hid::Up) &&
       InBox(RenderD7::Hid::GetLastTouchPosition(), pos, size)) {
@@ -298,7 +316,6 @@ bool Button(const std::string &label, R7Vec2 size) {
   RenderD7::TextColorByBg(btn);
   RenderD7::Draw2::Text(pos, label);
   RenderD7::UndoColorEdit(RD7Color_Text);
-  UI7CtxCursorMove(size);
   return ret;
 }
 
@@ -311,8 +328,10 @@ void Checkbox(const std::string &label, bool &c) {
   RD7Color bg = RD7Color_FrameBg;
 
   R7Vec2 pos = GetCursorPos();
+  pos -= R7Vec2(0, ui7_ctx->cm->scrolling_offset);
 
   UI7CtxCursorMove(inp);
+  if (pos.y > 240 || pos.y < ui7_ctx->cm->tbh - 5) return;
 
   if (RenderD7::Hid::IsEvent("touch", RenderD7::Hid::Up) &&
       InBox(RenderD7::Hid::GetLastTouchPosition(), pos, inp)) {
@@ -338,14 +357,16 @@ void Label(const std::string &label, RD7TextFlags flags) {
   if (!UI7CtxValidate()) return;
   R7Vec2 textdim = RenderD7::GetTextDimensions(label);
   R7Vec2 pos = GetCursorPos();
+  pos -= R7Vec2(0, ui7_ctx->cm->scrolling_offset);
+  // Remove some y offset cause texts have some offset
+  UI7CtxCursorMove(textdim - R7Vec2(0, 4));
+  if (pos.y > 240 || pos.y < ui7_ctx->cm->tbh - 5) return;
   float tbh = RenderD7::TextGetSize() * 40;
   if (flags & RD7TextFlags_AlignRight) {
     UI7CtxRegObj(UI7OBJ(R7Vec4(pos - R7Vec2(textdim.x, 0), textdim), 1));
   } else {
     UI7CtxRegObj(UI7OBJ(R7Vec4(pos, textdim), 1));
   }
-  // Remove some y offset cause texts have some offset
-  UI7CtxCursorMove(textdim - R7Vec2(0, 4));
   RenderD7::TextColorByBg(
       (pos.y + textdim.y < tbh ? RD7Color_Header : RD7Color_Background));
   RenderD7::Draw2::Text(pos, label, flags);
@@ -355,8 +376,10 @@ void Label(const std::string &label, RD7TextFlags flags) {
 void Progressbar(float value) {
   if (!UI7CtxValidate()) return;
   R7Vec2 pos = GetCursorPos();
+  pos -= R7Vec2(0, ui7_ctx->cm->scrolling_offset);
   R7Vec2 size = R7Vec2((rd7i_current_screen ? 400 : 320) - (pos.x * 2), 20);
   UI7CtxCursorMove(size);
+  if (pos.y > 240 || pos.y < ui7_ctx->cm->tbh - 5) return;
 
   RenderD7::Draw2::RFS(pos, size, RenderD7::StyleColor(RD7Color_FrameBg));
   RenderD7::Draw2::RFS(pos + R7Vec2(2, 2), size - R7Vec2(4, 4),
@@ -370,7 +393,9 @@ void Progressbar(float value) {
 void Image(RenderD7::Image *img) {
   if (!UI7CtxValidate()) return;
   R7Vec2 pos = GetCursorPos();
+  pos -= R7Vec2(0, ui7_ctx->cm->scrolling_offset);
   UI7CtxCursorMove(R7Vec2(img->get_size().x, img->get_size().y));
+  if (pos.y > 240 || pos.y < ui7_ctx->cm->tbh - 5) return;
   UI7CtxRegObj(UI7OBJ(R7Vec4(pos, img->get_size()), 1));
 
   RenderD7::Draw2::Image(img, pos);
@@ -442,8 +467,9 @@ void InputText(const std::string &label, std::string &text,
   RD7KeyboardState kbd_state;  // tmp (goes out of scope)
 
   R7Vec2 pos = GetCursorPos();
-
+  pos -= R7Vec2(0, ui7_ctx->cm->scrolling_offset);
   UI7CtxCursorMove(inp);
+  if (pos.y > 240 || pos.y < ui7_ctx->cm->tbh - 5) return;
 
   if (RenderD7::Hid::IsEvent("touch", RenderD7::Hid::Up) &&
       InBox(RenderD7::Hid::GetLastTouchPosition(), pos, inp)) {
@@ -464,7 +490,10 @@ void InputText(const std::string &label, std::string &text,
 
 bool BeginMenu(const std::string &title, R7Vec2 size, UI7MenuFlags flags) {
   if (!UI7CtxValidate()) return false;
+  if (UI7CtxInMenu()) return false;
   auto id = UI7CtxNewID(title);
+  auto ret = UI7CtxBeginMenu(title);
+  if (!ret) return ret;
   bool titlebar = true;
   if (size.x == 0) {
     size.x = rd7i_current_screen ? 400 : 320;
@@ -474,8 +503,36 @@ bool BeginMenu(const std::string &title, R7Vec2 size, UI7MenuFlags flags) {
   }
   RD7TextFlags txtflags = 0;
   float tbh = RenderD7::TextGetSize() * 40;
+  ui7_ctx->cm->tbh = tbh;
+
   if (flags & UI7MenuFlags_NoTitlebar) titlebar = false;
   if (flags & UI7MenuFlags_TitleMid) txtflags = RD7TextFlags_AlignMid;
+  if (flags & UI7MenuFlags_ForceScrolling) ui7_ctx->cm->enable_scrolling = true;
+  if (ui7_ctx->cm->enable_scrolling && !rd7i_current_screen) {
+    if (ui7_ctx->cm->scrolling_offset != 0.f && ui7_ctx->cm->ms.y < 235) {
+      ui7_ctx->cm->scrolling_offset = 0.f;
+    }
+    if (ui7_ctx->cm->scrolling_offset > ui7_ctx->cm->ms.y - 240 &&
+        ui7_ctx->cm->ms.y != 0 && ui7_ctx->cm->ms.y >= 235) {
+      ui7_ctx->cm->scrolling_offset -= 3;
+    }
+    if (ui7_ctx->cm->scrolling_offset < 0) {
+      ui7_ctx->cm->scrolling_offset += 3;
+      if (ui7_ctx->cm->scrolling_offset > 0) ui7_ctx->cm->scrolling_offset = 0;
+    }
+    if (RenderD7::Hid::IsEvent("touch", RenderD7::Hid::Down)) {
+      ui7_ctx->cm->mdp = RenderD7::Hid::GetTouchPosition();
+    } else if (RenderD7::Hid::IsEvent("touch", RenderD7::Hid::Up)) {
+      ui7_ctx->cm->mdp = R7Vec2();
+    }
+    if (RenderD7::Hid::IsEvent("touch", RenderD7::Hid::Held)) {
+      auto np = RenderD7::Hid::GetTouchPosition();
+      if (ui7_ctx->cm->scrolling_offset < ui7_ctx->cm->ms.y - 200 &&
+          ui7_ctx->cm->scrolling_offset > -40)
+        ui7_ctx->cm->scrolling_offset += (ui7_ctx->cm->mdp.y - np.y);
+      ui7_ctx->cm->mdp = np;
+    }
+  }
   RenderD7::Draw2::RFS(R7Vec2(0, 0), size,
                        RenderD7::StyleColor(RD7Color_Background));
   if (titlebar) {
@@ -490,7 +547,7 @@ bool BeginMenu(const std::string &title, R7Vec2 size, UI7MenuFlags flags) {
   UI7CtxRegObj(UI7OBJ(R7Vec4(R7Vec2(), size), 0));
   if (titlebar) UI7CtxRegObj(UI7OBJ(R7Vec4(R7Vec2(), R7Vec2(size.x, tbh)), 1));
 
-  return UI7CtxBeginMenu(title);
+  return ret;
 }
 
 void EndMenu() { UI7CtxEndMenu(); }
@@ -549,23 +606,27 @@ void EndTree() {
 
 R7Vec2 GetCursorPos() {
   if (!UI7CtxValidate()) return R7Vec2();
-  return ui7_ctx->cursor;
+  if (!UI7CtxInMenu()) return R7Vec2();
+  return ui7_ctx->cm->cursor;
 }
 
 void SetCursorPos(R7Vec2 cp) {
   if (!UI7CtxValidate()) return;
-  ui7_ctx->cbackup = ui7_ctx->cursor;
-  ui7_ctx->cursor = cp;
+  if (!UI7CtxInMenu()) return;
+  ui7_ctx->cm->cb = ui7_ctx->cm->cursor;
+  ui7_ctx->cm->cursor = cp;
 }
 
 void RestoreCursor() {
   if (!UI7CtxValidate()) return;
-  ui7_ctx->cursor = ui7_ctx->cbackup;
+  if (!UI7CtxInMenu()) return;
+  ui7_ctx->cm->cursor = ui7_ctx->cm->cb;
 }
 
 void SameLine() {
   if (!UI7CtxValidate()) return;
-  ui7_ctx->cursor = ui7_ctx->slc;
+  if (!UI7CtxInMenu()) return;
+  ui7_ctx->cm->cursor = ui7_ctx->cm->slc;
 }
 
 void Debug() {
@@ -575,6 +636,12 @@ void Debug() {
       ui7_ctx->objects[i].Debug();
     }
   }
+}
+
+float GetScrollingOffset() {
+  if (!UI7CtxValidate()) return 0.f;
+  if (!UI7CtxInMenu()) return 0.f;
+  return ui7_ctx->cm->scrolling_offset;
 }
 
 bool &IsDebugging() {

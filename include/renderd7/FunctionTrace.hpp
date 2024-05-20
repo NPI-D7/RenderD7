@@ -61,8 +61,8 @@ inline void End(std::string group, std::string func_name) {
   std::string trace_id = scomb(group, func_name);
   rd7_traces[trace_id].time_end = svcGetSystemTick();
   rd7_traces[trace_id].time_of = static_cast<float>(
-      rd7_traces[trace_id].time_end / (float)TICKS_PER_MSEC -
-      rd7_traces[trace_id].time_start / (float)TICKS_PER_MSEC);
+      ((float)rd7_traces[trace_id].time_end / (float)TICKS_PER_MSEC) -
+      ((float)rd7_traces[trace_id].time_start / (float)TICKS_PER_MSEC));
 }
 }  // namespace Ftrace
 }  // namespace RenderD7
