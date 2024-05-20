@@ -692,7 +692,7 @@ void RenderD7::RSettings::Draw(void) const {
 
     RenderD7::OnScreen(Bottom);
     if (UI7::BeginMenu("Press \uE001 to go back!", R7Vec2(),
-                       UI7MenuFlags_ForceScrolling)) {
+                       UI7MenuFlags_Scrolling)) {
       for (int i = 0; i < 20; i++) {
         UI7::Label("Line: " + std::to_string(i));
       }

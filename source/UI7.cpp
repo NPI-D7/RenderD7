@@ -296,10 +296,12 @@ bool Button(const std::string &label, R7Vec2 size) {
   }
   RD7Color btn = RD7Color_Button;
   R7Vec2 pos = GetCursorPos();
+  R7Vec2 pb = pos;
   pos -= R7Vec2(0, ui7_ctx->cm->scrolling_offset);
   UI7CtxRegObj(UI7OBJ(R7Vec4(pos, size), 1));
   UI7CtxCursorMove(size);
-  if (pos.y > 240 || pos.y < ui7_ctx->cm->tbh - 5) return false;
+  if (pos.y > 240 || (pos.y < ui7_ctx->cm->tbh - 5 && pb.y > ui7_ctx->cm->tbh))
+    return false;
 
   if (RenderD7::Hid::IsEvent("touch", RenderD7::Hid::Up) &&
       InBox(RenderD7::Hid::GetLastTouchPosition(), pos, size)) {
@@ -328,10 +330,12 @@ void Checkbox(const std::string &label, bool &c) {
   RD7Color bg = RD7Color_FrameBg;
 
   R7Vec2 pos = GetCursorPos();
+  R7Vec2 pb = pos;
   pos -= R7Vec2(0, ui7_ctx->cm->scrolling_offset);
 
   UI7CtxCursorMove(inp);
-  if (pos.y > 240 || pos.y < ui7_ctx->cm->tbh - 5) return;
+  if (pos.y > 240 || (pos.y < ui7_ctx->cm->tbh - 5 && pb.y > ui7_ctx->cm->tbh))
+    return;
 
   if (RenderD7::Hid::IsEvent("touch", RenderD7::Hid::Up) &&
       InBox(RenderD7::Hid::GetLastTouchPosition(), pos, inp)) {
@@ -357,10 +361,12 @@ void Label(const std::string &label, RD7TextFlags flags) {
   if (!UI7CtxValidate()) return;
   R7Vec2 textdim = RenderD7::GetTextDimensions(label);
   R7Vec2 pos = GetCursorPos();
+  R7Vec2 pb = pos;
   pos -= R7Vec2(0, ui7_ctx->cm->scrolling_offset);
   // Remove some y offset cause texts have some offset
   UI7CtxCursorMove(textdim - R7Vec2(0, 4));
-  if (pos.y > 240) return;
+  if (pos.y > 240 || (pos.y < ui7_ctx->cm->tbh - 5 && pb.y > ui7_ctx->cm->tbh))
+    return;
   float tbh = RenderD7::TextGetSize() * 40;
   if (flags & RD7TextFlags_AlignRight) {
     UI7CtxRegObj(UI7OBJ(R7Vec4(pos - R7Vec2(textdim.x, 0), textdim), 1));
@@ -376,10 +382,12 @@ void Label(const std::string &label, RD7TextFlags flags) {
 void Progressbar(float value) {
   if (!UI7CtxValidate()) return;
   R7Vec2 pos = GetCursorPos();
+  R7Vec2 pb = pos;
   pos -= R7Vec2(0, ui7_ctx->cm->scrolling_offset);
   R7Vec2 size = R7Vec2((rd7i_current_screen ? 400 : 320) - (pos.x * 2), 20);
   UI7CtxCursorMove(size);
-  if (pos.y > 240 || pos.y < ui7_ctx->cm->tbh - 5) return;
+  if (pos.y > 240 || (pos.y < ui7_ctx->cm->tbh - 5 && pb.y > ui7_ctx->cm->tbh))
+    return;
 
   RenderD7::Draw2::RFS(pos, size, RenderD7::StyleColor(RD7Color_FrameBg));
   RenderD7::Draw2::RFS(pos + R7Vec2(2, 2), size - R7Vec2(4, 4),
@@ -393,9 +401,11 @@ void Progressbar(float value) {
 void Image(RenderD7::Image *img) {
   if (!UI7CtxValidate()) return;
   R7Vec2 pos = GetCursorPos();
+  R7Vec2 pb = pos;
   pos -= R7Vec2(0, ui7_ctx->cm->scrolling_offset);
   UI7CtxCursorMove(R7Vec2(img->get_size().x, img->get_size().y));
-  if (pos.y > 240 || pos.y < ui7_ctx->cm->tbh - 5) return;
+  if (pos.y > 240 || (pos.y < ui7_ctx->cm->tbh - 5 && pb.y > ui7_ctx->cm->tbh))
+    return;
   UI7CtxRegObj(UI7OBJ(R7Vec4(pos, img->get_size()), 1));
 
   RenderD7::Draw2::Image(img, pos);
@@ -467,9 +477,11 @@ void InputText(const std::string &label, std::string &text,
   RD7KeyboardState kbd_state;  // tmp (goes out of scope)
 
   R7Vec2 pos = GetCursorPos();
+  R7Vec2 pb = pos;
   pos -= R7Vec2(0, ui7_ctx->cm->scrolling_offset);
   UI7CtxCursorMove(inp);
-  if (pos.y > 240 || pos.y < ui7_ctx->cm->tbh - 5) return;
+  if (pos.y > 240 || (pos.y < ui7_ctx->cm->tbh - 5 && pb.y > ui7_ctx->cm->tbh))
+    return;
 
   if (RenderD7::Hid::IsEvent("touch", RenderD7::Hid::Up) &&
       InBox(RenderD7::Hid::GetLastTouchPosition(), pos, inp)) {
@@ -507,7 +519,7 @@ bool BeginMenu(const std::string &title, R7Vec2 size, UI7MenuFlags flags) {
 
   if (flags & UI7MenuFlags_NoTitlebar) titlebar = false;
   if (flags & UI7MenuFlags_TitleMid) txtflags = RD7TextFlags_AlignMid;
-  ui7_ctx->cm->enable_scrolling = (flags & UI7MenuFlags_ForceScrolling);
+  ui7_ctx->cm->enable_scrolling = (flags & UI7MenuFlags_Scrolling);
   if (ui7_ctx->cm->enable_scrolling && !rd7i_current_screen) {
     if (ui7_ctx->cm->scrolling_offset != 0.f && ui7_ctx->cm->ms.y < 235) {
       ui7_ctx->cm->scrolling_offset = 0.f;
