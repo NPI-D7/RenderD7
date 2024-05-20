@@ -360,7 +360,7 @@ void Label(const std::string &label, RD7TextFlags flags) {
   pos -= R7Vec2(0, ui7_ctx->cm->scrolling_offset);
   // Remove some y offset cause texts have some offset
   UI7CtxCursorMove(textdim - R7Vec2(0, 4));
-  if (pos.y > 240 || pos.y < ui7_ctx->cm->tbh - 5) return;
+  if (pos.y > 240) return;
   float tbh = RenderD7::TextGetSize() * 40;
   if (flags & RD7TextFlags_AlignRight) {
     UI7CtxRegObj(UI7OBJ(R7Vec4(pos - R7Vec2(textdim.x, 0), textdim), 1));
@@ -507,7 +507,7 @@ bool BeginMenu(const std::string &title, R7Vec2 size, UI7MenuFlags flags) {
 
   if (flags & UI7MenuFlags_NoTitlebar) titlebar = false;
   if (flags & UI7MenuFlags_TitleMid) txtflags = RD7TextFlags_AlignMid;
-  if (flags & UI7MenuFlags_ForceScrolling) ui7_ctx->cm->enable_scrolling = true;
+  ui7_ctx->cm->enable_scrolling = (flags & UI7MenuFlags_ForceScrolling);
   if (ui7_ctx->cm->enable_scrolling && !rd7i_current_screen) {
     if (ui7_ctx->cm->scrolling_offset != 0.f && ui7_ctx->cm->ms.y < 235) {
       ui7_ctx->cm->scrolling_offset = 0.f;
@@ -532,6 +532,8 @@ bool BeginMenu(const std::string &title, R7Vec2 size, UI7MenuFlags flags) {
         ui7_ctx->cm->scrolling_offset += (ui7_ctx->cm->mdp.y - np.y);
       ui7_ctx->cm->mdp = np;
     }
+  } else {
+    ui7_ctx->cm->scrolling_offset = 0.f;
   }
   RenderD7::Draw2::RFS(R7Vec2(0, 0), size,
                        RenderD7::StyleColor(RD7Color_Background));
