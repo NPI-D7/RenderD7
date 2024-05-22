@@ -17,14 +17,15 @@
  */
 
 #pragma once
-#include <3ds.h>
+#include <functional>
 
 namespace RenderD7 {
 namespace Tasks {
 /// @brief Push A Task
-/// @param entrypoint Function of Your Task
-void create(ThreadFunc entrypoint);
+/// @param fun Function of Your Task
+/// @return index
+int Create(std::function<void()> fun);
 /// @brief Destroy all Tasks
-void destroy(void);
+void DestroyAll();
 }  // namespace Tasks
 }  // namespace RenderD7

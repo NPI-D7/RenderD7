@@ -26,6 +26,7 @@
 
 #include <renderd7/FileSystem.hpp>
 #include <renderd7/external/json.hpp>
+#include <renderd7/internal_db.hpp>
 #include <renderd7/renderd7.hpp>
 
 /// Base ///
@@ -71,6 +72,7 @@ bool rd7i_idb_running = false;
 bool rd7i_graphics_on = false;
 float rd7_draw2_tsm = 1.2f;
 bool rd7i_amdt = false;
+void *rd7i_soc_buf = nullptr;
 
 /// Global ///
 // Outdated HidApi (HidV2Patched)
@@ -93,6 +95,31 @@ bool rd7_debugging = false;
 C3D_RenderTarget *rd7_top;
 C3D_RenderTarget *rd7_top_right;
 C3D_RenderTarget *rd7_bottom;
+
+RenderD7::Net::Error rd7i_soc_init() {
+  if (rd7i_soc_buf != nullptr) {
+    return 0;
+  }
+  rd7i_soc_buf = memalign(0x1000, 0x100000);
+  if (!rd7i_soc_buf) {
+    return RenderD7::Net::Error_Memory;
+  }
+  Result ret = socInit((u32 *)rd7i_soc_buf, 0x100000);
+  if (R_FAILED(ret)) {
+    free(rd7i_soc_buf);
+    return ((static_cast<RenderD7::Net::Error>(ret) << 32) |
+            static_cast<RenderD7::Net::Error>(RenderD7::Net::Error_CtrStatus));
+  }
+  return 0;
+}
+
+void rd7i_soc_deinit() {
+  if (rd7i_soc_buf) {
+    socExit();
+    free(rd7i_soc_buf);
+  }
+  rd7i_soc_buf = nullptr;
+}
 
 class Logger {
  public:
@@ -157,10 +184,10 @@ class tcp_server {
 
 #define stupid(x) &x, sizeof(x)
 #define rd7i_reacttion(x)     \
-  ({                          \
+  {                           \
     int code = x;             \
     server.snd(stupid(code)); \
-  })
+  }
 
 struct pak32 {
   pak32() {}
@@ -206,30 +233,16 @@ struct pak32 {
   unsigned int tbs;
 };
 
-#define SOC_ALIGN 0x1000
-#define SOC_BUFFERSIZE 0x100000
-
-static u32 *SOC_buffer = NULL;
 static bool rd7i_idb_fp = false;
 
 void KillIdbServer() {
   rd7i_idb_fp = true;
   rd7i_idb_server.join(100);
-  socExit();
+  rd7i_soc_deinit();
 }
 
 void ServerThread(RenderD7::Parameter param) {
-  Result ret;
-  SOC_buffer = (u32 *)memalign(SOC_ALIGN, SOC_BUFFERSIZE);
-
-  if (SOC_buffer == NULL) {
-    return;
-  }
-
-  // Now intialise soc:u service
-  if ((ret = socInit(SOC_buffer, SOC_BUFFERSIZE)) != 0) {
-    return;
-  }
+  if (rd7i_soc_init()) return;
   rd7i_idb_running = true;
   rd7i_idb_fp = false;
   atexit(KillIdbServer);

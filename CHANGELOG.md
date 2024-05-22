@@ -30,6 +30,8 @@
 - Fix Crash in FilsSystem
 - Implement basic Theme System
 - Remove 0.9.4 Security
+- Tasks now based on std functional/thread
+- Add Network Support (Download Files, APi Requests)
 ## 0.9.4
 - Implement new Security System To prevent from crashes
 - Implement Functiontrace for better Timing Tests

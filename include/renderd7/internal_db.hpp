@@ -17,6 +17,7 @@
  */
 
 #pragma once
+#include <renderd7/Net.hpp>
 #include <renderd7/external/json.hpp>
 #include <renderd7/global_db.hpp>
 #include <renderd7/renderd7.hpp>
@@ -73,3 +74,7 @@ extern bool rd7i_fade_scene_wait;
 extern bool rd7i_idb_running;
 extern bool rd7i_graphics_on;
 extern bool rd7i_amdt;
+extern void* rd7i_soc_buf;
+
+RenderD7::Net::Error rd7i_soc_init();
+void rd7i_soc_deinit();

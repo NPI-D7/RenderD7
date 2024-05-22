@@ -25,6 +25,7 @@
 #include <renderd7/Hid.hpp>
 #include <renderd7/Image.hpp>
 #include <renderd7/Message.hpp>
+#include <renderd7/Net.hpp>
 #include <renderd7/Overlays.hpp>
 #include <renderd7/StealConsole.hpp>
 #include <renderd7/Timer.hpp>

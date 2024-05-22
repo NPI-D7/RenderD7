@@ -451,7 +451,8 @@ int RenderD7::GetRandomInt(int b, int e) {
 }
 
 bool RenderD7::FS::FileExist(const std::string &path) {
-  return std::filesystem::exists(path);
+  return std::filesystem::exists(path) &&
+         std::filesystem::is_regular_file(path);
 }
 
 int RenderD7::GetFps() { return (int)rd7i_framerate; }
