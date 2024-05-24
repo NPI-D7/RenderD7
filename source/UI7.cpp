@@ -598,6 +598,7 @@ bool BeginMenu(const std::string &title, R7Vec2 size, UI7MenuFlags flags) {
   RenderD7::Draw2::RFS(R7Vec2(0, 0), size,
                        RenderD7::StyleColor(RD7Color_Background));
   if (titlebar) {
+    RenderD7::Draw2::ScissorReset();
     RenderD7::Draw2::RFS(R7Vec2(0, 0), R7Vec2(size.x, tbh),
                          RenderD7::StyleColor(RD7Color_Header));
     RenderD7::TextColorByBg(RD7Color_Header);
