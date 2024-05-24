@@ -352,6 +352,18 @@ Result RenderD7::Init::Main(std::string app_name) {
   atexit(aptExit);
   romfsInit();
 
+  auto ret = rd7i_soc_init();
+  if (ret) {
+    RenderD7::PushMessage("RenderD7", "Failed to\nInit Soc!");
+  } else {
+    atexit(rd7i_soc_deinit);
+  }
+
+  if (R_SUCCEEDED(amInit())) {
+    atexit(amExit);
+    rd7i_is_am_init = true;
+  }
+
   C3D_Init(C3D_DEFAULT_CMDBUF_SIZE);
   atexit(C3D_Fini);
   C2D_Init((size_t)rd7_max_objects);
@@ -387,6 +399,18 @@ Result RenderD7::Init::Minimal(std::string app_name) {
   gfxInitDefault();
   atexit(gfxExit);
   romfsInit();
+
+  auto ret = rd7i_soc_init();
+  if (ret) {
+    RenderD7::PushMessage("RenderD7", "Failed to\nInit Soc!");
+  } else {
+    atexit(rd7i_soc_deinit);
+  }
+
+  if (R_SUCCEEDED(amInit())) {
+    atexit(amExit);
+    rd7i_is_am_init = true;
+  }
 
   osSetSpeedupEnable(true);
   C3D_Init(C3D_DEFAULT_CMDBUF_SIZE);

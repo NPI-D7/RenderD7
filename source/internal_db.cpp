@@ -73,6 +73,7 @@ bool rd7i_graphics_on = false;
 float rd7_draw2_tsm = 1.2f;
 bool rd7i_amdt = false;
 void *rd7i_soc_buf = nullptr;
+bool rd7i_is_am_init = false;
 
 /// Global ///
 // Outdated HidApi (HidV2Patched)
@@ -238,11 +239,10 @@ static bool rd7i_idb_fp = false;
 void KillIdbServer() {
   rd7i_idb_fp = true;
   rd7i_idb_server.join(100);
-  rd7i_soc_deinit();
 }
 
 void ServerThread(RenderD7::Parameter param) {
-  if (rd7i_soc_init()) return;
+  if (rd7i_soc_buf == nullptr) return;
   rd7i_idb_running = true;
   rd7i_idb_fp = false;
   atexit(KillIdbServer);

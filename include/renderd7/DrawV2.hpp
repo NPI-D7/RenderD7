@@ -52,6 +52,8 @@ void TextFont(Font::Ref fnt);
 void TextFontRestore();
 void TextDefaultFont();
 namespace Draw2 {
+void Scissor(R7Vec2 pos, R7Vec2 size);
+void ScissorReset();
 void Rect(R7Vec2 pos, R7Vec2 size, unsigned int color, int t = 1);
 void RectFilled(R7Vec2 pos, R7Vec2 size, Color4 colors);
 void RectFilledSolid(R7Vec2 pos, R7Vec2 size, unsigned int color);

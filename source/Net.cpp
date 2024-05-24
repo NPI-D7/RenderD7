@@ -32,7 +32,7 @@
 static RenderD7::Net::Error rd7i_check_wifi() {
   // if (rd7i_is_citra) return 0;
   int s = osGetWifiStrength();
-  return (s == 0);
+  return (s == 0 ? RenderD7::Net::Error_NoWifi : 0);
 }
 
 static size_t rd7i_handle_data(char* ptr, size_t size, size_t nmemb,
@@ -103,19 +103,10 @@ Error Download(const std::string& url, std::string& data) {
   if (rd7i_curl_is_busy) return Error_Busy;
   Error ret = rd7i_check_wifi();
   if (ret != 0) {
-    if (ret == 1) {
-      return Error_NoWifi;
-    } else {
-      return ret;
-    }
+    return ret;
   }
   rd7i_curl_is_busy = true;
   rd7i_net_dl_spec.Reset();
-  ret = rd7i_soc_init();
-  if (ret) {
-    rd7i_curl_is_busy = false;
-    return ret;
-  }
 
   auto hnd = curl_easy_init();
   rd7i_setup_curl_context(hnd, url, &data, true);
@@ -125,13 +116,11 @@ Error Download(const std::string& url, std::string& data) {
 
   if (curl_res != CURLE_OK) {
     data.clear();
-    rd7i_soc_deinit();
     rd7i_curl_is_busy = false;
     return ((static_cast<Error>(curl_res) << 32) |
             static_cast<Error>(Error_Curl));
   }
 
-  rd7i_soc_deinit();
   rd7i_curl_is_busy = false;
   return 0;
 }
@@ -140,20 +129,10 @@ Error Download2File(const std::string& url, const std::string& path) {
   if (rd7i_curl_is_busy) return Error_Busy;
   Error ret = rd7i_check_wifi();
   if (ret != 0) {
-    if (ret == 1) {
-      return Error_NoWifi;
-    } else {
-      return ret;
-    }
+    return ret;
   }
   rd7i_curl_is_busy = true;
   rd7i_net_dl_spec.Reset();
-  ret = rd7i_soc_init();
-  if (ret) {
-    rd7i_curl_is_busy = false;
-    return ret;
-  }
-
   // std::filesystem::create_directories(
   // std::filesystem::path(path).remove_filename());
   std::ofstream file(path, std::ios::binary);
@@ -171,7 +150,6 @@ Error Download2File(const std::string& url, const std::string& path) {
 
   file.close();
   if (curl_res != CURLE_OK) {
-    rd7i_soc_deinit();
     if (RenderD7::FS::FileExist(path)) {
       std::filesystem::remove(path);
     }
@@ -180,7 +158,6 @@ Error Download2File(const std::string& url, const std::string& path) {
             static_cast<Error>(Error_Curl));
   }
 
-  rd7i_soc_deinit();
   rd7i_curl_is_busy = false;
   return 0;
 }
@@ -190,11 +167,7 @@ Error GitDownloadRelease(const std::string& url, const std::string& asset_name,
   if (rd7i_apir_is_busy) return Error_Busy;
   Error ret = rd7i_check_wifi();
   if (ret != 0) {
-    if (ret == 1) {
-      return Error_NoWifi;
-    } else {
-      return ret;
-    }
+    return ret;
   }
   rd7i_apir_is_busy = true;
   std::regex parse("github\\.com\\/(.+)\\/(.+)");
@@ -253,11 +226,7 @@ Error JsonApiRequest(const std::string& api_url, nlohmann::json& res) {
   if (rd7i_apir_is_busy) return Error_Busy;
   Error ret = rd7i_check_wifi();
   if (ret != 0) {
-    if (ret == 1) {
-      return Error_NoWifi;
-    } else {
-      return ret;
-    }
+    return ret;
   }
   rd7i_apir_is_busy = true;
 

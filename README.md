@@ -11,7 +11,7 @@ RENDERD7_SRC := RenderD7/source RenderD7/external
 RENDERD7_INC := RenderD7/include
 # Libraries used for RenderD7
 # if you already use -lm, -lctru etc place a # before -lm
-RENDERD7_LIBS := -lcurl -lm -lcitro2dd -lcitro3d -lctru
+RENDERD7_LIBS := -lcurl -lmbedtls -lmbedx509 -lmbedcrypto -lz -lm -lcitro2dd -lcitro3d -lctru
 RENDERD7_FLAGS := -DRENDERD7_MEMTRACK=1
 ```
 Now you need to add it to your sources and includes

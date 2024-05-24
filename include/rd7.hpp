@@ -24,6 +24,7 @@
 #include <renderd7/FileSystem.hpp>
 #include <renderd7/Hid.hpp>
 #include <renderd7/Image.hpp>
+#include <renderd7/Installer.hpp>
 #include <renderd7/Message.hpp>
 #include <renderd7/Net.hpp>
 #include <renderd7/Overlays.hpp>

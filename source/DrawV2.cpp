@@ -150,6 +150,12 @@ std::string TextShort(const std::string &in, int max_len) {
 }
 
 namespace Draw2 {
+void Scissor(R7Vec2 pos, R7Vec2 size) {
+  // TODO: Seems not correct yet
+  C3D_SetScissor(GPU_SCISSOR_NORMAL, pos.y, pos.x, size.y - pos.y,
+                 pos.x + size.x);
+}
+void ScissorReset() { C3D_SetScissor(GPU_SCISSOR_DISABLE, 0, 0, 0, 0); }
 void Rect(R7Vec2 pos, R7Vec2 size, unsigned int color, int t) {
   // 4 DrawLine Calls Lol
   C2D_DrawLine(pos.x, pos.y, color, pos.x + size.x, pos.y, color, t, 1.f);
