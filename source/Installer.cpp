@@ -68,13 +68,25 @@ FS_MediaType GetTitleDest(u64 id) {
              : MEDIATYPE_SD;
 }
 
-/* Variables. */
-u64 rd7i_install_size = 0, rd7i_install_offset = 0;
+InstallerInfo rd7i_installer_info;
+
+InstallerInfo InstallGetInfo() { return rd7i_installer_info; }
+
+void InstallSetBuffersSize(unsigned int bytes) {
+  if (rd7i_installer_info.active) return;
+  if (bytes == 0) return;
+  if (bytes >= 0x200000) bytes = 0x200000;
+  rd7i_installer_info.mem_size = bytes;
+}
 
 Result InstallCia(const std::string& path, bool self) {
   if (!rd7i_is_am_init) return -1;
-  u32 bytes_read = 0, bytes_written;
-  rd7i_install_size = 0, rd7i_install_offset = 0;
+  if (rd7i_installer_info.active) return -1;
+  u32 bytes_read = 0;
+  u32 bytes_written = 0;
+  rd7i_installer_info.current = 0;
+  // Set 1 to avoid div0 error
+  rd7i_installer_info.total = 1;
   u64 size = 0;
   Handle cia, file;
   AM_TitleEntry info;
@@ -123,22 +135,16 @@ Result InstallCia(const std::string& path, bool self) {
     return ret;
   }
 
-  u32 toRead = 0x200000;
-  u8* buf = new u8[toRead];
-  if (buf == nullptr) {
-    return -1;
-  }
-
-  rd7i_install_size = size;
+  std::vector<unsigned char> buf(rd7i_installer_info.mem_size);
+  rd7i_installer_info.total = size;
 
   do {
-    FSFILE_Read(file, &bytes_read, rd7i_install_offset, buf, toRead);
-    FSFILE_Write(cia, &bytes_written, rd7i_install_offset, buf, toRead,
-                 FS_WRITE_FLUSH);
-    rd7i_install_offset += bytes_read;
-  } while (rd7i_install_offset < rd7i_install_size);
-
-  delete[] buf;
+    FSFILE_Read(file, &bytes_read, rd7i_installer_info.current, &buf[0],
+                buf.size());
+    FSFILE_Write(cia, &bytes_written, rd7i_installer_info.current, &buf[0],
+                 buf.size(), FS_WRITE_FLUSH);
+    rd7i_installer_info.current += bytes_read;
+  } while (rd7i_installer_info.current < rd7i_installer_info.total);
 
   ret = AM_FinishCiaInstall(cia);
 
