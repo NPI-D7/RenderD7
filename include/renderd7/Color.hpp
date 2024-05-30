@@ -20,7 +20,9 @@
 #include <unistd.h>
 
 #include <cstring>
+#include <memory>
 #include <string>
+#include <vector>
 
 #define UNPACK_RGBA(col) (uint8_t)(col >> 24), (col >> 16), (col >> 8), (col)
 #define UNPACK_BGRA(col) (uint8_t)(col >> 8), (col >> 16), (col >> 24), (col)
@@ -58,23 +60,59 @@ enum RD7Color_ {
   RD7Color_TextDisabled,  /// Text Disabled Color
   RD7Color_Text2,         ///< And This want for Texts on Dark Backgrounds
   RD7Color_Background,    ///< Your Bg Color
-  RD7Color_Header,  ///< Header Color (if the header is dark text2 is used)
-  RD7Color_Selector,
-  RD7Color_SelectorFade,
-  RD7Color_List0,
-  RD7Color_List1,
-  RD7Color_MessageBackground,
-  RD7Color_Button,
-  RD7Color_ButtonHovered,
-  RD7Color_ButtonDisabled,
-  RD7Color_ButtonActive,
-  RD7Color_Checkmark,
-  RD7Color_FrameBg,
-  RD7Color_FrameBgHovered,
-  RD7Color_Progressbar,
+  RD7Color_Header,    ///< Header Color (if the header is dark text2 is used)
+  RD7Color_Selector,  ///< Selector Color
+  RD7Color_SelectorFade,       ///< Selector FadingTo Color
+  RD7Color_List0,              ///< List Color1
+  RD7Color_List1,              ///< List Color2
+  RD7Color_MessageBackground,  ///< Message Background
+  RD7Color_Button,             ///< Button Color
+  RD7Color_ButtonHovered,      ///< Button Color if Hovered
+  RD7Color_ButtonDisabled,     ///< Button Color if disabled
+  RD7Color_ButtonActive,       ///< Button Colkor if Clicked
+  RD7Color_Checkmark,          ///< Checkbox Checkmark Color
+  RD7Color_FrameBg,            ///< Frame Background Color
+  RD7Color_FrameBgHovered,     ///< Frame Background Color if hovered
+  RD7Color_Progressbar,        ///< Progressbar Color
+  /// NON COLOR ///
+  RD7Color_Len,  ///< Used to define the lengh of this list
 };
 
 namespace RenderD7 {
+class Theme {
+ public:
+  Theme() = default;
+  ~Theme() = default;
+
+  void Load(const std::string &path);
+  void Default();
+
+  unsigned int Get(RD7Color clr);
+  void Set(RD7Color clr, unsigned int v);
+  void Swap(RD7Color a, RD7Color b);
+  bool Undo();
+  void UndoAll();
+
+  // For Smart Pointer
+  using Ref = std::shared_ptr<Theme>;
+  static Ref New() { return std::make_shared<Theme>(); }
+
+ private:
+  struct change {
+    change(RD7Color a, unsigned int f, unsigned int t)
+        : clr(a), from(f), to(t) {}
+    change(RD7Color a, RD7Color b, unsigned int f, unsigned int t)
+        : clr(a), clr2(b), from(f), to(t) {}
+    RD7Color clr;
+    RD7Color clr2 = 0;  // Used if Swap
+    unsigned int from;
+    unsigned int to;
+  };
+  // Use a vector for faster access
+  std::vector<unsigned int> clr_tab;
+  std::vector<change> changes;
+};
+
 unsigned int StyleColor(RD7Color color);
 void RedirectColor(RD7Color to, RD7Color from);
 void TextColorByBg(RD7Color background);
@@ -88,6 +126,8 @@ void UndoAllColorEdits();
 void ThemeLoad(const std::string &path);
 void ThemeSave(const std::string &path);
 void ThemeDefault();
+Theme::Ref ThemeActive();
+void ThemeSet(Theme::Ref theme);
 namespace Color {
 /// @brief RGBA Class
 class RGBA {

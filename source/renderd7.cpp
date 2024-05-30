@@ -81,6 +81,7 @@ void Npifade() {
 }
 
 void PushSplash() {
+  RenderD7::Ftrace::ScopedTrace st("rd7-core", f2s(PushSplash));
   C2D_SpriteSheet sheet;
   sheet = C2D_SpriteSheetLoadFromMem((void *)renderd7_logo, renderd7_logo_size);
   // Display for 2 Sec
@@ -242,10 +243,12 @@ void RenderD7::Init::NdspFirm() {
 }
 
 void RenderD7::Scene::doDraw() {
+  Ftrace::ScopedTrace st("rd7-core", f2s(Scene::doDraw));
   if (!RenderD7::Scene::scenes.empty()) RenderD7::Scene::scenes.top()->Draw();
 }
 
 void RenderD7::Scene::doLogic() {
+  Ftrace::ScopedTrace st("rd7-core", f2s(Scene::doLogic));
   if (!RenderD7::Scene::scenes.empty()) RenderD7::Scene::scenes.top()->Logic();
 }
 
@@ -278,7 +281,7 @@ std::string RenderD7::GetFramerate() {
 }
 
 bool RenderD7::MainLoop() {
-  RenderD7::Ftrace::Beg("rd7-core", f2s(RenderD7::MainLoop));
+  RenderD7::Ftrace::ScopedTrace st("rd7-core", f2s(MainLoop));
   if (!aptMainLoop()) return false;
   // Deltatime
   uint64_t currentTime = svcGetSystemTick();
@@ -304,18 +307,11 @@ bool RenderD7::MainLoop() {
 
   C2D_TargetClear(Top, C2D_Color32(0, 0, 0, 0));
   C2D_TargetClear(Bottom, C2D_Color32(0, 0, 0, 0));
-  RenderD7::Ftrace::Beg("rd7-core", "frame");
   frameloop();
   if (rd7_enable_scene_system) {
-    RenderD7::Ftrace::Beg("rd7sm", f2s(RenderD7::Scene::doDraw));
     RenderD7::Scene::doDraw();
-    RenderD7::Ftrace::End("rd7sm", f2s(RenderD7::Scene::doDraw));
-    RenderD7::Ftrace::Beg("rd7sm", f2s(RenderD7::Scene::doLogic));
     RenderD7::Scene::doLogic();
-    RenderD7::Ftrace::End("rd7sm", f2s(RenderD7::Scene::doLogic));
   }
-
-  RenderD7::Ftrace::End("rd7-core", f2s(RenderD7::MainLoop));
   return rd7i_running;
 }
 
@@ -334,9 +330,8 @@ void RenderD7::Init::Graphics() {
 }
 
 Result RenderD7::Init::Main(std::string app_name) {
+  RenderD7::Ftrace::ScopedTrace st("rd7-core", f2s(Init::Main));
   rd7i_app_name = app_name;
-  /// The only func that can be executed before Security
-  RenderD7::Ftrace::Beg("rd7-core", f2s(RenderD7::Init::Main));
 
   gfxInitDefault();
   atexit(gfxExit);
@@ -379,21 +374,19 @@ Result RenderD7::Init::Main(std::string app_name) {
 
   rd7i_graphics_on = true;
   rd7i_last_tm = svcGetSystemTick();
-  RenderD7::Ftrace::Beg("rd7-core", "do_splash");
   if (rd7_do_splash) PushSplash();
-  RenderD7::Ftrace::End("rd7-core", "do_splash");
 
   rd7i_init_config();
   rd7i_init_input();
   rd7i_init_theme();
   UI7::Init();
   atexit(UI7::Deinit);
-  RenderD7::Ftrace::End("rd7-core", f2s(RenderD7::Init::Main));
   rd7i_running = true;
   return 0;
 }
 
 Result RenderD7::Init::Minimal(std::string app_name) {
+  RenderD7::Ftrace::ScopedTrace st("rd7-core", f2s(Init::Minimal));
   rd7i_app_name = app_name;
 
   gfxInitDefault();
@@ -484,6 +477,7 @@ int RenderD7::GetFps() { return (int)rd7i_framerate; }
 bool RenderD7::IsNdspInit() { return rd7i_is_ndsp; }
 
 void OvlHandler() {
+  RenderD7::Ftrace::ScopedTrace st("rd7-core", f2s(OvlHandler));
   for (size_t i = 0; i < rd7i_overlays.size(); i++) {
     rd7i_overlays[i]->Draw();
     rd7i_overlays[i]->Logic();
@@ -493,18 +487,16 @@ void OvlHandler() {
 }
 
 void RenderD7::FrameEnd() {
+  Ftrace::ScopedTrace st("rd7-core", f2s(FrameEnd));
   C3D_FrameBegin(2);
   if (!rd7_enable_scene_system && rd7i_settings) {
     RenderD7::Scene::doDraw();
     RenderD7::Scene::doLogic();
   }
   RenderD7::ProcessMessages();
-  RenderD7::Ftrace::Beg("rd7oh", f2s(OvlHandler));
   OvlHandler();
-  RenderD7::Ftrace::End("rd7oh", f2s(OvlHandler));
   UI7::Debug();
   Npifade();
-  RenderD7::Ftrace::End("rd7-core", "frame");
   C3D_FrameEnd(0);
 }
 
@@ -537,8 +529,6 @@ std::vector<std::string> StrHelper(std::string input) {
             std::istream_iterator<std::string>(), std::back_inserter(test1));
   return test1;
 }
-
-extern int rd7i_ui7_ids_active();
 
 void RenderD7::RSettings::Draw(void) const {
   if (m_state == RSETTINGS) {
@@ -690,6 +680,10 @@ void RenderD7::RSettings::Draw(void) const {
       UI7::Label("Function: " + jt->second.func_name);
       UI7::Checkbox("In Overlay", jt->second.is_ovl);
       UI7::Label("Time: " + RenderD7::MsTimeFmt(jt->second.time_of));
+      UI7::Label("Max: " + RenderD7::MsTimeFmt(jt->second.time_ofm));
+      UI7::Label("TS: " + std::to_string(jt->second.time_start));
+      UI7::Label("TE: " + std::to_string(jt->second.time_end));
+      UI7::Label("SVC_Stk: " + std::to_string(svcGetSystemTick()));
       UI7::EndMenu();
     }
   } else if (m_state == RUI7) {
@@ -711,7 +705,6 @@ void RenderD7::RSettings::Draw(void) const {
       UI7::Label(
           "Touch Last Pos: " + std::to_string(Hid::GetLastTouchPosition().x) +
           ", " + std::to_string(Hid::GetLastTouchPosition().y));
-      UI7::Label("Active IDs: " + std::to_string(rd7i_ui7_ids_active()));
       UI7::EndMenu();
     }
 

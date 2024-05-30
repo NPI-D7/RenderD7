@@ -23,6 +23,41 @@
 #include <renderd7/external/json.hpp>
 #include <renderd7/internal_db.hpp>
 
+void rd7i_swap32(unsigned int& c) {
+  c = ((c & 0xFF) << 24) | ((c & 0xFF00) << 8) | ((c & 0xFF0000) >> 8) |
+      ((c & 0xFF000000) >> 24);
+}
+
+std::string rd7i_mk2hex(unsigned int c32) {
+  rd7i_swap32(c32);
+  std::stringstream ss;
+  ss << "#";
+  ss << std::hex << std::setw(8) << std::setfill('0') << c32;
+  return ss.str();
+}
+
+// Standart Color Converter
+static const std::map<char, int> HEX_TO_DEC = {
+    {'0', 0},  {'1', 1},  {'2', 2},  {'3', 3},  {'4', 4},  {'5', 5},
+    {'6', 6},  {'7', 7},  {'8', 8},  {'9', 9},  {'a', 10}, {'b', 11},
+    {'c', 12}, {'d', 13}, {'e', 14}, {'f', 15}, {'A', 10}, {'B', 11},
+    {'C', 12}, {'D', 13}, {'E', 14}, {'F', 15}};
+
+unsigned int rd7i_special_color_hex(const std::string& hex) {
+  if (hex.length() < 9 || std::find_if(hex.begin() + 1, hex.end(), [](char c) {
+                            return !std::isxdigit(c);
+                          }) != hex.end()) {
+    return rd7i_special_color_hex("#00000000");
+  }
+
+  int r = HEX_TO_DEC.at(hex[1]) * 16 + HEX_TO_DEC.at(hex[2]);
+  int g = HEX_TO_DEC.at(hex[3]) * 16 + HEX_TO_DEC.at(hex[4]);
+  int b = HEX_TO_DEC.at(hex[5]) * 16 + HEX_TO_DEC.at(hex[6]);
+  int a = HEX_TO_DEC.at(hex[7]) * 16 + HEX_TO_DEC.at(hex[8]);
+
+  return RGBA8(r, g, b, a);
+}
+
 // Default Theme
 const std::map<RD7Color, unsigned int> rd7i_default_theme = {
     {RD7Color_Text, RGBA8(0, 0, 0, 255)},
@@ -44,6 +79,86 @@ const std::map<RD7Color, unsigned int> rd7i_default_theme = {
     {RD7Color_FrameBgHovered, RGBA8(119, 119, 119, 255)},
     {RD7Color_Progressbar, RGBA8(0, 255, 0, 255)},
 };
+
+void RenderD7::Theme::Load(const std::string& path) {
+  std::ifstream file(path);
+  if (!file.is_open()) {
+    return;
+  }
+  nlohmann::json js;
+  file >> js;
+  // clang-format off
+  if(THEMEVER != js["version"]) {
+    file.close();
+    return; 
+  }
+  this->clr_tab.clear();
+  this->clr_tab.resize(RD7Color_Len);
+  this->clr_tab[RD7Color_Text] = rd7i_special_color_hex(js["RD7Color_Text"].get<std::string>());
+  this->clr_tab[RD7Color_Text2] = rd7i_special_color_hex(js["RD7Color_Text2"].get<std::string>());
+  this->clr_tab[RD7Color_TextDisabled] = rd7i_special_color_hex(js["RD7Color_TextDisabled"].get<std::string>());
+  this->clr_tab[RD7Color_Background] = rd7i_special_color_hex(js["RD7Color_Background"].get<std::string>());
+  this->clr_tab[RD7Color_Header] = rd7i_special_color_hex(js["RD7Color_Header"].get<std::string>());
+  this->clr_tab[RD7Color_Selector] = rd7i_special_color_hex(js["RD7Color_Selector"].get<std::string>());
+  this->clr_tab[RD7Color_SelectorFade] = rd7i_special_color_hex(js["RD7Color_SelectorFade"].get<std::string>());
+  this->clr_tab[RD7Color_List0] = rd7i_special_color_hex(js["RD7Color_List0"].get<std::string>());
+  this->clr_tab[RD7Color_List1] = rd7i_special_color_hex(js["RD7Color_List1"].get<std::string>());
+  this->clr_tab[RD7Color_MessageBackground] =  rd7i_special_color_hex(js["RD7Color_MessageBackground"].get<std::string>());
+  this->clr_tab[RD7Color_Button] = rd7i_special_color_hex(js["RD7Color_Button"].get<std::string>());
+  this->clr_tab[RD7Color_ButtonHovered] = rd7i_special_color_hex(js["RD7Color_ButtonHovered"].get<std::string>());
+  this->clr_tab[RD7Color_ButtonDisabled] = rd7i_special_color_hex(js["RD7Color_ButtonDisabled"].get<std::string>());
+  this->clr_tab[RD7Color_ButtonActive] = rd7i_special_color_hex(js["RD7Color_ButtonActive"].get<std::string>());
+  this->clr_tab[RD7Color_Checkmark] = rd7i_special_color_hex(js["RD7Color_Checkmark"].get<std::string>());
+  this->clr_tab[RD7Color_FrameBg] = rd7i_special_color_hex(js["RD7Color_FrameBg"].get<std::string>());
+  this->clr_tab[RD7Color_FrameBgHovered] = rd7i_special_color_hex(js["RD7Color_FrameBgHovered"].get<std::string>());
+  this->clr_tab[RD7Color_Progressbar] = rd7i_special_color_hex(js["RD7Color_Progressbar"].get<std::string>());
+  // clang-format on
+  file.close();
+}
+
+void RenderD7::Theme::Default() {
+  this->clr_tab.clear();
+  this->clr_tab.resize(RD7Color_Len);
+  for (auto& it : rd7i_default_theme) {
+    this->clr_tab[it.first] = it.second;
+  }
+}
+
+unsigned int RenderD7::Theme::Get(RD7Color clr) {
+  if (clr < 0 || clr >= RD7Color_Len) return 0;
+  return this->clr_tab[clr];
+}
+void RenderD7::Theme::Set(RD7Color clr, unsigned int v) {
+  if (clr < 0 || clr >= RD7Color_Len) return;
+  this->changes.push_back(change(clr, this->clr_tab[clr], v));
+  this->clr_tab[clr] = v;
+}
+void RenderD7::Theme::Swap(RD7Color a, RD7Color b) {
+  if (a < 0 || a >= RD7Color_Len || b < 0 || b >= RD7Color_Len) return;
+  auto c = this->clr_tab[a];
+  this->clr_tab[a] = this->clr_tab[b];
+  this->clr_tab[b] = c;
+  this->changes.push_back(change(a, b, c, this->clr_tab[a]));
+}
+
+bool RenderD7::Theme::Undo() {
+  if (!this->changes.size()) return false;
+  auto ch = this->changes[this->changes.size() - 1];
+  this->changes.pop_back();
+  if (ch.clr2) {
+    this->clr_tab[ch.clr2] = ch.to;
+    this->clr_tab[ch.clr] = ch.from;
+  } else {
+    this->clr_tab[ch.clr] = ch.from;
+  }
+  return true;
+}
+
+void RenderD7::Theme::UndoAll() {
+  while (Undo()) {
+    // Just Run Undo Until all is undone
+  }
+}
 
 // RenderD7 StyleColor Api
 // not const cause const = error lol
@@ -89,41 +204,6 @@ void RenderD7::UndoColorEdit(RD7Color color) {
 }
 
 void RenderD7::UndoAllColorEdits() { rd7i_color_swap_map.clear(); }
-
-void rd7i_swap32(unsigned int& c) {
-  c = ((c & 0xFF) << 24) | ((c & 0xFF00) << 8) | ((c & 0xFF0000) >> 8) |
-      ((c & 0xFF000000) >> 24);
-}
-
-std::string rd7i_mk2hex(unsigned int c32) {
-  rd7i_swap32(c32);
-  std::stringstream ss;
-  ss << "#";
-  ss << std::hex << std::setw(8) << std::setfill('0') << c32;
-  return ss.str();
-}
-
-// Standart Color Converter
-static const std::map<char, int> HEX_TO_DEC = {
-    {'0', 0},  {'1', 1},  {'2', 2},  {'3', 3},  {'4', 4},  {'5', 5},
-    {'6', 6},  {'7', 7},  {'8', 8},  {'9', 9},  {'a', 10}, {'b', 11},
-    {'c', 12}, {'d', 13}, {'e', 14}, {'f', 15}, {'A', 10}, {'B', 11},
-    {'C', 12}, {'D', 13}, {'E', 14}, {'F', 15}};
-
-unsigned int rd7i_special_color_hex(const std::string& hex) {
-  if (hex.length() < 9 || std::find_if(hex.begin() + 1, hex.end(), [](char c) {
-                            return !std::isxdigit(c);
-                          }) != hex.end()) {
-    return rd7i_special_color_hex("#00000000");
-  }
-
-  int r = HEX_TO_DEC.at(hex[1]) * 16 + HEX_TO_DEC.at(hex[2]);
-  int g = HEX_TO_DEC.at(hex[3]) * 16 + HEX_TO_DEC.at(hex[4]);
-  int b = HEX_TO_DEC.at(hex[5]) * 16 + HEX_TO_DEC.at(hex[6]);
-  int a = HEX_TO_DEC.at(hex[7]) * 16 + HEX_TO_DEC.at(hex[8]);
-
-  return RGBA8(r, g, b, a);
-}
 
 void RenderD7::ThemeLoad(const std::string& path) {
   std::ifstream file(path);
