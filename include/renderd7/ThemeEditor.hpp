@@ -38,5 +38,10 @@ class ThemeEditor : public RenderD7::Scene {
   mutable bool cm;
   mutable std::string inpt;
   mutable int menu = 0;
+
+  // Keyboard
+  mutable RD7KeyboardState kbd_state;
+  mutable std::string kbd_text;
+  mutable std::vector<std::string> theme_list;
 };
 }  // namespace RenderD7

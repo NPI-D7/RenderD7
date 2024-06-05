@@ -28,7 +28,7 @@
 #define UNPACK_BGRA(col) (uint8_t)(col >> 8), (col >> 16), (col >> 24), (col)
 
 inline uint32_t RGBA8(uint8_t r, uint8_t g, uint8_t b, uint8_t a = 255) {
-#define ISIMPLEPAK(x, y) (((x) & 0xff) << y)
+#define ISIMPLEPAK(x, y) (((x)&0xff) << y)
   return (ISIMPLEPAK(r, 0) | ISIMPLEPAK(g, 8) | ISIMPLEPAK(b, 16) |
           ISIMPLEPAK(a, 24));
 }
@@ -100,6 +100,9 @@ class Theme {
   // For Smart Pointer
   using Ref = std::shared_ptr<Theme>;
   static Ref New() { return std::make_shared<Theme>(); }
+
+  // Loader method
+  void CopyOther(Theme::Ref theme);
 
  private:
   struct change {

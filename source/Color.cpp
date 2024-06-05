@@ -20,6 +20,7 @@
 #include <fstream>
 #include <map>
 #include <renderd7/Color.hpp>
+#include <renderd7/Message.hpp>
 #include <renderd7/external/json.hpp>
 #include <renderd7/internal_db.hpp>
 
@@ -124,6 +125,14 @@ void RenderD7::Theme::Default() {
   }
 }
 
+void RenderD7::Theme::CopyOther(Theme::Ref theme) {
+  this->clr_tab.clear();
+  this->clr_tab.resize(RD7Color_Len);
+  for (int i = 0; i < (int)RD7Color_Len; i++) {
+    this->clr_tab[i] = theme->Get(i);
+  }
+}
+
 unsigned int RenderD7::Theme::Get(RD7Color clr) {
   if (clr < 0 || clr >= RD7Color_Len) return 0;
   return this->clr_tab[clr];
@@ -172,11 +181,13 @@ void RenderD7::Theme::UndoAll() {
 void RenderD7::Theme::Save(const std::string& path) {
   if (std::filesystem::path(path).filename().string() == "renderd7.theme") {
     if (!rd7i_amdt) {
+      RenderD7::PushMessage("Theme", "Default Theme cannot\nbe overwritten!");
       return;
     }
   }
   std::ofstream file(path);
   if (!file.is_open()) {
+    RenderD7::PushMessage("Theme", "Unable to\ncreate file!");
     return;
   }
   nlohmann::json js;

@@ -553,6 +553,8 @@ void BrowserList(const std::vector<std::string> &entrys, int &selection,
   if (size.x == 0) size.x = (rd7i_current_screen ? 400 : 320) - (pos.x * 2);
   if (size.y == 0) size.y = (max_entrys * 15);
   UI7CtxCursorMove(size);
+  int selindex = (selection < max_entrys ? selection : (max_entrys - 1));
+
   for (int i = 0; i < max_entrys; i++) {
     ui7_ctx->cm->main.push_back(
         DrawCmd::New(R7Vec4(pos + R7Vec2(0, 15 * i), R7Vec2(size.x, 15)),
@@ -562,7 +564,6 @@ void BrowserList(const std::vector<std::string> &entrys, int &selection,
        i < ((entrys.size() < (size_t)max_entrys) ? entrys.size()
                                                  : (size_t)max_entrys);
        i++) {
-    int selindex = (selection < max_entrys ? selection : (max_entrys - 1));
     int list_index =
         (selection < max_entrys ? i : (i + selection - (max_entrys - 1)));
     if (i == (size_t)selindex) {
@@ -933,7 +934,7 @@ void ColorSelector(const std::string &label, unsigned int &color) {
                        0xff0000ff));
 
       auto ncmd = DrawCmd::New(npos + R7Vec2(2, cbs.y * 3 + 4),
-                               std::to_string(clr.m_r), RD7Color_Text);
+                               "R: " + std::to_string(clr.m_r), RD7Color_Text);
       ncmd->text_flags |= RD7TextFlags_AlignMid;
       ncmd->text_box = R7Vec2(50, 0);
       ui7_ctx->cm->front.push_back(ncmd);
@@ -948,7 +949,7 @@ void ColorSelector(const std::string &label, unsigned int &color) {
                               R7Vec2(50 * ((float)clr.m_g / 255.f), cbs.y)),
                        0xff00ff00));
       auto ncmd = DrawCmd::New(npos + R7Vec2(54, cbs.y * 3 + 4),
-                               std::to_string(clr.m_g), RD7Color_Text);
+                               "G: " + std::to_string(clr.m_g), RD7Color_Text);
       ncmd->text_flags |= RD7TextFlags_AlignMid;
       ncmd->text_box = R7Vec2(50, 0);
       ui7_ctx->cm->front.push_back(ncmd);
@@ -964,7 +965,7 @@ void ColorSelector(const std::string &label, unsigned int &color) {
                        0xffff0000));
 
       auto ncmd = DrawCmd::New(npos + R7Vec2(2, cbs.y * 4 + 4),
-                               std::to_string(clr.m_b), RD7Color_Text);
+                               "B: " + std::to_string(clr.m_b), RD7Color_Text);
       ncmd->text_flags |= RD7TextFlags_AlignMid;
       ncmd->text_box = R7Vec2(50, 0);
       ui7_ctx->cm->front.push_back(ncmd);
@@ -980,7 +981,7 @@ void ColorSelector(const std::string &label, unsigned int &color) {
                        0xffffffff));
 
       auto ncmd = DrawCmd::New(npos + R7Vec2(54, cbs.y * 4 + 4),
-                               std::to_string(clr.m_a), RD7Color_Text);
+                               "A: " + std::to_string(clr.m_a), RD7Color_Text);
       ncmd->text_flags |= RD7TextFlags_AlignMid;
       ncmd->text_box = R7Vec2(50, 0);
       ui7_ctx->cm->front.push_back(ncmd);
