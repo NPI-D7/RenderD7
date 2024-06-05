@@ -74,6 +74,7 @@ float rd7_draw2_tsm = 1.2f;
 bool rd7i_amdt = false;
 void *rd7i_soc_buf = nullptr;
 bool rd7i_is_am_init = false;
+RenderD7::Theme::Ref rd7i_active_theme;
 
 /// Global ///
 // Outdated HidApi (HidV2Patched)

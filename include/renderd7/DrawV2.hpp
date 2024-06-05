@@ -68,6 +68,8 @@ void TriangleSolid(R7Vec2 pos0, R7Vec2 pos1, R7Vec2 pos2, unsigned int color);
 void TriangleLined(R7Vec2 pos0, R7Vec2 pos1, R7Vec2 pos2, unsigned int color,
                    int t = 1);
 void Text(R7Vec2 pos, const std::string& text, RD7TextFlags flags = 0);
+void TextClr(R7Vec2 pos, const std::string& text, unsigned int color,
+             RD7TextFlags flags = 0);
 void Image(RenderD7::Image* img, const R7Vec2& pos = R7Vec2(0, 0),
            const R7Vec2& scale = R7Vec2(1, 1));
 }  // namespace Draw2

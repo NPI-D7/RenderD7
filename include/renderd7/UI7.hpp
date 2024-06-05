@@ -65,6 +65,7 @@ void EndMenu();
 void Grid(const std::string &name, const R7Vec2 &size, const R7Vec2 &entry_size,
           void (*display_func)(void *, R7Vec2), void **data_array,
           size_t num_entrys);
+void ColorSelector(const std::string &label, unsigned int &color);
 bool BeginTree(const std::string &text);
 void EndTree();
 R7Vec2 GetCursorPos();

@@ -40,6 +40,30 @@ struct Key {
   int action = 0;
 };
 
+std::vector<Key> keyboard_layout_num{
+    // 1st row
+    {"7", R7Vec2(5, 135), R7Vec2(36, 24), 0},
+    {"8", R7Vec2(43, 135), R7Vec2(36, 24), 0},
+    {"9", R7Vec2(81, 135), R7Vec2(36, 24), 0},
+    // 2nd row
+    {"4", R7Vec2(5, 161), R7Vec2(36, 24), 0},
+    {"5", R7Vec2(43, 161), R7Vec2(36, 24), 0},
+    {"6", R7Vec2(81, 161), R7Vec2(36, 24), 0},
+    // 3rd row
+    {"1", R7Vec2(5, 187), R7Vec2(36, 24), 0},
+    {"2", R7Vec2(43, 187), R7Vec2(36, 24), 0},
+    {"3", R7Vec2(81, 187), R7Vec2(36, 24), 0},
+
+    // 4th row
+    {"0", R7Vec2(5, 213), R7Vec2(74, 24), 0},
+    {".", R7Vec2(81, 213), R7Vec2(36, 24), 0},
+    // additional actions
+    {"bksp", R7Vec2(119, 135), R7Vec2(74, 24), 2},
+    //{"", R7Vec2(119, 161), R7Vec2(74, 24), 0},
+    {"Confirm", R7Vec2(119, 187), R7Vec2(74, 24), 5},
+    {"Cancel", R7Vec2(119, 213), R7Vec2(74, 24), 4},
+};
+
 std::vector<Key> keyboard_layout = {
     // 1st row
     {"`", R7Vec2(5, 137), R7Vec2(18, 18), 0},
@@ -336,7 +360,7 @@ void Ovl_Metrik::Draw(void) const {
                        RenderD7::GetTextDimensions(mt_tbs), i_mt_color[0]);
   RenderD7::Draw2::RFS(R7Vec2(0, infoy), RenderD7::GetTextDimensions(info),
                        i_mt_color[0]);
-  RenderD7::CustomizeColor(RD7Color_Text, i_txt_color[0]);
+  RenderD7::ThemeActive()->Set(RD7Color_Text, i_txt_color[0]);
   RenderD7::Draw2::Text(R7Vec2(0, 0), mt_fps);
   RenderD7::Draw2::Text(R7Vec2(0, 50), mt_cpu);
   RenderD7::Draw2::Text(R7Vec2(0, 50 + dim_y * 1), mt_gpu);
@@ -344,7 +368,7 @@ void Ovl_Metrik::Draw(void) const {
   RenderD7::Draw2::Text(R7Vec2(0, 50 + dim_y * 3), mt_lfr);
   RenderD7::Draw2::Text(R7Vec2(0, 50 + dim_y * 4), mt_tbs);
   RenderD7::Draw2::Text(R7Vec2(0, infoy), info);
-  RenderD7::UndoColorEdit(RD7Color_Text);
+  RenderD7::ThemeActive()->Undo();
 
   // Force Bottom (Debug Touchpos)
   RenderD7::OnScreen(Bottom);
@@ -370,6 +394,7 @@ Ovl_Keyboard::Ovl_Keyboard(std::string& ref, RD7KeyboardState& state,
   RenderD7::Hid::Lock();
   typed_text = &ref;
   this->state = &state;
+  this->type = type;
   *this->state = RD7KeyboardState_None;
   str_bak = ref;
   ft3 = 0;
@@ -384,7 +409,8 @@ void Ovl_Keyboard::Draw(void) const {
   float tmp_txt = RenderD7::TextGetSize();
   RenderD7::TextDefaultSize();
   if (ft3 > 5) RenderD7::Hid::Unlock();
-  auto key_table = keyboard_layout;
+  auto key_table =
+      (type == RD7Keyboard_Numpad) ? keyboard_layout_num : keyboard_layout;
   if (mode == 1)
     key_table = keyboard_layout_caps;
   else if (mode == 2)
@@ -398,17 +424,21 @@ void Ovl_Keyboard::Draw(void) const {
       R7Vec2(0, 0), R7Vec2(320, 112),
       RenderD7::Color::RGBA(RD7Color_FrameBg).changeA(150).toRGBA());
   RenderD7::Draw2::RFS(R7Vec2(0, 112), R7Vec2(320, 128),
-                       RenderD7::StyleColor(RD7Color_FrameBg));
+                       RenderD7::ThemeActive()->Get(RD7Color_FrameBg));
   RenderD7::Draw2::RFS(R7Vec2(0, 112), R7Vec2(320, 20),
-                       RenderD7::StyleColor(RD7Color_Header));
-  RenderD7::TextColorByBg(RD7Color_Header);
+                       RenderD7::ThemeActive()->Get(RD7Color_Header));
+  RenderD7::ThemeActive()->TextBy(RD7Color_Header);
   RenderD7::Draw2::Text(R7Vec2(5, 114), "> " + *typed_text);
-  RenderD7::UndoColorEdit(RD7Color_Text);
+  RenderD7::ThemeActive()->Undo();
   for (auto const& it : key_table) {
     R7Vec2 txtdim = RenderD7::GetTextDimensions(it.disp);
     R7Vec2 txtpos = R7Vec2(it.pos.x + it.size.x * 0.5 - txtdim.x * 0.5,
                            it.pos.y + it.size.y * 0.5 - txtdim.y * 0.5);
     RD7Color btn = RD7Color_Button;
+    if (RenderD7::Hid::IsEvent("cancel", RenderD7::Hid::Up)) {
+      RenderD7::Hid::Clear();
+      shared_data[0x05] = 1;
+    }
     if (RenderD7::Hid::IsEvent("touch", RenderD7::Hid::Up) &&
         UI7_InBox(RenderD7::Hid::GetLastTouchPosition(), it.pos, it.size)) {
       if (mode == 2)  // Request Disable Shift
@@ -436,10 +466,10 @@ void Ovl_Keyboard::Draw(void) const {
                UI7_InBox(RenderD7::Hid::GetTouchPosition(), it.pos, it.size)) {
       btn = RD7Color_ButtonHovered;
     }
-    RenderD7::Draw2::RFS(it.pos, it.size, RenderD7::StyleColor(btn));
-    RenderD7::TextColorByBg(btn);
+    RenderD7::Draw2::RFS(it.pos, it.size, RenderD7::ThemeActive()->Get(btn));
+    RenderD7::ThemeActive()->TextBy(btn);
     RenderD7::Draw2::Text(txtpos, it.disp);
-    RenderD7::UndoColorEdit(RD7Color_Text);
+    RenderD7::ThemeActive()->Undo();
   }
   if (ft3 > 5) RenderD7::Hid::Lock();
   RenderD7::CustomTextSize(tmp_txt);

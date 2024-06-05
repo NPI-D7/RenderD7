@@ -28,7 +28,7 @@ void rd7i_swap32(unsigned int& c) {
       ((c & 0xFF000000) >> 24);
 }
 
-std::string rd7i_mk2hex(unsigned int c32) {
+std::string RenderD7::Color::RGBA2Hex(unsigned int c32) {
   rd7i_swap32(c32);
   std::stringstream ss;
   ss << "#";
@@ -128,6 +128,7 @@ unsigned int RenderD7::Theme::Get(RD7Color clr) {
   if (clr < 0 || clr >= RD7Color_Len) return 0;
   return this->clr_tab[clr];
 }
+
 void RenderD7::Theme::Set(RD7Color clr, unsigned int v) {
   if (clr < 0 || clr >= RD7Color_Len) return;
   this->changes.push_back(change(clr, this->clr_tab[clr], v));
@@ -139,6 +140,14 @@ void RenderD7::Theme::Swap(RD7Color a, RD7Color b) {
   this->clr_tab[a] = this->clr_tab[b];
   this->clr_tab[b] = c;
   this->changes.push_back(change(a, b, c, this->clr_tab[a]));
+}
+
+void RenderD7::Theme::TextBy(RD7Color bg) {
+  if (!Color::RGBA(bg).is_light()) Swap(RD7Color_Text, RD7Color_Text2);
+}
+
+RD7Color RenderD7::Theme::AutoText(RD7Color bg) {
+  return Color::RGBA(bg).is_light() ? RD7Color_Text : RD7Color_Text2;
 }
 
 bool RenderD7::Theme::Undo() {
@@ -160,86 +169,7 @@ void RenderD7::Theme::UndoAll() {
   }
 }
 
-// RenderD7 StyleColor Api
-// not const cause const = error lol
-std::map<RD7Color, unsigned int> rd7i_color_map = rd7i_default_theme;
-
-std::map<RD7Color, unsigned int> rd7i_color_swap_map;
-
-unsigned int RenderD7::StyleColor(RD7Color color) {
-  if (rd7i_color_swap_map.find(color) != rd7i_color_swap_map.end())
-    return rd7i_color_swap_map[color];
-  else if (rd7i_color_map.find(color) != rd7i_color_map.end())
-    return rd7i_color_map[color];
-  return RGBA8(0, 0, 0, 0);
-}
-
-void RenderD7::ColorNew(RD7Color color, unsigned int new_color) {
-  // Dont edit before Init
-  if (!rd7i_running) return;
-  rd7i_color_map[color] = new_color;
-}
-
-void RenderD7::RedirectColor(RD7Color to, RD7Color from) {
-  // As you see at the code Redirect doesnt redirect xd
-  // Just named cause it feels like redirecting
-  // Oh and if the color is edit you redirect to it is
-  // grabs that redirected lol
-  rd7i_color_swap_map[to] = StyleColor(from);
-}
-
-void RenderD7::CustomizeColor(RD7Color color, unsigned int custom) {
-  rd7i_color_swap_map[color] = custom;
-}
-
-void RenderD7::TextColorByBg(RD7Color background) {
-  UndoColorEdit(RD7Color_Text);  // To be sure
-  rd7i_color_swap_map[RD7Color_Text] = StyleColor(
-      Color::RGBA(background).is_light() ? RD7Color_Text : RD7Color_Text2);
-}
-
-void RenderD7::UndoColorEdit(RD7Color color) {
-  if (rd7i_color_swap_map.find(color) == rd7i_color_swap_map.end()) return;
-  rd7i_color_swap_map.erase(color);
-}
-
-void RenderD7::UndoAllColorEdits() { rd7i_color_swap_map.clear(); }
-
-void RenderD7::ThemeLoad(const std::string& path) {
-  std::ifstream file(path);
-  if (!file.is_open()) {
-    return;
-  }
-  nlohmann::json js;
-  file >> js;
-  // clang-format off
-  if(THEMEVER != js["version"]) {
-    file.close();
-    return; 
-  }
-  rd7i_color_map[RD7Color_Text] =rd7i_special_color_hex(js["RD7Color_Text"].get<std::string>());
-  rd7i_color_map[RD7Color_Text2] =rd7i_special_color_hex(js["RD7Color_Text2"].get<std::string>());
-  rd7i_color_map[RD7Color_TextDisabled] =rd7i_special_color_hex(js["RD7Color_TextDisabled"].get<std::string>());
-  rd7i_color_map[RD7Color_Background] =rd7i_special_color_hex(js["RD7Color_Background"].get<std::string>());
-  rd7i_color_map[RD7Color_Header] =rd7i_special_color_hex(js["RD7Color_Header"].get<std::string>());
-  rd7i_color_map[RD7Color_Selector] =rd7i_special_color_hex(js["RD7Color_Selector"].get<std::string>());
-  rd7i_color_map[RD7Color_SelectorFade] =rd7i_special_color_hex(js["RD7Color_SelectorFade"].get<std::string>());
-  rd7i_color_map[RD7Color_List0] =rd7i_special_color_hex(js["RD7Color_List0"].get<std::string>());
-  rd7i_color_map[RD7Color_List1] =rd7i_special_color_hex(js["RD7Color_List1"].get<std::string>());
-  rd7i_color_map[RD7Color_MessageBackground] = rd7i_special_color_hex(js["RD7Color_MessageBackground"].get<std::string>());
-  rd7i_color_map[RD7Color_Button] =rd7i_special_color_hex(js["RD7Color_Button"].get<std::string>());
-  rd7i_color_map[RD7Color_ButtonHovered] =rd7i_special_color_hex(js["RD7Color_ButtonHovered"].get<std::string>());
-  rd7i_color_map[RD7Color_ButtonDisabled] =rd7i_special_color_hex(js["RD7Color_ButtonDisabled"].get<std::string>());
-  rd7i_color_map[RD7Color_ButtonActive] =rd7i_special_color_hex(js["RD7Color_ButtonActive"].get<std::string>());
-  rd7i_color_map[RD7Color_Checkmark] =rd7i_special_color_hex(js["RD7Color_Checkmark"].get<std::string>());
-  rd7i_color_map[RD7Color_FrameBg] =rd7i_special_color_hex(js["RD7Color_FrameBg"].get<std::string>());
-  rd7i_color_map[RD7Color_FrameBgHovered] =rd7i_special_color_hex(js["RD7Color_FrameBgHovered"].get<std::string>());
-  rd7i_color_map[RD7Color_Progressbar] =rd7i_special_color_hex(js["RD7Color_Progressbar"].get<std::string>());
-  // clang-format on
-  file.close();
-}
-
-void RenderD7::ThemeSave(const std::string& path) {
+void RenderD7::Theme::Save(const std::string& path) {
   if (std::filesystem::path(path).filename().string() == "renderd7.theme") {
     if (!rd7i_amdt) {
       return;
@@ -252,30 +182,37 @@ void RenderD7::ThemeSave(const std::string& path) {
   nlohmann::json js;
   // clang-format off
   js["version"] = THEMEVER;
-  js["RD7Color_Text"] = rd7i_mk2hex(rd7i_color_map[RD7Color_Text]);
-  js["RD7Color_Text2"] = rd7i_mk2hex(rd7i_color_map[RD7Color_Text2]);
-  js["RD7Color_TextDisabled"] = rd7i_mk2hex(rd7i_color_map[RD7Color_TextDisabled]);
-  js["RD7Color_Background"] = rd7i_mk2hex(rd7i_color_map[RD7Color_Background]);
-  js["RD7Color_Header"] = rd7i_mk2hex(rd7i_color_map[RD7Color_Header]);
-  js["RD7Color_Selector"] = rd7i_mk2hex(rd7i_color_map[RD7Color_Selector]);
-  js["RD7Color_SelectorFade"] = rd7i_mk2hex(rd7i_color_map[RD7Color_SelectorFade]);
-  js["RD7Color_List0"] = rd7i_mk2hex(rd7i_color_map[RD7Color_List0]);
-  js["RD7Color_List1"] = rd7i_mk2hex(rd7i_color_map[RD7Color_List1]);
-  js["RD7Color_MessageBackground"] = rd7i_mk2hex(rd7i_color_map[RD7Color_MessageBackground]);
-  js["RD7Color_Button"] = rd7i_mk2hex(rd7i_color_map[RD7Color_Button]);
-  js["RD7Color_ButtonHovered"] = rd7i_mk2hex(rd7i_color_map[RD7Color_ButtonHovered]);
-  js["RD7Color_ButtonDisabled"] = rd7i_mk2hex(rd7i_color_map[RD7Color_ButtonDisabled]);
-  js["RD7Color_ButtonActive"] = rd7i_mk2hex(rd7i_color_map[RD7Color_ButtonActive]);
-  js["RD7Color_Checkmark"] = rd7i_mk2hex(rd7i_color_map[RD7Color_Checkmark]);
-  js["RD7Color_FrameBg"] = rd7i_mk2hex(rd7i_color_map[RD7Color_FrameBg]);
-  js["RD7Color_FrameBgHovered"] = rd7i_mk2hex(rd7i_color_map[RD7Color_FrameBgHovered]);
-  js["RD7Color_Progressbar"] = rd7i_mk2hex(rd7i_color_map[RD7Color_Progressbar]);
+  js["RD7Color_Text"] = RenderD7::Color::RGBA2Hex(this->clr_tab[RD7Color_Text]);
+  js["RD7Color_Text2"] = RenderD7::Color::RGBA2Hex(this->clr_tab[RD7Color_Text2]);
+  js["RD7Color_TextDisabled"] =
+RenderD7::Color::RGBA2Hex(this->clr_tab[RD7Color_TextDisabled]); js["RD7Color_Background"] =
+RenderD7::Color::RGBA2Hex(this->clr_tab[RD7Color_Background]); js["RD7Color_Header"] =
+RenderD7::Color::RGBA2Hex(this->clr_tab[RD7Color_Header]); js["RD7Color_Selector"] =
+RenderD7::Color::RGBA2Hex(this->clr_tab[RD7Color_Selector]); js["RD7Color_SelectorFade"] =
+RenderD7::Color::RGBA2Hex(this->clr_tab[RD7Color_SelectorFade]); js["RD7Color_List0"] =
+RenderD7::Color::RGBA2Hex(this->clr_tab[RD7Color_List0]); js["RD7Color_List1"] =
+RenderD7::Color::RGBA2Hex(this->clr_tab[RD7Color_List1]); js["RD7Color_MessageBackground"] =
+RenderD7::Color::RGBA2Hex(this->clr_tab[RD7Color_MessageBackground]); js["RD7Color_Button"] =
+RenderD7::Color::RGBA2Hex(this->clr_tab[RD7Color_Button]); js["RD7Color_ButtonHovered"] =
+RenderD7::Color::RGBA2Hex(this->clr_tab[RD7Color_ButtonHovered]);
+  js["RD7Color_ButtonDisabled"] =
+RenderD7::Color::RGBA2Hex(this->clr_tab[RD7Color_ButtonDisabled]);
+  js["RD7Color_ButtonActive"] =
+RenderD7::Color::RGBA2Hex(this->clr_tab[RD7Color_ButtonActive]); js["RD7Color_Checkmark"] =
+RenderD7::Color::RGBA2Hex(this->clr_tab[RD7Color_Checkmark]); js["RD7Color_FrameBg"] =
+RenderD7::Color::RGBA2Hex(this->clr_tab[RD7Color_FrameBg]); js["RD7Color_FrameBgHovered"] =
+RenderD7::Color::RGBA2Hex(this->clr_tab[RD7Color_FrameBgHovered]); js["RD7Color_Progressbar"]
+= RenderD7::Color::RGBA2Hex(this->clr_tab[RD7Color_Progressbar]);
   // clang-format on
   file << js.dump(4);
   file.close();
 }
 
-void RenderD7::ThemeDefault() { rd7i_color_map = rd7i_default_theme; }
+RenderD7::Theme::Ref RenderD7::ThemeActive() { return rd7i_active_theme; }
+
+void RenderD7::ThemeSet(RenderD7::Theme::Ref theme) {
+  rd7i_active_theme = theme;
+}
 
 uint32_t RenderD7::Color::Hex(const std::string& color, uint8_t a) {
   if (color.length() < 7 ||

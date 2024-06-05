@@ -198,8 +198,15 @@ void TriangleLined(R7Vec2 pos0, R7Vec2 pos1, R7Vec2 pos2, unsigned int color,
 }
 
 void Text(R7Vec2 pos, const std::string &text, RD7TextFlags flags) {
+  TextClr(pos, text, RenderD7::ThemeActive()->Get(RD7Color_Text), flags);
+}
+
+void TextClr(R7Vec2 pos, const std::string &text, unsigned int color,
+             RD7TextFlags flags) {
   // The Start of the C2D Text Hell
   if (!RD7I_FNT_VALID()) return;
+  // Check if Theme Loadet
+  if (!ThemeActive()) return;
   // little patch for a freeze
   if (text.length() < 1) return;
   // Variables
@@ -262,17 +269,17 @@ void Text(R7Vec2 pos, const std::string &text, RD7TextFlags flags) {
     if (flags & RD7TextFlags_Shaddow)  // performance Killer xd
       C2D_DrawText(&c2dtext, C2D_WithColor, newpos.x + 1 + (dim.y * line),
                    newpos.y + 1, 0.5, rd7i_d2_txt_size, rd7i_d2_txt_size,
-                   RenderD7::StyleColor(RD7Color_TextDisabled));
+                   RenderD7::ThemeActive()->Get(RD7Color_TextDisabled));
 
     C2D_DrawText(&c2dtext, C2D_WithColor, newpos.x, newpos.y + (dim.y * line),
-                 0.5, rd7i_d2_txt_size, rd7i_d2_txt_size,
-                 RenderD7::StyleColor(RD7Color_Text));
+                 0.5, rd7i_d2_txt_size, rd7i_d2_txt_size, color);
     edit_text = edit_text.substr(edit_text.find('\n') + 1);
     line++;
   }
 
   if (updated_mwh) rd7i_d7_mwh = R7Vec2(0, 0);
 }
+
 void Image(RenderD7::Image *img, const R7Vec2 &pos, const R7Vec2 &scale) {
   if (img->loaded())
     C2D_DrawImageAt(img->get(), pos.x, pos.y, 0.5f, nullptr, scale.x, scale.y);

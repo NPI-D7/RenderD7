@@ -50,6 +50,7 @@ void RegKeyEvent(const std::string &event, uint32_t key);
 bool IsEvent(const std::string &event, Actions action);
 R7Vec2 GetTouchPosition();
 R7Vec2 GetLastTouchPosition();
+R7Vec2 GetTouchDownPosition();
 void Update();
 // Lock/Unlock Input api for example for Keyboard
 void Lock();

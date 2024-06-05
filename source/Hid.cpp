@@ -41,6 +41,7 @@ class HidApi {
     // Clears Functionality for 1 Frame
     last_touch_pos = R7Vec2();
     touch_pos[0] = R7Vec2();
+    dtp = R7Vec2();
     backups[Hid::Down] = 0;
     backups[Hid::Held] = 0;
     backups[Hid::Up] = 0;
@@ -60,9 +61,16 @@ class HidApi {
 
   R7Vec2 getTouchPos() { return touch_pos[0]; }
   R7Vec2 getLastTouchPos() { return last_touch_pos; }
+  R7Vec2 getTouchDownPos() { return dtp; }
 
   void update() {
     last_touch_pos = touch_pos[0];
+    if (isEvent("touch", Hid::Down)) {
+      dtp = touch_pos[0];
+    }
+    if (isEvent("touch", Hid::Up)) {
+      dtp = R7Vec2();
+    }
     for (const auto &it : actions) {
       backups[it.first] = it.second[0];
     }
@@ -82,6 +90,7 @@ class HidApi {
   R7Vec2 *js2_mv = nullptr;
 
   R7Vec2 last_touch_pos;
+  R7Vec2 dtp;
 
   std::map<std::string, uint32_t> key_bindings;
   bool locked = false;
@@ -120,6 +129,7 @@ bool IsEvent(const std::string &event, Actions action) {
 }
 R7Vec2 GetTouchPosition() { return hid_handler.getTouchPos(); }
 R7Vec2 GetLastTouchPosition() { return hid_handler.getLastTouchPos(); }
+R7Vec2 GetTouchDownPosition() { return hid_handler.getTouchDownPos(); }
 void Update() { hid_handler.update(); }
 void Lock() { hid_handler.lock(true); }
 void Unlock() { hid_handler.lock(false); }

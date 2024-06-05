@@ -28,7 +28,7 @@
 #define UNPACK_BGRA(col) (uint8_t)(col >> 8), (col >> 16), (col >> 24), (col)
 
 inline uint32_t RGBA8(uint8_t r, uint8_t g, uint8_t b, uint8_t a = 255) {
-#define ISIMPLEPAK(x, y) (((x)&0xff) << y)
+#define ISIMPLEPAK(x, y) (((x) & 0xff) << y)
   return (ISIMPLEPAK(r, 0) | ISIMPLEPAK(g, 8) | ISIMPLEPAK(b, 16) |
           ISIMPLEPAK(a, 24));
 }
@@ -86,13 +86,17 @@ class Theme {
 
   void Load(const std::string &path);
   void Default();
+  void Save(const std::string &path);
 
   unsigned int Get(RD7Color clr);
   void Set(RD7Color clr, unsigned int v);
   void Swap(RD7Color a, RD7Color b);
   bool Undo();
   void UndoAll();
+  void TextBy(RD7Color bg);
+  RD7Color AutoText(RD7Color bg);
 
+  std::vector<unsigned int> &GetTableRef() { return clr_tab; }
   // For Smart Pointer
   using Ref = std::shared_ptr<Theme>;
   static Ref New() { return std::make_shared<Theme>(); }
@@ -113,20 +117,9 @@ class Theme {
   std::vector<change> changes;
 };
 
-unsigned int StyleColor(RD7Color color);
-void RedirectColor(RD7Color to, RD7Color from);
-void TextColorByBg(RD7Color background);
-/// @brief Customices a color until undone
-/// For example with RebderD7::Color::Hex
-void CustomizeColor(RD7Color color, unsigned int custom);
-/// @brief Completly changes a theme color
-void ColorNew(RD7Color color, unsigned int new_color);
-void UndoColorEdit(RD7Color color);
-void UndoAllColorEdits();
-void ThemeLoad(const std::string &path);
-void ThemeSave(const std::string &path);
-void ThemeDefault();
 Theme::Ref ThemeActive();
+/// @brief Change Theme Adress
+/// @param theme your adress
 void ThemeSet(Theme::Ref theme);
 namespace Color {
 /// @brief RGBA Class
@@ -154,7 +147,8 @@ class RGBA {
     m_a = ISIMPLEUNPAK(in, 24);
   }
   RGBA(RD7Color in) {
-    unsigned int col = RenderD7::StyleColor(in);
+    if (!RenderD7::ThemeActive()) return;
+    unsigned int col = RenderD7::ThemeActive()->Get(in);
     m_r = ISIMPLEUNPAK(col, 0);
     m_g = ISIMPLEUNPAK(col, 8);
     m_b = ISIMPLEUNPAK(col, 16);
@@ -207,6 +201,7 @@ class RGBA {
 
   uint8_t m_r, m_g, m_b, m_a;
 };
+std::string RGBA2Hex(unsigned int c32);
 /// @brief Convert RGB to Hex
 /// @param r
 /// @param g

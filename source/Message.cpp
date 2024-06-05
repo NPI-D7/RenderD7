@@ -65,22 +65,23 @@ void ProcessMessages() {
             200 - (float(msg_lst[i]->animationframe - fade_outs) / fol) * 200;
       }
       // Wtf is this function lol
-      RenderD7::CustomizeColor(RD7Color_MessageBackground,
-                               RenderD7::Color::RGBA(RD7Color_MessageBackground)
-                                   .changeA(new_alpha)
-                                   .toRGBA());
-      RenderD7::CustomizeColor(
+      RenderD7::ThemeActive()->Set(
+          RD7Color_MessageBackground,
+          RenderD7::Color::RGBA(RD7Color_MessageBackground)
+              .changeA(new_alpha)
+              .toRGBA());
+      RenderD7::ThemeActive()->Set(
           RD7Color_Text,
           RenderD7::Color::RGBA(RD7Color_Text2).changeA(new_alpha).toRGBA());
-      RenderD7::Draw2::RFS(pos, R7Vec2(150, 50),
-                           RenderD7::StyleColor(RD7Color_MessageBackground));
+      RenderD7::Draw2::RFS(
+          pos, R7Vec2(150, 50),
+          RenderD7::ThemeActive()->Get(RD7Color_MessageBackground));
       RenderD7::Draw2::Text(pos + R7Vec2(5, 1), msg_lst[i]->title);
       RenderD7::Draw2::Text(pos + R7Vec2(5, 17), msg_lst[i]->message);
       if (rd7_debugging)
         RenderD7::Draw2::Text(pos + R7Vec2(155, 1),
                               std::to_string(msg_lst[i]->animationframe));
-      RenderD7::UndoColorEdit(RD7Color_Text);
-      RenderD7::UndoColorEdit(RD7Color_MessageBackground);
+      RenderD7::ThemeActive()->UndoAll();
       // Why Frameadd? because Message uses int as frame and
       // It seems that lower 0.5 will be rounded to 0
       // Why not replace int with float ?

@@ -20,6 +20,7 @@
 #include <renderd7/Hid.hpp>     // Integate HidApi
 #include <renderd7/Message.hpp>
 #include <renderd7/Overlays.hpp>
+#include <renderd7/ThemeEditor.hpp>
 #include <renderd7/UI7.hpp>
 #include <renderd7/log.hpp>
 #include <renderd7/renderd7.hpp>
@@ -214,7 +215,7 @@ void rd7i_init_theme() {
 
   if (!RenderD7::FS::FileExist(path + "/renderd7.theme") || renew) {
     rd7i_amdt = true;
-    RenderD7::ThemeSave(path + "/renderd7.theme");
+    RenderD7::ThemeActive()->Save(path + "/renderd7.theme");
     rd7i_amdt = false;
   }
 }
@@ -347,6 +348,9 @@ Result RenderD7::Init::Main(std::string app_name) {
   atexit(aptExit);
   romfsInit();
 
+  rd7i_active_theme = Theme::New();
+  rd7i_active_theme->Default();
+
   auto ret = rd7i_soc_init();
   if (ret) {
     RenderD7::PushMessage("RenderD7", "Failed to\nInit Soc!");
@@ -392,6 +396,9 @@ Result RenderD7::Init::Minimal(std::string app_name) {
   gfxInitDefault();
   atexit(gfxExit);
   romfsInit();
+
+  rd7i_active_theme = Theme::New();
+  rd7i_active_theme->Default();
 
   auto ret = rd7i_soc_init();
   if (ret) {
@@ -561,6 +568,9 @@ void RenderD7::RSettings::Draw(void) const {
       if (UI7::Button("IDB")) {
         shared_request[0x00000001] = RIDB;
       }
+      if (UI7::Button("ThemeEditor")) {
+        RenderD7::LoadThemeEditor();
+      }
       if (UI7::Button("Back")) {
         shared_request[0x00000002] = 1U;
       }
@@ -600,38 +610,38 @@ void RenderD7::RSettings::Draw(void) const {
   } else if (m_state == RFTRACE) {
     RenderD7::OnScreen(Top);
     RenderD7::Draw2::RFS(R7Vec2(0, 0), R7Vec2(400, 240),
-                         RenderD7::StyleColor(RD7Color_Background));
+                         RenderD7::ThemeActive()->Get(RD7Color_Background));
     RenderD7::Draw2::RFS(R7Vec2(0, 0), R7Vec2(400, 20),
-                         RenderD7::StyleColor(RD7Color_Header));
-    RenderD7::TextColorByBg(RD7Color_Header);
+                         RenderD7::ThemeActive()->Get(RD7Color_Header));
+    RenderD7::ThemeActive()->TextBy(RD7Color_Header);
     RenderD7::Draw2::Text(R7Vec2(5, 2), "RenderD7 -> FTrace");
     RenderD7::Draw2::Text(R7Vec2(395, 2), RENDERD7VSTRING,
                           RD7TextFlags_AlignRight);
-    RenderD7::UndoColorEdit(RD7Color_Text);
+    RenderD7::ThemeActive()->Undo();
     RenderD7::Draw2::RFS(R7Vec2(0, 220), R7Vec2(400, 20),
-                         RenderD7::StyleColor(RD7Color_Header));
-    RenderD7::TextColorByBg(RD7Color_Header);
+                         RenderD7::ThemeActive()->Get(RD7Color_Header));
+    RenderD7::ThemeActive()->TextBy(RD7Color_Header);
     RenderD7::Draw2::Text(
         R7Vec2(5, 222),
         "Traces: " + std::to_string(ftrace_index + 1) + "/" +
             std::to_string(RenderD7::Ftrace::rd7_traces.size()));
-    RenderD7::UndoColorEdit(RD7Color_Text);
+    RenderD7::ThemeActive()->Undo();
     RenderD7::Draw2::RFS(R7Vec2(0, 20), R7Vec2(400, 20),
-                         RenderD7::StyleColor(RD7Color_TextDisabled));
-    RenderD7::TextColorByBg(RD7Color_TextDisabled);
+                         RenderD7::ThemeActive()->Get(RD7Color_TextDisabled));
+    RenderD7::ThemeActive()->TextBy(RD7Color_TextDisabled);
     RenderD7::Draw2::Text(R7Vec2(5, 22), "Function:");
     RenderD7::Draw2::Text(R7Vec2(395, 22),
                           "Time (ms):", RD7TextFlags_AlignRight);
-    RenderD7::UndoColorEdit(RD7Color_Text);
+    RenderD7::ThemeActive()->Undo();
 
     // List Bg
     for (int i = 0; i < 12; i++) {
       if ((i % 2 == 0))
-        RenderD7::Draw2::RFS(R7Vec2(0, 40 + (i)*15), R7Vec2(400, 15),
-                             RenderD7::StyleColor(RD7Color_List0));
+        RenderD7::Draw2::RFS(R7Vec2(0, 40 + (i) * 15), R7Vec2(400, 15),
+                             RenderD7::ThemeActive()->Get(RD7Color_List0));
       else
-        RenderD7::Draw2::RFS(R7Vec2(0, 40 + (i)*15), R7Vec2(400, 15),
-                             RenderD7::StyleColor(RD7Color_List1));
+        RenderD7::Draw2::RFS(R7Vec2(0, 40 + (i) * 15), R7Vec2(400, 15),
+                             RenderD7::ThemeActive()->Get(RD7Color_List1));
     }
 
     RenderD7::Ftrace::Beg("rd7ft", "display_traces");
@@ -647,24 +657,24 @@ void RenderD7::RSettings::Draw(void) const {
         _fkey__ = it->first;
         RenderD7::Draw2::RFS(R7Vec2(0, 40 + (ix - start_index) * 15),
                              R7Vec2(400, 15),
-                             RenderD7::StyleColor(RD7Color_Selector));
-        RenderD7::TextColorByBg(RD7Color_Header);
+                             RenderD7::ThemeActive()->Get(RD7Color_Selector));
+        RenderD7::ThemeActive()->TextBy(RD7Color_Header);
         RenderD7::Draw2::Text(R7Vec2(5, 40 + (ix - start_index) * 15),
                               it->second.func_name);
         RenderD7::Draw2::Text(R7Vec2(395, 40 + (ix - start_index) * 15),
                               RenderD7::MsTimeFmt(it->second.time_of),
                               RD7TextFlags_AlignRight);
-        RenderD7::UndoColorEdit(RD7Color_Text);
+        RenderD7::ThemeActive()->Undo();
 
       } else {
         // Use List 0 cause no reference for screenpos
-        RenderD7::TextColorByBg(RD7Color_List0);
+        RenderD7::ThemeActive()->TextBy(RD7Color_List0);
         RenderD7::Draw2::Text(R7Vec2(5, 40 + (ix - start_index) * 15),
                               it->second.func_name);
         RenderD7::Draw2::Text(R7Vec2(395, 40 + (ix - start_index) * 15),
                               RenderD7::MsTimeFmt(it->second.time_of),
                               RD7TextFlags_AlignRight);
-        RenderD7::UndoColorEdit(RD7Color_Text);
+        RenderD7::ThemeActive()->Undo();
       }
       ++it;
       ++ix;
@@ -705,6 +715,9 @@ void RenderD7::RSettings::Draw(void) const {
       UI7::Label(
           "Touch Last Pos: " + std::to_string(Hid::GetLastTouchPosition().x) +
           ", " + std::to_string(Hid::GetLastTouchPosition().y));
+      UI7::Label(
+          "Touch Down Pos: " + std::to_string(Hid::GetTouchDownPosition().x) +
+          ", " + std::to_string(Hid::GetTouchDownPosition().y));
       UI7::EndMenu();
     }
 
@@ -832,6 +845,10 @@ void RenderD7::RSettings::Logic() {
 void RenderD7::LoadSettings() {
   if (!rd7i_settings)
     RenderD7::Scene::Load(std::make_unique<RenderD7::RSettings>());
+}
+
+void RenderD7::LoadThemeEditor() {
+  RenderD7::Scene::Load(std::make_unique<RenderD7::ThemeEditor>());
 }
 
 void RenderD7::AddOvl(std::unique_ptr<RenderD7::Ovl> overlay) {

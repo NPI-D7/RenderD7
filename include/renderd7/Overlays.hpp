@@ -95,6 +95,7 @@ class Ovl_Keyboard : public RenderD7::Ovl {
   std::string* typed_text = nullptr;
   std::string str_bak;
   RD7KeyboardState* state;
+  RD7Keyboard type;
   int mode = 0;
   int ft3 = 0;
 };

@@ -138,6 +138,8 @@ class RSettings : public RenderD7::Scene {
 
 /// @brief Show Up the RenderD7-Settings Menu
 void LoadSettings();
+/// @brief Show Up The Theme Editor
+void LoadThemeEditor();
 /// @brief Get's The Programs Time running
 /// @return Time Running
 float GetTime();
