@@ -16,8 +16,7 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <renderd7/DrawV2.hpp>  // Switch to Draw2
-#include <renderd7/Hid.hpp>     // Integate HidApi
+#include <renderd7/Hid.hpp>  // Integate HidApi
 #include <renderd7/Message.hpp>
 #include <renderd7/Overlays.hpp>
 #include <renderd7/ThemeEditor.hpp>
@@ -33,6 +32,8 @@
 // C++ includes
 #include <filesystem>
 #include <random>
+
+RenderD7::R2Base::Ref rd7i_render2;
 
 static void RD7i_ExitHook() {
   C2D_TextBufDelete(rd7i_text_buffer);
@@ -53,13 +54,21 @@ std::vector<std::string> string_to_lines(std::string input_str) {
 void Npifade() {
   if (rd7i_fadein) {
     if (rd7i_fadealpha < 255) {
-      rd7i_fadealpha += 3;
+      if ((int)rd7i_fadealpha + 3 > 255) {
+        rd7i_fadealpha = 255;
+      } else {
+        rd7i_fadealpha += 3;
+      }
     } else {
       rd7i_fadein = false;
     }
   } else if (rd7i_fadeout) {
     if (rd7i_fadealpha > 0) {
-      rd7i_fadealpha -= 3;
+      if ((int)rd7i_fadealpha - 3 < 0) {
+        rd7i_fadealpha = 0;
+      } else {
+        rd7i_fadealpha -= 3;
+      }
     } else {
       rd7i_fadeout = false;
     }
@@ -73,12 +82,14 @@ void Npifade() {
     }
     // No fade
   }
-  RenderD7::OnScreen(Top);
-  RenderD7::Draw2::RFS(R7Vec2(0, 0), R7Vec2(400, 240),
-                       ((rd7i_fadealpha << 24) | 0x00000000));
-  RenderD7::OnScreen(Bottom);
-  RenderD7::Draw2::RFS(R7Vec2(0, 0), R7Vec2(320, 240),
-                       ((rd7i_fadealpha << 24) | 0x00000000));
+  /*if (rd7i_fadein || rd7i_fadeout) {
+    RenderD7::R2()->OnScreen(RenderD7::R2Screen_Top);
+    RenderD7::R2()->AddRect(R7Vec2(0, 0), R7Vec2(400, 240),
+                            ((rd7i_fadealpha << 24) | 0x00000000));
+    RenderD7::R2()->OnScreen(RenderD7::R2Screen_Bottom);
+    RenderD7::R2()->AddRect(R7Vec2(0, 0), R7Vec2(320, 240),
+                            ((rd7i_fadealpha << 24) | 0x00000000));
+  }*/
 }
 
 void PushSplash() {
@@ -220,6 +231,14 @@ void rd7i_init_theme() {
   }
 }
 
+RenderD7::R2Base::Ref RenderD7::R2() {
+  if (!rd7i_render2) {
+    RenderD7::Error("Render2 Was Called before being Init!");
+    // return schould not be reached then
+  }
+  return rd7i_render2;
+}
+
 float RenderD7::GetDeltaTime() { return (float)rd7i_dtm; }
 
 bool RenderD7::DrawImageFromSheet(RenderD7::Sheet *sheet, size_t index, float x,
@@ -324,9 +343,13 @@ void RenderD7::Init::Graphics() {
   Top = C2D_CreateScreenTarget(GFX_TOP, GFX_LEFT);
   TopRight = C2D_CreateScreenTarget(GFX_TOP, GFX_RIGHT);
   Bottom = C2D_CreateScreenTarget(GFX_BOTTOM, GFX_LEFT);
+  rd7_top = Top;
+  rd7_bottom = Bottom;
+  rd7_top_right = TopRight;
   rd7i_text_buffer = C2D_TextBufNew(4096);
   rd7i_d2_dimbuf = C2D_TextBufNew(4096);
   rd7i_base_font = C2D_FontLoadSystem(CFG_REGION_USA);
+  rd7i_render2 = R2Base::New();
 }
 
 Result RenderD7::Init::Main(std::string app_name) {
@@ -371,6 +394,9 @@ Result RenderD7::Init::Main(std::string app_name) {
   Top = C2D_CreateScreenTarget(GFX_TOP, GFX_LEFT);
   TopRight = C2D_CreateScreenTarget(GFX_TOP, GFX_RIGHT);
   Bottom = C2D_CreateScreenTarget(GFX_BOTTOM, GFX_LEFT);
+  rd7_top = Top;
+  rd7_bottom = Bottom;
+  rd7_top_right = TopRight;
   rd7i_text_buffer = C2D_TextBufNew(4096);
   rd7i_d2_dimbuf = C2D_TextBufNew(4096);
   rd7i_base_font = C2D_FontLoadSystem(CFG_REGION_USA);
@@ -379,6 +405,7 @@ Result RenderD7::Init::Main(std::string app_name) {
   rd7i_last_tm = svcGetSystemTick();
   if (rd7_do_splash) PushSplash();
 
+  rd7i_render2 = R2Base::New();
   rd7i_init_config();
   rd7i_init_input();
   rd7i_init_theme();
@@ -421,6 +448,9 @@ Result RenderD7::Init::Minimal(std::string app_name) {
   Top = C2D_CreateScreenTarget(GFX_TOP, GFX_LEFT);
   TopRight = C2D_CreateScreenTarget(GFX_TOP, GFX_RIGHT);
   Bottom = C2D_CreateScreenTarget(GFX_BOTTOM, GFX_LEFT);
+  rd7_top = Top;
+  rd7_bottom = Bottom;
+  rd7_top_right = TopRight;
   rd7i_text_buffer = C2D_TextBufNew(4096);
   rd7i_d2_dimbuf = C2D_TextBufNew(4096);
   rd7i_base_font = C2D_FontLoadSystem(CFG_REGION_USA);
@@ -432,6 +462,7 @@ Result RenderD7::Init::Minimal(std::string app_name) {
   svcGetSystemInfo(&citracheck, 0x20000, 0);
   rd7i_is_citra = citracheck ? true : false;
 
+  rd7i_render2 = R2Base::New();
   rd7i_init_config();
   rd7i_init_input();
   rd7i_init_theme();
@@ -444,6 +475,7 @@ Result RenderD7::Init::Minimal(std::string app_name) {
 Result RenderD7::Init::Reload() {
   rd7i_graphics_on = false;
   C2D_TextBufDelete(rd7i_text_buffer);
+  rd7i_render2 = nullptr;  // Delete Render2
   C2D_Fini();
   C3D_Fini();
   C3D_Init(C3D_DEFAULT_CMDBUF_SIZE);
@@ -452,8 +484,12 @@ Result RenderD7::Init::Reload() {
   Top = C2D_CreateScreenTarget(GFX_TOP, GFX_LEFT);
   TopRight = C2D_CreateScreenTarget(GFX_TOP, GFX_RIGHT);
   Bottom = C2D_CreateScreenTarget(GFX_BOTTOM, GFX_LEFT);
+  rd7_top = Top;
+  rd7_bottom = Bottom;
+  rd7_top_right = TopRight;
   rd7i_text_buffer = C2D_TextBufNew(4096);
   rd7i_base_font = C2D_FontLoadSystem(CFG_REGION_USA);
+  rd7i_render2 = R2Base::New();
   rd7i_graphics_on = true;
 
   return 0;
@@ -504,15 +540,16 @@ void RenderD7::FrameEnd() {
   RenderD7::ProcessMessages();
   OvlHandler();
   Npifade();
+  R2()->Process();
   C3D_FrameEnd(0);
 }
 
 RenderD7::RSettings::RSettings() {
   // RenderD7 Settings is designed for
   // System Font
-  RenderD7::TextDefaultFont();
-  tmp_txt = RenderD7::TextGetSize();
-  RenderD7::TextDefaultSize();
+  R2()->DefaultFont();
+  tmp_txt = R2()->GetTextSize();
+  R2()->DefaultTextSize();
   RenderD7::FadeIn();
   std::fstream cfg_ldr(rd7i_config_path + "/config.rc7", std::ios::in);
   cfg_ldr >> rd7i_config;
@@ -522,10 +559,7 @@ RenderD7::RSettings::RSettings() {
   stateftold = rd7i_ftraced;
 }
 
-RenderD7::RSettings::~RSettings() {
-  RenderD7::TextFontRestore();
-  RenderD7::CustomTextSize(tmp_txt);
-}
+RenderD7::RSettings::~RSettings() { R2()->SetTextSize(tmp_txt); }
 
 std::vector<std::string> StrHelper(std::string input) {
   std::string ss(input);
@@ -609,39 +643,44 @@ void RenderD7::RSettings::Draw(void) const {
 
   } else if (m_state == RFTRACE) {
     RenderD7::OnScreen(Top);
-    RenderD7::Draw2::RFS(R7Vec2(0, 0), R7Vec2(400, 240),
-                         RenderD7::ThemeActive()->Get(RD7Color_Background));
-    RenderD7::Draw2::RFS(R7Vec2(0, 0), R7Vec2(400, 20),
-                         RenderD7::ThemeActive()->Get(RD7Color_Header));
-    RenderD7::ThemeActive()->TextBy(RD7Color_Header);
-    RenderD7::Draw2::Text(R7Vec2(5, 2), "RenderD7 -> FTrace");
-    RenderD7::Draw2::Text(R7Vec2(395, 2), RENDERD7VSTRING,
-                          RD7TextFlags_AlignRight);
-    RenderD7::ThemeActive()->Undo();
-    RenderD7::Draw2::RFS(R7Vec2(0, 220), R7Vec2(400, 20),
-                         RenderD7::ThemeActive()->Get(RD7Color_Header));
-    RenderD7::ThemeActive()->TextBy(RD7Color_Header);
-    RenderD7::Draw2::Text(
+    // Draw Top Screen Into Background DrawList
+    UI7::GetBackgroundList()->AddRectangle(R7Vec2(0, 0), R7Vec2(400, 240),
+                                           RD7Color_Background);
+    UI7::GetBackgroundList()->AddRectangle(R7Vec2(0, 0), R7Vec2(400, 20),
+                                           RD7Color_Header);
+    UI7::GetBackgroundList()->AddText(
+        R7Vec2(5, 2), "RenderD7 -> FTrace",
+        RenderD7::ThemeActive()->AutoText(RD7Color_Header));
+    UI7::GetBackgroundList()->AddText(
+        R7Vec2(395, 2), RENDERD7VSTRING,
+        RenderD7::ThemeActive()->AutoText(RD7Color_Header),
+        RD7TextFlags_AlignRight);
+    UI7::GetBackgroundList()->AddRectangle(
+        R7Vec2(0, 220), R7Vec2(400, 20),
+        RenderD7::ThemeActive()->Get(RD7Color_Header));
+    UI7::GetBackgroundList()->AddText(
         R7Vec2(5, 222),
         "Traces: " + std::to_string(ftrace_index + 1) + "/" +
-            std::to_string(RenderD7::Ftrace::rd7_traces.size()));
-    RenderD7::ThemeActive()->Undo();
-    RenderD7::Draw2::RFS(R7Vec2(0, 20), R7Vec2(400, 20),
-                         RenderD7::ThemeActive()->Get(RD7Color_TextDisabled));
-    RenderD7::ThemeActive()->TextBy(RD7Color_TextDisabled);
-    RenderD7::Draw2::Text(R7Vec2(5, 22), "Function:");
-    RenderD7::Draw2::Text(R7Vec2(395, 22),
-                          "Time (ms):", RD7TextFlags_AlignRight);
-    RenderD7::ThemeActive()->Undo();
+            std::to_string(RenderD7::Ftrace::rd7_traces.size()),
+        RenderD7::ThemeActive()->AutoText(RD7Color_Header));
+    UI7::GetBackgroundList()->AddRectangle(R7Vec2(0, 20), R7Vec2(400, 20),
+                                           RD7Color_TextDisabled);
+    UI7::GetBackgroundList()->AddText(
+        R7Vec2(5, 22),
+        "Function:", RenderD7::ThemeActive()->AutoText(RD7Color_TextDisabled));
+    UI7::GetBackgroundList()->AddText(
+        R7Vec2(395, 22),
+        "Time (ms):", RenderD7::ThemeActive()->AutoText(RD7Color_TextDisabled),
+        RD7TextFlags_AlignRight);
 
     // List Bg
     for (int i = 0; i < 12; i++) {
       if ((i % 2 == 0))
-        RenderD7::Draw2::RFS(R7Vec2(0, 40 + (i) * 15), R7Vec2(400, 15),
-                             RenderD7::ThemeActive()->Get(RD7Color_List0));
+        UI7::GetBackgroundList()->AddRectangle(R7Vec2(0, 40 + (i)*15),
+                                               R7Vec2(400, 15), RD7Color_List0);
       else
-        RenderD7::Draw2::RFS(R7Vec2(0, 40 + (i) * 15), R7Vec2(400, 15),
-                             RenderD7::ThemeActive()->Get(RD7Color_List1));
+        UI7::GetBackgroundList()->AddRectangle(R7Vec2(0, 40 + (i)*15),
+                                               R7Vec2(400, 15), RD7Color_List1);
     }
 
     RenderD7::Ftrace::Beg("rd7ft", "display_traces");
@@ -655,27 +694,20 @@ void RenderD7::RSettings::Draw(void) const {
            ix < start_index + 10 && it != RenderD7::Ftrace::rd7_traces.end()) {
       if (ix == ftrace_index) {
         _fkey__ = it->first;
-        RenderD7::Draw2::RFS(R7Vec2(0, 40 + (ix - start_index) * 15),
-                             R7Vec2(400, 15),
-                             RenderD7::ThemeActive()->Get(RD7Color_Selector));
-        RenderD7::ThemeActive()->TextBy(RD7Color_Header);
-        RenderD7::Draw2::Text(R7Vec2(5, 40 + (ix - start_index) * 15),
-                              it->second.func_name);
-        RenderD7::Draw2::Text(R7Vec2(395, 40 + (ix - start_index) * 15),
-                              RenderD7::MsTimeFmt(it->second.time_of),
-                              RD7TextFlags_AlignRight);
-        RenderD7::ThemeActive()->Undo();
-
-      } else {
-        // Use List 0 cause no reference for screenpos
-        RenderD7::ThemeActive()->TextBy(RD7Color_List0);
-        RenderD7::Draw2::Text(R7Vec2(5, 40 + (ix - start_index) * 15),
-                              it->second.func_name);
-        RenderD7::Draw2::Text(R7Vec2(395, 40 + (ix - start_index) * 15),
-                              RenderD7::MsTimeFmt(it->second.time_of),
-                              RD7TextFlags_AlignRight);
-        RenderD7::ThemeActive()->Undo();
+        UI7::GetBackgroundList()->AddRectangle(
+            R7Vec2(0, 40 + (ix - start_index) * 15), R7Vec2(400, 15),
+            RD7Color_Selector);
       }
+      auto clr = ix == ftrace_index
+                     ? RD7Color_Selector
+                     : (ix % 2 == 0 ? RD7Color_List0 : RD7Color_List1);
+      UI7::GetBackgroundList()->AddText(R7Vec2(5, 40 + (ix - start_index) * 15),
+                                        it->second.func_name,
+                                        RenderD7::ThemeActive()->AutoText(clr));
+      UI7::GetBackgroundList()->AddText(
+          R7Vec2(395, 40 + (ix - start_index) * 15),
+          RenderD7::MsTimeFmt(it->second.time_of),
+          RenderD7::ThemeActive()->AutoText(clr), RD7TextFlags_AlignRight);
       ++it;
       ++ix;
     }

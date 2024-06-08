@@ -19,9 +19,9 @@
 #include <algorithm>
 #include <memory>
 #include <renderd7/Color.hpp>
-#include <renderd7/DrawV2.hpp>  // Update to Draw2
 #include <renderd7/Message.hpp>
 #include <renderd7/Screen.hpp>
+#include <renderd7/renderd7.hpp>
 #include <vector>
 
 extern bool rd7_debugging;
@@ -45,10 +45,10 @@ namespace RenderD7 {
 float GetDeltaTime();  // Extern from renderd7.cpp
 
 void ProcessMessages() {
-  float tmp_txt = RenderD7::TextGetSize();
-  RenderD7::TextDefaultSize();
+  float tmp_txt = R2()->GetTextSize();
+  R2()->DefaultTextSize();
   // Draw in ovl mode
-  RenderD7::OnScreen(Top);
+  R2()->OnScreen(R2Screen_Top);
   float fol = anim_len - fade_outs;
   std::reverse(msg_lst.begin(), msg_lst.end());
   for (size_t i = 0; i < msg_lst.size(); i++) {
@@ -65,23 +65,17 @@ void ProcessMessages() {
             200 - (float(msg_lst[i]->animationframe - fade_outs) / fol) * 200;
       }
       // Wtf is this function lol
-      RenderD7::ThemeActive()->Set(
-          RD7Color_MessageBackground,
-          RenderD7::Color::RGBA(RD7Color_MessageBackground)
-              .changeA(new_alpha)
-              .toRGBA());
-      RenderD7::ThemeActive()->Set(
-          RD7Color_Text,
-          RenderD7::Color::RGBA(RD7Color_Text2).changeA(new_alpha).toRGBA());
-      RenderD7::Draw2::RFS(
-          pos, R7Vec2(150, 50),
-          RenderD7::ThemeActive()->Get(RD7Color_MessageBackground));
-      RenderD7::Draw2::Text(pos + R7Vec2(5, 1), msg_lst[i]->title);
-      RenderD7::Draw2::Text(pos + R7Vec2(5, 17), msg_lst[i]->message);
+      auto bgc = RenderD7::Color::RGBA(RD7Color_MessageBackground)
+                     .changeA(new_alpha)
+                     .toRGBA();
+      auto tc =
+          RenderD7::Color::RGBA(RD7Color_Text2).changeA(new_alpha).toRGBA();
+      R2()->AddRect(pos, R7Vec2(150, 50), bgc);
+      R2()->AddText(pos + R7Vec2(5, 1), msg_lst[i]->title, tc);
+      R2()->AddText(pos + R7Vec2(5, 17), msg_lst[i]->message, tc);
       if (rd7_debugging)
-        RenderD7::Draw2::Text(pos + R7Vec2(155, 1),
-                              std::to_string(msg_lst[i]->animationframe));
-      RenderD7::ThemeActive()->UndoAll();
+        R2()->AddText(pos + R7Vec2(155, 1),
+                      std::to_string(msg_lst[i]->animationframe), tc);
       // Why Frameadd? because Message uses int as frame and
       // It seems that lower 0.5 will be rounded to 0
       // Why not replace int with float ?
@@ -103,7 +97,7 @@ void ProcessMessages() {
   // ReReverse ?? lol
   // Cause otherwise the Toasts will swap
   std::reverse(msg_lst.begin(), msg_lst.end());
-  RenderD7::CustomTextSize(tmp_txt);
+  R2()->SetTextSize(tmp_txt);
 }
 
 void PushMessage(const Message &msg) {

@@ -18,8 +18,9 @@
 
 #pragma once
 
-#include <renderd7/DrawV2.hpp>
+#include <renderd7/Image.hpp>
 #include <renderd7/R7Vec.hpp>
+#include <renderd7/Render2.hpp>
 #include <renderd7/smart_ctor.hpp>
 
 // UI7: The new RenderD7 UI Standart based on
@@ -80,7 +81,7 @@ void Label(const std::string &label, RD7TextFlags flags = 0);
 void Progressbar(float value);
 /// @brief Draw Image in Menu
 /// @param img Pointer f.e to RenderD7::Image2
-void Image(RenderD7::Image *img);
+void Image(RenderD7::Image::Ref img);
 void BrowserList(const std::vector<std::string> &entrys, int &selection,
                  RD7TextFlags txtflags = 0, R7Vec2 size = R7Vec2(0, 0),
                  int max_entrys = 13);

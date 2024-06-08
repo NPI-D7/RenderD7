@@ -23,6 +23,7 @@
 
 #include <renderd7/R7Vec.hpp>
 #include <renderd7/nimg.hpp>
+#include <renderd7/smart_ctor.hpp>
 #include <string>
 
 namespace RenderD7 {
@@ -30,14 +31,15 @@ class Image {
  public:
   Image();
   ~Image();
-  void load(const std::string& path);
-  void from_nimg(const nimg& image);
+  RD7_SMART_CTOR(Image)
+  void Load(const std::string& path);
+  void From_NIMG(const nimg& image);
 
-  C2D_Image get();
-  C2D_Image& get_ref();
-  void set(const C2D_Image& i);
-  R7Vec2 get_size();
-  bool loaded();
+  C2D_Image Get();
+  C2D_Image& GetRef();
+  void Set(const C2D_Image& i);
+  R7Vec2 GetSize();
+  bool Loadet();
 
  private:
   void safe_del();

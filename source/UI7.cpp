@@ -18,12 +18,12 @@
 
 #include <ctime>
 #include <renderd7/Color.hpp>
-#include <renderd7/DrawV2.hpp>
 #include <renderd7/Hid.hpp>
 #include <renderd7/Message.hpp>
 #include <renderd7/Overlays.hpp>
 #include <renderd7/UI7.hpp>
 #include <renderd7/internal_db.hpp>
+#include <renderd7/renderd7.hpp>
 #include <unordered_map>
 
 template <typename T>
@@ -39,9 +39,7 @@ inline T d7min(T a, T b) {
 // As the 3ds doesn't support std::chrono
 #ifdef __3DS__
 /// @brief 3ds System Ticks per milli second
-/// Already defined in FTrace ik but
-/// I Want to make UI7 and Draw2 more
-/// Independent of the main RenderD7 api
+/// Already defined in FTrace ik
 #define TICKS_PER_MSEC 268111.856
 #include <3ds.h>
 #define __get_time() (float)svcGetSystemTick() / (float)TICKS_PER_MSEC
@@ -106,20 +104,16 @@ class DrawCmd {
     if (type == DrawCmdType_Skip) {
       return;
     }
-    RenderD7::OnScreen(screen ? Top : Bottom);
+    RenderD7::R2()->OnScreen(screen ? R2Screen_Top : R2Screen_Bottom);
     if (type == DrawCmdType_Rect) {
-      RenderD7::Draw2::RFS(R7Vec2(rect.x, rect.y), R7Vec2(rect.z, rect.w), clr);
+      RenderD7::R2()->AddRect(R7Vec2(rect.x, rect.y), R7Vec2(rect.z, rect.w),
+                              clr);
     } else if (type == DrawCmdType_Triangle) {
-      RenderD7::Draw2::TriangleSolid(R7Vec2(rect.x, rect.y),
-                                     R7Vec2(rect.z, rect.w), add_coords, clr);
+      RenderD7::R2()->AddTriangle(R7Vec2(rect.x, rect.y),
+                                  R7Vec2(rect.z, rect.w), add_coords, clr);
     } else if (type == DrawCmdType_Text) {
-      if (text_box.x || text_box.y) {
-        RenderD7::TextMaxBox(text_box);
-      }
-      RenderD7::Draw2::TextClr(R7Vec2(rect.x, rect.y), text, clr, text_flags);
-      if (text_box.x || text_box.y) {
-        RenderD7::TextDefaultBox();
-      }
+      RenderD7::R2()->AddText(R7Vec2(rect.x, rect.y), text, clr, text_flags,
+                              text_box);
     } else if (type == DrawCmdType_Debug) {
       Debug();
     }
@@ -127,31 +121,33 @@ class DrawCmd {
   void Debug() {
     RenderD7::OnScreen(screen ? Top : Bottom);
     if (stype == DrawCmdType_Skip && type != DrawCmdType_Debug) return;
-    // auto color = (clr == -1 ? ovr_clr : RenderD7::ThemeActive()->Get(clr));
     if (stype == DrawCmdType_Rect) {
-      RenderD7::Draw2::TriangleLined(
-          R7Vec2(rect.x, rect.y), R7Vec2(rect.x + rect.z, rect.y),
-          R7Vec2(rect.x, rect.y + rect.w), 0xff0000ff);
-      RenderD7::Draw2::TriangleLined(R7Vec2(rect.x + rect.z, rect.y + rect.w),
-                                     R7Vec2(rect.x + rect.z, rect.y),
-                                     R7Vec2(rect.x, rect.y + rect.w),
-                                     0xff0000ff);
+      RenderD7::R2()->DrawNextLined();
+      RenderD7::R2()->AddTriangle(R7Vec2(rect.x, rect.y),
+                                  R7Vec2(rect.x + rect.z, rect.y),
+                                  R7Vec2(rect.x, rect.y + rect.w), 0xff0000ff);
+      RenderD7::R2()->DrawNextLined();
+      RenderD7::R2()->AddTriangle(R7Vec2(rect.x + rect.z, rect.y + rect.w),
+                                  R7Vec2(rect.x + rect.z, rect.y),
+                                  R7Vec2(rect.x, rect.y + rect.w), 0xff0000ff);
     } else if (stype == DrawCmdType_Triangle) {
-      RenderD7::Draw2::TriangleLined(R7Vec2(rect.x, rect.y),
-                                     R7Vec2(rect.z, rect.w), add_coords,
-                                     0xff00ff00);
+      RenderD7::R2()->DrawNextLined();
+      RenderD7::R2()->AddTriangle(R7Vec2(rect.x, rect.y),
+                                  R7Vec2(rect.z, rect.w), add_coords,
+                                  0xff00ff00);
     } else if (stype == DrawCmdType_Text) {
-      auto szs = RenderD7::GetTextDimensions(text);
+      auto szs = RenderD7::R2()->GetTextDimensions(text);
       if (text_flags & RD7TextFlags_AlignRight) {
         rect.x -= szs.x;
       }
-      RenderD7::Draw2::TriangleLined(
-          R7Vec2(rect.x, rect.y), R7Vec2(rect.x + szs.x, rect.y),
-          R7Vec2(rect.x, rect.y + szs.y), 0xff00ffff);
-      RenderD7::Draw2::TriangleLined(R7Vec2(rect.x + szs.x, rect.y + szs.y),
-                                     R7Vec2(rect.x + szs.x, rect.y),
-                                     R7Vec2(rect.x, rect.y + szs.y),
-                                     0xff00ffff);
+      RenderD7::R2()->DrawNextLined();
+      RenderD7::R2()->AddTriangle(R7Vec2(rect.x, rect.y),
+                                  R7Vec2(rect.x + szs.x, rect.y),
+                                  R7Vec2(rect.x, rect.y + szs.y), 0xff00ffff);
+      RenderD7::R2()->DrawNextLined();
+      RenderD7::R2()->AddTriangle(R7Vec2(rect.x + szs.x, rect.y + szs.y),
+                                  R7Vec2(rect.x + szs.x, rect.y),
+                                  R7Vec2(rect.x, rect.y + szs.y), 0xff00ffff);
     }
   }
   RD7_SMART_CTOR(DrawCmd)
@@ -469,7 +465,7 @@ float GetDeltaTime() {
 bool Button(const std::string &label, R7Vec2 size) {
   bool ret = false;
   if (!UI7CtxValidate()) return ret;
-  R7Vec2 textdim = RenderD7::GetTextDimensions(label);
+  R7Vec2 textdim = RenderD7::R2()->GetTextDimensions(label);
   if (size.x == 0) {
     size.x = textdim.x + 8;
   }
@@ -509,9 +505,9 @@ bool Button(const std::string &label, R7Vec2 size) {
 
 void Checkbox(const std::string &label, bool &c) {
   if (!UI7CtxValidate()) return;
-  float sv = (RenderD7::TextGetSize() * 40) * 0.9;
+  float sv = (RenderD7::R2()->GetTextSize() * 40) * 0.9;
   R7Vec2 cbs = R7Vec2(sv, sv);
-  R7Vec2 txtdim = RenderD7::GetTextDimensions(label);
+  R7Vec2 txtdim = RenderD7::R2()->GetTextDimensions(label);
   R7Vec2 inp = cbs + R7Vec2(txtdim.x + 5, 0);
   RD7Color bg = RD7Color_FrameBg;
 
@@ -550,7 +546,7 @@ void Checkbox(const std::string &label, bool &c) {
 
 void Label(const std::string &label, RD7TextFlags flags) {
   if (!UI7CtxValidate()) return;
-  R7Vec2 textdim = RenderD7::GetTextDimensions(label);
+  R7Vec2 textdim = RenderD7::R2()->GetTextDimensions(label);
   R7Vec2 pos = GetCursorPos();
   auto upos = pos;
   // Remove some y offset cause texts have some offset
@@ -564,7 +560,7 @@ void Label(const std::string &label, RD7TextFlags flags) {
       return;
   }
 
-  float tbh = RenderD7::TextGetSize() * 40;
+  float tbh = RenderD7::R2()->GetTextSize() * 40;
   auto &list =
       (upos.y + textdim.y < tbh) ? ui7_ctx->cm->front : ui7_ctx->cm->main;
 
@@ -601,28 +597,28 @@ void Progressbar(float value) {
   }
 }
 
-void Image(RenderD7::Image *img) {
+void Image(RenderD7::Image::Ref img) {
   if (!UI7CtxValidate()) return;
   R7Vec2 pos = GetCursorPos();
-  UI7CtxCursorMove(R7Vec2(img->get_size().x, img->get_size().y));
+  UI7CtxCursorMove(R7Vec2(img->GetSize().x, img->GetSize().y));
 
   if (ui7_ctx->cm->enable_scrolling) {
     R7Vec2 pb = pos;
     pos -= R7Vec2(0, ui7_ctx->cm->scrolling_offset);
-    if (pos.y > 240 || (pos.y + img->get_size().y < ui7_ctx->cm->tbh - 5 &&
+    if (pos.y > 240 || (pos.y + img->GetSize().y < ui7_ctx->cm->tbh - 5 &&
                         pb.y > ui7_ctx->cm->tbh))
       return;
   }
 
-  RenderD7::Draw2::Image(img, pos);
+  // RenderD7::Draw2::Image(img, pos);
 }
 
 void BrowserList(const std::vector<std::string> &entrys, int &selection,
                  RD7TextFlags txtflags, R7Vec2 size, int max_entrys) {
   if (!UI7CtxValidate()) return;
   if (selection < 0) return;
-  float tmp_txt = RenderD7::TextGetSize();
-  RenderD7::TextDefaultSize();
+  float tmp_txt = RenderD7::R2()->GetTextSize();
+  RenderD7::R2()->DefaultTextSize();
   R7Vec2 pos = GetCursorPos();
   if (pos.y + 15 * max_entrys > 230) max_entrys = (int)((230 - pos.y) / 15);
   if (size.x == 0) size.x = (rd7i_current_screen ? 400 : 320) - (pos.x * 2);
@@ -656,15 +652,15 @@ void BrowserList(const std::vector<std::string> &entrys, int &selection,
                 : (i % 2 == 0 ? RD7Color_List0 : RD7Color_List1)),
         txtflags | RD7TextFlags_Short, R7Vec2(size.x, 15));
   }
-  RenderD7::CustomTextSize(tmp_txt);
+  RenderD7::R2()->SetTextSize(tmp_txt);
 }
 
 void InputText(const std::string &label, std::string &text,
                const std::string &hint) {
   if (!UI7CtxValidate()) return;
-  float sv = (RenderD7::TextGetSize() * 40) * 0.9;
+  float sv = (RenderD7::R2()->GetTextSize() * 40) * 0.9;
   R7Vec2 cbs = R7Vec2(144, sv);
-  R7Vec2 txtdim = RenderD7::GetTextDimensions(label);
+  R7Vec2 txtdim = RenderD7::R2()->GetTextDimensions(label);
   R7Vec2 inp = cbs + R7Vec2(txtdim.x + 5, 0);
   RD7Color bg = RD7Color_FrameBg;
   auto id = UI7ID(label);
@@ -715,7 +711,7 @@ bool BeginMenu(const std::string &title, R7Vec2 size, UI7MenuFlags flags) {
     size.y = 240;
   }
   RD7TextFlags txtflags = 0;
-  float tbh = RenderD7::TextGetSize() * 40;
+  float tbh = RenderD7::R2()->GetTextSize() * 40;
   ui7_ctx->cm->tbh = tbh;
 
   if (flags & UI7MenuFlags_NoTitlebar) {
@@ -840,8 +836,8 @@ void Grid(const std::string &name, const R7Vec2 &size, const R7Vec2 &entry_size,
   pos += igoff;
   for (size_t i = 0; i < num_entrys; i++) {
     display_func(data_array[i], pos);
-    if (ui7_ctx->debugging)
-      RenderD7::Draw2::Text(pos + R7Vec2(4, 4), std::to_string(i));
+    // if (ui7_ctx->debugging)
+    //  RenderD7::Draw2::Text(pos + R7Vec2(4, 4), std::to_string(i));
     if (pos.x + (entry_size.x * 2) > (cpos.x + size.x) &&
         pos.y + (entry_size.y * 2) > cpos.y + size.y) {
       break;
@@ -858,9 +854,9 @@ void Grid(const std::string &name, const R7Vec2 &size, const R7Vec2 &entry_size,
 
 void ColorSelector(const std::string &label, unsigned int &color) {
   if (!UI7CtxValidate()) return;
-  float sv = (RenderD7::TextGetSize() * 40) * 0.9;
+  float sv = (RenderD7::R2()->GetTextSize() * 40) * 0.9;
   R7Vec2 cbs = R7Vec2(sv, sv);
-  R7Vec2 txtdim = RenderD7::GetTextDimensions(label);
+  R7Vec2 txtdim = RenderD7::R2()->GetTextDimensions(label);
   R7Vec2 inp = cbs + R7Vec2(txtdim.x + 5, 0);
   auto outline =
       RenderD7::Color::RGBA(color).is_light() ? 0xff000000 : 0xffffffff;

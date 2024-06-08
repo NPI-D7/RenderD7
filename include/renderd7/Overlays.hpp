@@ -67,6 +67,7 @@ class Ovl_Metrik : public RenderD7::Ovl {
   mutable std::string mt_cmd;
   mutable std::string mt_lfr;
   mutable std::string mt_tbs;
+  mutable std::string mt_mem;
 
   // Importand Adresses
   bool* i_is_enabled;

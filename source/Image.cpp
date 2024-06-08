@@ -111,7 +111,7 @@ Image::Image() {
 
 Image::~Image() { safe_del(); }
 
-void Image::load(const std::string &path) {
+void Image::Load(const std::string &path) {
   // Make sure to cleanup
   safe_del();
   ld = false;
@@ -149,7 +149,7 @@ void Image::load(const std::string &path) {
   ld = true;
 }
 
-void Image::from_nimg(const nimg &image) {
+void Image::From_NIMG(const nimg &image) {
   // Make sure to cleanup
   safe_del();
   ld = false;
@@ -164,15 +164,15 @@ void Image::from_nimg(const nimg &image) {
   ld = true;
 }
 
-C2D_Image Image::get() { return img; }
-C2D_Image &Image::get_ref() { return img; }
+C2D_Image Image::Get() { return img; }
+C2D_Image &Image::GetRef() { return img; }
 
-void Image::set(const C2D_Image &i) {
+void Image::Set(const C2D_Image &i) {
   safe_del();
   img = i;
 }
 
-R7Vec2 Image::get_size() {
+R7Vec2 Image::GetSize() {
   if (!img.subtex) return R7Vec2(0, 0);
   return R7Vec2(img.subtex->width, img.subtex->height);
 }
@@ -182,5 +182,5 @@ void Image::safe_del() {
   if (img.tex != nullptr) delete img.tex;
 }
 
-bool Image::loaded() { return ld; }
+bool Image::Loadet() { return ld; }
 }  // namespace RenderD7

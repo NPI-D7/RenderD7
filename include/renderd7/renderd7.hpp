@@ -40,6 +40,7 @@
 #include <renderd7/Memory.hpp>
 #include <renderd7/Overlays.hpp>
 #include <renderd7/Ovl.hpp>
+#include <renderd7/Render2.hpp>
 #include <renderd7/ResultDecoder.hpp>
 #include <renderd7/Screen.hpp>
 #include <renderd7/Sheet.hpp>
@@ -67,6 +68,8 @@ extern int rd7_max_objects;
 extern bool rd7_enable_scene_system;
 
 namespace RenderD7 {
+// Reference to the New Renderer
+R2Base::Ref R2();
 /// @brief Get Deltatime
 /// @return Deltatime
 float GetDeltaTime();

@@ -38,13 +38,32 @@ void RenderD7::Sprite::SetRotation(float rotation) {
 void RenderD7::Sprite::Rotate(float speed) {
   C2D_SpriteRotateDegrees(&this->sprite, speed);
 }
-float RenderD7::Sprite::getHeight() { return this->sprite.params.pos.h; }
-float RenderD7::Sprite::getWidth() { return this->sprite.params.pos.w; }
-float RenderD7::Sprite::getPosX() { return this->sprite.params.pos.x; }
-float RenderD7::Sprite::getPosY() { return this->sprite.params.pos.y; }
+float RenderD7::Sprite::GetHeight() { return GetSize().x; }
+float RenderD7::Sprite::GetWidth() { return GetSize().y; }
+float RenderD7::Sprite::GetPosX() { return GetPos().x; }
+float RenderD7::Sprite::GetPosY() { return GetPos().y; }
 
-void RenderD7::Sprite::FromImage(RenderD7::Image *img) {
-  C2D_SpriteFromImage(&this->sprite, img->get());
+R7Vec2 RenderD7::Sprite::GetPos() {
+  return R7Vec2(this->sprite.params.pos.x, this->sprite.params.pos.y);
+}
+
+R7Vec2 RenderD7::Sprite::GetSize() {
+  return R7Vec2(this->sprite.params.pos.w, this->sprite.params.pos.h);
+}
+
+void RenderD7::Sprite::SetPos(R7Vec2 pos) {
+  C2D_SpriteSetPos(&this->sprite, pos.x, pos.y);
+}
+
+void RenderD7::Sprite::SetScale(R7Vec2 scale) {
+  C2D_SpriteScale(&this->sprite, scale.x, scale.y);
+}
+void RenderD7::Sprite::SetRotCenter(R7Vec2 percentage) {
+  C2D_SpriteSetCenter(&this->sprite, percentage.x, percentage.y);
+}
+
+void RenderD7::Sprite::FromImage(RenderD7::Image::Ref img) {
+  C2D_SpriteFromImage(&this->sprite, img->Get());
 }
 
 void RenderD7::Sprite::SetScale(float x, float y) {

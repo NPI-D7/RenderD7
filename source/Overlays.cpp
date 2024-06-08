@@ -16,7 +16,6 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <renderd7/DrawV2.hpp>
 #include <renderd7/FunctionTrace.hpp>
 #include <renderd7/Hid.hpp>
 #include <renderd7/Overlays.hpp>
@@ -286,22 +285,22 @@ namespace RenderD7 {
 Ovl_Ftrace::Ovl_Ftrace(bool* is_enabled) { i_is_enabled = is_enabled; }
 
 void Ovl_Ftrace::Draw(void) const {
-  float tmp_txt = RenderD7::TextGetSize();
-  RenderD7::TextDefaultSize();
-  RenderD7::OnScreen(Top);
+  float tmp_txt = R2()->GetTextSize();
+  R2()->DefaultTextSize();
+  R2()->OnScreen(R2Screen_Top);
   RenderD7::Color::RGBA bg(RD7Color_Background);
   bg.changeA(150);
-  RenderD7::Draw2::RFS(R7Vec2(0, 0), R7Vec2(400, 20), bg.toRGBA());
+  R2()->AddRect(R7Vec2(0, 0), R7Vec2(400, 20), bg.toRGBA());
 
   std::vector<RenderD7::Ftrace::FTRes> dt;
   for (auto const& it : RenderD7::Ftrace::rd7_traces)
     if (it.second.is_ovl && dt.size() < 10) dt.push_back(it.second);
   for (size_t i = 0; i < (dt.size() < 10 ? dt.size() : 10); i++) {
-    RenderD7::Draw2::Text(R7Vec2(5, 30 + i * 15), dt[i].func_name);
-    RenderD7::Draw2::Text(R7Vec2(295, 30 + i * 15),
-                          RenderD7::MsTimeFmt(dt[i].time_of));
+    R2()->AddText(R7Vec2(5, 30 + i * 15), dt[i].func_name, RD7Color_Text);
+    R2()->AddText(R7Vec2(295, 30 + i * 15), RenderD7::MsTimeFmt(dt[i].time_of),
+                  RD7Color_Text);
   }
-  RenderD7::CustomTextSize(tmp_txt);
+  R2()->SetTextSize(tmp_txt);
 }
 
 void Ovl_Ftrace::Logic() {
@@ -318,16 +317,12 @@ Ovl_Metrik::Ovl_Metrik(bool* is_enabled, bool* screen, uint32_t* mt_color,
 }
 
 void Ovl_Metrik::Draw(void) const {
-  float tmp_txt = RenderD7::TextGetSize();
-  RenderD7::TextDefaultSize();
-  if (i_screen[0]) {
-    RenderD7::OnScreen(Bottom);
-  } else {
-    RenderD7::OnScreen(Top);
-  }
+  float tmp_txt = R2()->GetTextSize();
+  R2()->DefaultTextSize();
+  R2()->OnScreen(i_screen[0] ? R2Screen_Bottom : R2Screen_Top);
   std::string info =
       "RenderD7 " + std::string(RENDERD7VSTRING) + " Debug Overlay";
-  float dim_y = RenderD7::GetTextDimensions(info).y;
+  float dim_y = R2()->GetTextDimensions(info).y;
   float infoy = 240 - dim_y;
   mt_fps = "FPS: " + RenderD7::GetFramerate();
   if (rd7i_idb_running) mt_fps += " IDB -> ON";
@@ -346,41 +341,54 @@ void Ovl_Metrik::Draw(void) const {
   mt_tbs =
       "TextBuf: " + std::to_string(C2D_TextBufGetNumGlyphs(rd7i_text_buffer)) +
       "/4096";
-  RenderD7::Draw2::RFS(R7Vec2(0, 0), RenderD7::GetTextDimensions(mt_fps),
-                       i_mt_color[0]);
-  RenderD7::Draw2::RFS(R7Vec2(0, 50), RenderD7::GetTextDimensions(mt_cpu),
-                       i_mt_color[0]);
-  RenderD7::Draw2::RFS(R7Vec2(0, 50 + dim_y * 1),
-                       RenderD7::GetTextDimensions(mt_gpu), i_mt_color[0]);
-  RenderD7::Draw2::RFS(R7Vec2(0, 50 + dim_y * 2),
-                       RenderD7::GetTextDimensions(mt_cmd), i_mt_color[0]);
-  RenderD7::Draw2::RFS(R7Vec2(0, 50 + dim_y * 3),
-                       RenderD7::GetTextDimensions(mt_lfr), i_mt_color[0]);
-  RenderD7::Draw2::RFS(R7Vec2(0, 50 + dim_y * 4),
-                       RenderD7::GetTextDimensions(mt_tbs), i_mt_color[0]);
-  RenderD7::Draw2::RFS(R7Vec2(0, infoy), RenderD7::GetTextDimensions(info),
-                       i_mt_color[0]);
-  RenderD7::ThemeActive()->Set(RD7Color_Text, i_txt_color[0]);
-  RenderD7::Draw2::Text(R7Vec2(0, 0), mt_fps);
-  RenderD7::Draw2::Text(R7Vec2(0, 50), mt_cpu);
-  RenderD7::Draw2::Text(R7Vec2(0, 50 + dim_y * 1), mt_gpu);
-  RenderD7::Draw2::Text(R7Vec2(0, 50 + dim_y * 2), mt_cmd);
-  RenderD7::Draw2::Text(R7Vec2(0, 50 + dim_y * 3), mt_lfr);
-  RenderD7::Draw2::Text(R7Vec2(0, 50 + dim_y * 4), mt_tbs);
-  RenderD7::Draw2::Text(R7Vec2(0, infoy), info);
-  RenderD7::ThemeActive()->Undo();
+  if (rd7_enable_memtrack)
+    mt_mem = "Mem: " + RenderD7::FormatBytes(RenderD7::Memory::GetCurrent()) +
+             " | " +
+             RenderD7::FormatBytes(RenderD7::Memory::GetTotalAllocated()) +
+             " | " + RenderD7::FormatBytes(RenderD7::Memory::GetTotalFreed());
+  R2()->AddRect(R7Vec2(0, 0), R2()->GetTextDimensions(mt_fps),
+                (unsigned int)i_mt_color[0]);
+  R2()->AddRect(R7Vec2(0, 50), R2()->GetTextDimensions(mt_cpu),
+                (unsigned int)i_mt_color[0]);
+  R2()->AddRect(R7Vec2(0, 50 + dim_y * 1), R2()->GetTextDimensions(mt_gpu),
+                (unsigned int)i_mt_color[0]);
+  R2()->AddRect(R7Vec2(0, 50 + dim_y * 2), R2()->GetTextDimensions(mt_cmd),
+                (unsigned int)i_mt_color[0]);
+  R2()->AddRect(R7Vec2(0, 50 + dim_y * 3), R2()->GetTextDimensions(mt_lfr),
+                (unsigned int)i_mt_color[0]);
+  R2()->AddRect(R7Vec2(0, 50 + dim_y * 4), R2()->GetTextDimensions(mt_tbs),
+                (unsigned int)i_mt_color[0]);
+  if (rd7_enable_memtrack)
+    R2()->AddRect(R7Vec2(0, 50 + dim_y * 5), R2()->GetTextDimensions(mt_mem),
+                  (unsigned int)i_mt_color[0]);
+  R2()->AddRect(R7Vec2(0, infoy), R2()->GetTextDimensions(info),
+                (unsigned int)i_mt_color[0]);
+  R2()->AddText(R7Vec2(0, 0), mt_fps, (unsigned int)i_txt_color[0]);
+  R2()->AddText(R7Vec2(0, 50), mt_cpu, (unsigned int)i_txt_color[0]);
+  R2()->AddText(R7Vec2(0, 50 + dim_y * 1), mt_gpu,
+                (unsigned int)i_txt_color[0]);
+  R2()->AddText(R7Vec2(0, 50 + dim_y * 2), mt_cmd,
+                (unsigned int)i_txt_color[0]);
+  R2()->AddText(R7Vec2(0, 50 + dim_y * 3), mt_lfr,
+                (unsigned int)i_txt_color[0]);
+  R2()->AddText(R7Vec2(0, 50 + dim_y * 4), mt_tbs,
+                (unsigned int)i_txt_color[0]);
+  if (rd7_enable_memtrack)
+    R2()->AddText(R7Vec2(0, 50 + dim_y * 5), mt_mem,
+                  (unsigned int)i_txt_color[0]);
+  R2()->AddText(R7Vec2(0, infoy), info, (unsigned int)i_txt_color[0]);
 
   // Force Bottom (Debug Touchpos)
-  RenderD7::OnScreen(Bottom);
+  R2()->OnScreen(R2Screen_Bottom);
   if (Hid::IsEvent("touch", Hid::Held)) {
-    RenderD7::Draw2::Line(R7Vec2(Hid::GetTouchPosition().x, 0),
-                          R7Vec2(Hid::GetTouchPosition().x, 240),
-                          RenderD7::Color::Hex("#ff0000"));
-    RenderD7::Draw2::Line(R7Vec2(0, Hid::GetTouchPosition().y),
-                          R7Vec2(320, Hid::GetTouchPosition().y),
-                          RenderD7::Color::Hex("#ff0000"));
+    /*R2()->AddLine(R7Vec2(Hid::GetTouchPosition().x, 0),
+                  R7Vec2(Hid::GetTouchPosition().x, 240),
+                  RenderD7::Color::Hex("#ff0000"));
+    R2()->AddLine(R7Vec2(0, Hid::GetTouchPosition().y),
+                  R7Vec2(320, Hid::GetTouchPosition().y),
+                  RenderD7::Color::Hex("#ff0000"));*/
   }
-  RenderD7::CustomTextSize(tmp_txt);
+  R2()->SetTextSize(tmp_txt);
 }
 
 void Ovl_Metrik::Logic() {
@@ -406,8 +414,8 @@ Ovl_Keyboard::~Ovl_Keyboard() {
 }
 
 void Ovl_Keyboard::Draw(void) const {
-  float tmp_txt = RenderD7::TextGetSize();
-  RenderD7::TextDefaultSize();
+  float tmp_txt = R2()->GetTextSize();
+  R2()->DefaultTextSize();
   if (ft3 > 5) RenderD7::Hid::Unlock();
   auto key_table =
       (type == RD7Keyboard_Numpad) ? keyboard_layout_num : keyboard_layout;
@@ -415,23 +423,18 @@ void Ovl_Keyboard::Draw(void) const {
     key_table = keyboard_layout_caps;
   else if (mode == 2)
     key_table = keyboard_layout_shift;
-  RenderD7::OnScreen(Top);
-  RenderD7::Draw2::RFS(
-      R7Vec2(0, 0), R7Vec2(400, 240),
-      RenderD7::Color::RGBA(RD7Color_FrameBg).changeA(150).toRGBA());
-  RenderD7::OnScreen(Bottom);
-  RenderD7::Draw2::RFS(
-      R7Vec2(0, 0), R7Vec2(320, 112),
-      RenderD7::Color::RGBA(RD7Color_FrameBg).changeA(150).toRGBA());
-  RenderD7::Draw2::RFS(R7Vec2(0, 112), R7Vec2(320, 128),
-                       RenderD7::ThemeActive()->Get(RD7Color_FrameBg));
-  RenderD7::Draw2::RFS(R7Vec2(0, 112), R7Vec2(320, 20),
-                       RenderD7::ThemeActive()->Get(RD7Color_Header));
-  RenderD7::ThemeActive()->TextBy(RD7Color_Header);
-  RenderD7::Draw2::Text(R7Vec2(5, 114), "> " + *typed_text);
-  RenderD7::ThemeActive()->Undo();
+  R2()->OnScreen(R2Screen_Top);
+  R2()->AddRect(R7Vec2(0, 0), R7Vec2(400, 240),
+                RenderD7::Color::RGBA(RD7Color_FrameBg).changeA(150).toRGBA());
+  R2()->OnScreen(R2Screen_Bottom);
+  R2()->AddRect(R7Vec2(0, 0), R7Vec2(320, 112),
+                RenderD7::Color::RGBA(RD7Color_FrameBg).changeA(150).toRGBA());
+  R2()->AddRect(R7Vec2(0, 112), R7Vec2(320, 128), RD7Color_FrameBg);
+  R2()->AddRect(R7Vec2(0, 112), R7Vec2(320, 20), RD7Color_Header);
+  R2()->AddText(R7Vec2(5, 114), "> " + *typed_text,
+                RenderD7::ThemeActive()->AutoText(RD7Color_Header));
   for (auto const& it : key_table) {
-    R7Vec2 txtdim = RenderD7::GetTextDimensions(it.disp);
+    R7Vec2 txtdim = R2()->GetTextDimensions(it.disp);
     R7Vec2 txtpos = R7Vec2(it.pos.x + it.size.x * 0.5 - txtdim.x * 0.5,
                            it.pos.y + it.size.y * 0.5 - txtdim.y * 0.5);
     RD7Color btn = RD7Color_Button;
@@ -466,13 +469,11 @@ void Ovl_Keyboard::Draw(void) const {
                UI7_InBox(RenderD7::Hid::GetTouchPosition(), it.pos, it.size)) {
       btn = RD7Color_ButtonHovered;
     }
-    RenderD7::Draw2::RFS(it.pos, it.size, RenderD7::ThemeActive()->Get(btn));
-    RenderD7::ThemeActive()->TextBy(btn);
-    RenderD7::Draw2::Text(txtpos, it.disp);
-    RenderD7::ThemeActive()->Undo();
+    R2()->AddRect(it.pos, it.size, btn);
+    R2()->AddText(txtpos, it.disp, RenderD7::ThemeActive()->AutoText(btn));
   }
   if (ft3 > 5) RenderD7::Hid::Lock();
-  RenderD7::CustomTextSize(tmp_txt);
+  R2()->SetTextSize(tmp_txt);
 }
 
 void Ovl_Keyboard::Logic() {
