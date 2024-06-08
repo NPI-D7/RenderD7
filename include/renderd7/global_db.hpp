@@ -36,11 +36,6 @@ extern u32 d7_hUp;
 extern u32 d7_hRepeat;  // Inofficial lol
 extern touchPosition d7_touch;
 
-// Outdated Screens
-extern C3D_RenderTarget *Top;
-extern C3D_RenderTarget *TopRight;
-extern C3D_RenderTarget *Bottom;
-
 // Modern Global Api
 extern int rd7_max_objects;
 extern bool rd7_do_splash;

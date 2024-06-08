@@ -20,7 +20,6 @@
 #include <memory>
 #include <renderd7/Color.hpp>
 #include <renderd7/Message.hpp>
-#include <renderd7/Screen.hpp>
 #include <renderd7/renderd7.hpp>
 #include <vector>
 

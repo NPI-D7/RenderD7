@@ -57,7 +57,7 @@ RenderD7::ThemeEditor::~ThemeEditor() {
 }
 
 void RenderD7::ThemeEditor::Draw() const {
-  RenderD7::OnScreen(Top);
+  RenderD7::R2()->OnScreen(R2Screen_Top);
   if (UI7::BeginMenu("RenderD7 -> Theme Editor")) {
     UI7::Label("Sample Text");
     UI7::Checkbox("Checkbox", cm);
@@ -68,7 +68,7 @@ void RenderD7::ThemeEditor::Draw() const {
                        edit_theme->GetTableRef()[RD7Color_Progressbar]);
     UI7::EndMenu();
   }
-  RenderD7::OnScreen(Bottom);
+  RenderD7::R2()->OnScreen(R2Screen_Bottom);
   if (UI7::BeginMenu("Theme", R7Vec2(), UI7MenuFlags_Scrolling)) {
     if (menu == 0) {
       if (UI7::Button("Create New")) {

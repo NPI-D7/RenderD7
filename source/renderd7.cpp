@@ -99,10 +99,11 @@ void PushSplash() {
   // Display for 2 Sec
   for (int x = 0; x < 120; x++) {
     C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
-    C2D_TargetClear(Top, 0xff000000);
-    C2D_TargetClear(Bottom, 0xff000000);
+    C2D_TargetClear(rd7_top, 0xff000000);
+    C2D_TargetClear(rd7_bottom, 0xff000000);
     RenderD7::ClearTextBufs();
-    RenderD7::OnScreen(Top);
+    C2D_SceneBegin(rd7_top);
+    RenderD7::R2()->OnScreen(R2Screen_Top);
     C2D_DrawImageAt(C2D_SpriteSheetGetImage(sheet, 0), 400 / 2 - 300 / 2,
                     240 / 2 - 100 / 2, 0.5);
     C3D_FrameEnd(0);
@@ -324,8 +325,8 @@ bool RenderD7::MainLoop() {
   RenderD7::ClearTextBufs();
   C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
 
-  C2D_TargetClear(Top, C2D_Color32(0, 0, 0, 0));
-  C2D_TargetClear(Bottom, C2D_Color32(0, 0, 0, 0));
+  C2D_TargetClear(rd7_top, C2D_Color32(0, 0, 0, 0));
+  C2D_TargetClear(rd7_bottom, C2D_Color32(0, 0, 0, 0));
   frameloop();
   if (rd7_enable_scene_system) {
     RenderD7::Scene::doDraw();
@@ -340,12 +341,9 @@ void RenderD7::Init::Graphics() {
   C3D_Init(C3D_DEFAULT_CMDBUF_SIZE);
   C2D_Init((size_t)rd7_max_objects);
   C2D_Prepare();
-  Top = C2D_CreateScreenTarget(GFX_TOP, GFX_LEFT);
-  TopRight = C2D_CreateScreenTarget(GFX_TOP, GFX_RIGHT);
-  Bottom = C2D_CreateScreenTarget(GFX_BOTTOM, GFX_LEFT);
-  rd7_top = Top;
-  rd7_bottom = Bottom;
-  rd7_top_right = TopRight;
+  rd7_top = C2D_CreateScreenTarget(GFX_TOP, GFX_LEFT);
+  rd7_top_right = C2D_CreateScreenTarget(GFX_TOP, GFX_RIGHT);
+  rd7_bottom = C2D_CreateScreenTarget(GFX_BOTTOM, GFX_LEFT);
   rd7i_text_buffer = C2D_TextBufNew(4096);
   rd7i_d2_dimbuf = C2D_TextBufNew(4096);
   rd7i_base_font = C2D_FontLoadSystem(CFG_REGION_USA);
@@ -391,21 +389,18 @@ Result RenderD7::Init::Main(std::string app_name) {
   atexit(C2D_Fini);
   atexit(RD7i_ExitHook);
   C2D_Prepare();
-  Top = C2D_CreateScreenTarget(GFX_TOP, GFX_LEFT);
-  TopRight = C2D_CreateScreenTarget(GFX_TOP, GFX_RIGHT);
-  Bottom = C2D_CreateScreenTarget(GFX_BOTTOM, GFX_LEFT);
-  rd7_top = Top;
-  rd7_bottom = Bottom;
-  rd7_top_right = TopRight;
+  rd7_top = C2D_CreateScreenTarget(GFX_TOP, GFX_LEFT);
+  rd7_top_right = C2D_CreateScreenTarget(GFX_TOP, GFX_RIGHT);
+  rd7_bottom = C2D_CreateScreenTarget(GFX_BOTTOM, GFX_LEFT);
   rd7i_text_buffer = C2D_TextBufNew(4096);
   rd7i_d2_dimbuf = C2D_TextBufNew(4096);
   rd7i_base_font = C2D_FontLoadSystem(CFG_REGION_USA);
+  rd7i_render2 = R2Base::New();
 
   rd7i_graphics_on = true;
   rd7i_last_tm = svcGetSystemTick();
   if (rd7_do_splash) PushSplash();
 
-  rd7i_render2 = R2Base::New();
   rd7i_init_config();
   rd7i_init_input();
   rd7i_init_theme();
@@ -445,15 +440,13 @@ Result RenderD7::Init::Minimal(std::string app_name) {
   atexit(C2D_Fini);
   atexit(RD7i_ExitHook);
   C2D_Prepare();
-  Top = C2D_CreateScreenTarget(GFX_TOP, GFX_LEFT);
-  TopRight = C2D_CreateScreenTarget(GFX_TOP, GFX_RIGHT);
-  Bottom = C2D_CreateScreenTarget(GFX_BOTTOM, GFX_LEFT);
-  rd7_top = Top;
-  rd7_bottom = Bottom;
-  rd7_top_right = TopRight;
+  rd7_top = C2D_CreateScreenTarget(GFX_TOP, GFX_LEFT);
+  rd7_top_right = C2D_CreateScreenTarget(GFX_TOP, GFX_RIGHT);
+  rd7_bottom = C2D_CreateScreenTarget(GFX_BOTTOM, GFX_LEFT);
   rd7i_text_buffer = C2D_TextBufNew(4096);
   rd7i_d2_dimbuf = C2D_TextBufNew(4096);
   rd7i_base_font = C2D_FontLoadSystem(CFG_REGION_USA);
+  rd7i_render2 = R2Base::New();
   rd7i_graphics_on = true;
   if (rd7_do_splash) PushSplash();
 
@@ -462,7 +455,6 @@ Result RenderD7::Init::Minimal(std::string app_name) {
   svcGetSystemInfo(&citracheck, 0x20000, 0);
   rd7i_is_citra = citracheck ? true : false;
 
-  rd7i_render2 = R2Base::New();
   rd7i_init_config();
   rd7i_init_input();
   rd7i_init_theme();
@@ -481,12 +473,9 @@ Result RenderD7::Init::Reload() {
   C3D_Init(C3D_DEFAULT_CMDBUF_SIZE);
   C2D_Init((size_t)rd7_max_objects);
   C2D_Prepare();
-  Top = C2D_CreateScreenTarget(GFX_TOP, GFX_LEFT);
-  TopRight = C2D_CreateScreenTarget(GFX_TOP, GFX_RIGHT);
-  Bottom = C2D_CreateScreenTarget(GFX_BOTTOM, GFX_LEFT);
-  rd7_top = Top;
-  rd7_bottom = Bottom;
-  rd7_top_right = TopRight;
+  rd7_top = C2D_CreateScreenTarget(GFX_TOP, GFX_LEFT);
+  rd7_top_right = C2D_CreateScreenTarget(GFX_TOP, GFX_RIGHT);
+  rd7_bottom = C2D_CreateScreenTarget(GFX_BOTTOM, GFX_LEFT);
   rd7i_text_buffer = C2D_TextBufNew(4096);
   rd7i_base_font = C2D_FontLoadSystem(CFG_REGION_USA);
   rd7i_render2 = R2Base::New();
@@ -573,7 +562,7 @@ std::vector<std::string> StrHelper(std::string input) {
 
 void RenderD7::RSettings::Draw(void) const {
   if (m_state == RSETTINGS) {
-    RenderD7::OnScreen(Top);
+    RenderD7::R2()->OnScreen(R2Screen_Top);
     if (UI7::BeginMenu("RenderD7 -> Settings")) {
       UI7::SetCursorPos(R7Vec2(395, 2));
       UI7::Label(RENDERD7VSTRING, RD7TextFlags_AlignRight);
@@ -588,7 +577,7 @@ void RenderD7::RSettings::Draw(void) const {
       UI7::Label("Kbd test: " + kbd_test);
       UI7::EndMenu();
     }
-    RenderD7::OnScreen(Bottom);
+    RenderD7::R2()->OnScreen(R2Screen_Bottom);
     if (UI7::BeginMenu("Press \uE001 to go back!")) {
       if (UI7::Button("FTrace")) {
         shared_request[0x00000001] = RFTRACE;
@@ -615,7 +604,7 @@ void RenderD7::RSettings::Draw(void) const {
     }
 
   } else if (m_state == RIDB) {
-    RenderD7::OnScreen(Top);
+    RenderD7::R2()->OnScreen(R2Screen_Top);
     if (UI7::BeginMenu("RenderD7 -> Debugger")) {
       UI7::SetCursorPos(R7Vec2(395, 2));
       UI7::Label(RENDERD7VSTRING, RD7TextFlags_AlignRight);
@@ -624,7 +613,7 @@ void RenderD7::RSettings::Draw(void) const {
                  std::string(rd7i_idb_running ? "true" : "false"));
       UI7::EndMenu();
     }
-    RenderD7::OnScreen(Bottom);
+    RenderD7::R2()->OnScreen(R2Screen_Bottom);
     if (UI7::BeginMenu("Press \uE001 to go back!")) {
       if (UI7::Button("Start Server")) {
         RenderD7::IDB::Start();
@@ -642,7 +631,7 @@ void RenderD7::RSettings::Draw(void) const {
     }
 
   } else if (m_state == RFTRACE) {
-    RenderD7::OnScreen(Top);
+    RenderD7::R2()->OnScreen(R2Screen_Top);
     // Draw Top Screen Into Background DrawList
     UI7::GetBackgroundList()->AddRectangle(R7Vec2(0, 0), R7Vec2(400, 240),
                                            RD7Color_Background);
@@ -714,7 +703,7 @@ void RenderD7::RSettings::Draw(void) const {
 
     RenderD7::Ftrace::End("rd7ft", "display_traces");
 
-    RenderD7::OnScreen(Bottom);
+    RenderD7::R2()->OnScreen(R2Screen_Bottom);
     if (UI7::BeginMenu("Press \uE001 to go back!")) {
       auto jt = RenderD7::Ftrace::rd7_traces.begin();
       std::advance(jt, ftrace_index);
@@ -729,7 +718,7 @@ void RenderD7::RSettings::Draw(void) const {
       UI7::EndMenu();
     }
   } else if (m_state == RUI7) {
-    RenderD7::OnScreen(Top);
+    RenderD7::R2()->OnScreen(R2Screen_Top);
     if (UI7::BeginMenu("RenderD7 -> UI7")) {
       UI7::SetCursorPos(R7Vec2(395, 2));
       UI7::Label(RENDERD7VSTRING, RD7TextFlags_AlignRight);
@@ -753,7 +742,7 @@ void RenderD7::RSettings::Draw(void) const {
       UI7::EndMenu();
     }
 
-    RenderD7::OnScreen(Bottom);
+    RenderD7::R2()->OnScreen(R2Screen_Bottom);
     if (UI7::BeginMenu("Press \uE001 to go back!", R7Vec2(),
                        UI7MenuFlags_Scrolling)) {
       for (int i = 0; i < 20; i++) {
@@ -769,7 +758,7 @@ void RenderD7::RSettings::Draw(void) const {
       UI7::EndMenu();
     }
   } else if (m_state == ROVERLAYS) {
-    RenderD7::OnScreen(Top);
+    RenderD7::R2()->OnScreen(R2Screen_Top);
     if (UI7::BeginMenu("RenderD7 -> Overlays")) {
       UI7::SetCursorPos(R7Vec2(395, 2));
       UI7::Label(RENDERD7VSTRING, RD7TextFlags_AlignRight);
@@ -779,7 +768,7 @@ void RenderD7::RSettings::Draw(void) const {
       UI7::EndMenu();
     }
 
-    RenderD7::OnScreen(Bottom);
+    RenderD7::R2()->OnScreen(R2Screen_Bottom);
     if (UI7::BeginMenu("Press \uE001 to go back!")) {
       UI7::Label("Metrik:");
       UI7::Checkbox("Enable Overlay", rd7i_metrikd);

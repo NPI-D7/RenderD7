@@ -51,6 +51,7 @@ class UI7DrawList {
                RD7TextFlags flags = 0, R7Vec2 box = R7Vec2());
   void AddText(R7Vec2 pos, const std::string &text, unsigned int clr,
                RD7TextFlags flags = 0, R7Vec2 box = R7Vec2());
+  void AddImage(R7Vec2 pos, RenderD7::Image::Ref img);
   void AddCall(std::shared_ptr<DrawCmd> cmd);
 
   void Process(bool auto_clear = true);

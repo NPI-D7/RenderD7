@@ -56,7 +56,6 @@ bool rd7i_mt_screen;
 float rd7i_mt_txtSize;
 bool rd7i_metrikd = false;
 bool rd7i_ftraced = false;
-bool rd7i_current_screen = false;
 u64 rd7i_delta_time;
 u64 rd7i_last_tm;
 float rd7i_dtm;
@@ -83,11 +82,6 @@ u32 d7_hHeld;
 u32 d7_hUp;
 u32 d7_hRepeat;  // Inofficial lol
 touchPosition d7_touch;
-
-// Outdated Screens
-C3D_RenderTarget *Top;
-C3D_RenderTarget *TopRight;
-C3D_RenderTarget *Bottom;
 
 // Modern Global Api
 int rd7_max_objects = C2D_DEFAULT_MAX_OBJECTS;

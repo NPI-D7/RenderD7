@@ -57,7 +57,6 @@ extern bool rd7i_mt_screen;
 extern float rd7i_mt_txtSize;
 extern bool rd7i_metrikd;
 extern bool rd7i_ftraced;
-extern bool rd7i_current_screen;
 extern u64 rd7i_delta_time;
 extern u64 rd7i_last_tm;
 extern float rd7i_dtm;

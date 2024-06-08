@@ -147,6 +147,11 @@ void R2Base::Process() {
         edit_text = edit_text.substr(edit_text.find('\n') + 1);
         line++;
       }
+    } else if (it.type == 4) {
+      C2D_DrawImageAt(it.img->Get(), it.pos.x, it.pos.y, 0.5f);
+    } else if (it.type == 5) {
+      // TODO: Move the Draw Func into this API
+      it.spr->Draw();
     }
   }
   this->commands.clear();
@@ -247,6 +252,35 @@ void R2Base::AddText(R7Vec2 pos, const std::string& text, unsigned int clr,
   cmd.flags = flags;
   cmd.text = text;
   cmd.type = 3;  // Text
+  // Just assign current screen as bottom is 0 (false)
+  // and Top and TopRight are !0 (true)
+  cmd.Screen = current_screen;
+  if (this->next_lined) {
+    cmd.lined = true;
+    this->next_lined = false;
+  }
+  this->commands.push_back(cmd);
+}
+
+void R2Base::AddImage(R7Vec2 pos, Image::Ref img) {
+  R2Cmd cmd;
+  cmd.pos = pos;
+  cmd.img = img;
+  cmd.type = 4;  // Image
+  // Just assign current screen as bottom is 0 (false)
+  // and Top and TopRight are !0 (true)
+  cmd.Screen = current_screen;
+  if (this->next_lined) {
+    cmd.lined = true;
+    this->next_lined = false;
+  }
+  this->commands.push_back(cmd);
+}
+
+void R2Base::AddSprite(Sprite::Ref spr) {
+  R2Cmd cmd;
+  cmd.spr = spr;
+  cmd.type = 5;  // Sprite
   // Just assign current screen as bottom is 0 (false)
   // and Top and TopRight are !0 (true)
   cmd.Screen = current_screen;

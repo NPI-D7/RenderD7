@@ -21,7 +21,9 @@
 #include <map>
 #include <renderd7/Color.hpp>
 #include <renderd7/Font.hpp>
+#include <renderd7/Image.hpp>
 #include <renderd7/R7Vec.hpp>
+#include <renderd7/Sprite.hpp>
 #include <renderd7/smart_ctor.hpp>
 
 #define MAKEFLAG(x) (1 << x)
@@ -53,7 +55,10 @@ class R2Base {
     R7Vec2 ap;         //< Additional Pos
     unsigned int clr;  //< Color
     bool Screen;       //< TopScreen
-    // 0 = skip, 1 = rect, 2 = tri, 3 = text, 4 = image
+    Image::Ref img;    //< Image Reference
+    Sprite::Ref spr;   //< Sprite Reference
+    // 0 = skip, 1 = rect, 2 = tri, 3 = text,
+    // 4 = image, 5 = sprite
     int type;            //< Command Type
     bool lined = false;  //< Draw Lined Rect/Tri
     // Text Specific
@@ -88,6 +93,8 @@ class R2Base {
                RD7TextFlags flags = 0, R7Vec2 tmb = R7Vec2());
   void AddText(R7Vec2 pos, const std::string& text, unsigned int clr,
                RD7TextFlags flags = 0, R7Vec2 tmb = R7Vec2());
+  void AddImage(R7Vec2 pos, Image::Ref img);
+  void AddSprite(Sprite::Ref spr);
 
  private:
   const float default_text_size = 0.5f;

@@ -89,6 +89,7 @@ enum DrawCmdType_ {
   DrawCmdType_Rect,
   DrawCmdType_Triangle,
   DrawCmdType_Text,
+  DrawCmdType_Image,
   DrawCmdType_Debug,
 };
 
@@ -114,12 +115,14 @@ class DrawCmd {
     } else if (type == DrawCmdType_Text) {
       RenderD7::R2()->AddText(R7Vec2(rect.x, rect.y), text, clr, text_flags,
                               text_box);
+    } else if (type == DrawCmdType_Image) {
+      RenderD7::R2()->AddImage(R7Vec2(rect.x, rect.y), img);
     } else if (type == DrawCmdType_Debug) {
       Debug();
     }
   }
   void Debug() {
-    RenderD7::OnScreen(screen ? Top : Bottom);
+    RenderD7::R2()->OnScreen(screen ? R2Screen_Top : R2Screen_Bottom);
     if (stype == DrawCmdType_Skip && type != DrawCmdType_Debug) return;
     if (stype == DrawCmdType_Rect) {
       RenderD7::R2()->DrawNextLined();
@@ -148,6 +151,17 @@ class DrawCmd {
       RenderD7::R2()->AddTriangle(R7Vec2(rect.x + szs.x, rect.y + szs.y),
                                   R7Vec2(rect.x + szs.x, rect.y),
                                   R7Vec2(rect.x, rect.y + szs.y), 0xff00ffff);
+    } else if (stype == DrawCmdType_Image) {
+      rect.z = img->GetSize().x;
+      rect.w = img->GetSize().y;
+      RenderD7::R2()->DrawNextLined();
+      RenderD7::R2()->AddTriangle(R7Vec2(rect.x, rect.y),
+                                  R7Vec2(rect.x + rect.z, rect.y),
+                                  R7Vec2(rect.x, rect.y + rect.w), 0xff0000ff);
+      RenderD7::R2()->DrawNextLined();
+      RenderD7::R2()->AddTriangle(R7Vec2(rect.x + rect.z, rect.y + rect.w),
+                                  R7Vec2(rect.x + rect.z, rect.y),
+                                  R7Vec2(rect.x, rect.y + rect.w), 0xff0000ff);
     }
   }
   RD7_SMART_CTOR(DrawCmd)
@@ -156,6 +170,7 @@ class DrawCmd {
   R7Vec2 add_coords = R7Vec2();          // Additional Coords
   unsigned int clr = 0;                  // Color
   std::string text = "";                 // Text
+  RenderD7::Image::Ref img;              // Image
   DrawCmdType type = DrawCmdType_Skip;   // DrawCmd Type
   DrawCmdType stype = DrawCmdType_Skip;  // Second Type
   RD7TextFlags text_flags = 0;           // Flags for Text Rendering
@@ -165,7 +180,7 @@ class DrawCmd {
 
 void UI7DrawList::AddRectangle(R7Vec2 pos, R7Vec2 szs, RD7Color clr) {
   auto cmd = DrawCmd::New();
-  cmd->screen = rd7i_current_screen;
+  cmd->screen = RenderD7::R2()->GetCurrentScreen();
   cmd->rect.x = pos.x;
   cmd->rect.y = pos.y;
   cmd->rect.z = szs.x;
@@ -178,7 +193,7 @@ void UI7DrawList::AddRectangle(R7Vec2 pos, R7Vec2 szs, RD7Color clr) {
 
 void UI7DrawList::AddRectangle(R7Vec2 pos, R7Vec2 szs, unsigned int clr) {
   auto cmd = DrawCmd::New();
-  cmd->screen = rd7i_current_screen;
+  cmd->screen = RenderD7::R2()->GetCurrentScreen();
   cmd->rect.x = pos.x;
   cmd->rect.y = pos.y;
   cmd->rect.z = szs.x;
@@ -192,7 +207,7 @@ void UI7DrawList::AddRectangle(R7Vec2 pos, R7Vec2 szs, unsigned int clr) {
 void UI7DrawList::AddTriangle(R7Vec2 pos0, R7Vec2 pos1, R7Vec2 pos2,
                               RD7Color clr) {
   auto cmd = DrawCmd::New();
-  cmd->screen = rd7i_current_screen;
+  cmd->screen = RenderD7::R2()->GetCurrentScreen();
   cmd->rect.x = pos0.x;
   cmd->rect.y = pos0.y;
   cmd->rect.z = pos1.x;
@@ -207,7 +222,7 @@ void UI7DrawList::AddTriangle(R7Vec2 pos0, R7Vec2 pos1, R7Vec2 pos2,
 void UI7DrawList::AddTriangle(R7Vec2 pos0, R7Vec2 pos1, R7Vec2 pos2,
                               unsigned int clr) {
   auto cmd = DrawCmd::New();
-  cmd->screen = rd7i_current_screen;
+  cmd->screen = RenderD7::R2()->GetCurrentScreen();
   cmd->rect.x = pos0.x;
   cmd->rect.y = pos0.y;
   cmd->rect.z = pos1.x;
@@ -222,7 +237,7 @@ void UI7DrawList::AddTriangle(R7Vec2 pos0, R7Vec2 pos1, R7Vec2 pos2,
 void UI7DrawList::AddText(R7Vec2 pos, const std::string &text, RD7Color clr,
                           RD7TextFlags flags, R7Vec2 box) {
   auto cmd = DrawCmd::New();
-  cmd->screen = rd7i_current_screen;
+  cmd->screen = RenderD7::R2()->GetCurrentScreen();
   cmd->rect.x = pos.x;
   cmd->rect.y = pos.y;
   cmd->text = text;
@@ -237,7 +252,7 @@ void UI7DrawList::AddText(R7Vec2 pos, const std::string &text, RD7Color clr,
 void UI7DrawList::AddText(R7Vec2 pos, const std::string &text, unsigned int clr,
                           RD7TextFlags flags, R7Vec2 box) {
   auto cmd = DrawCmd::New();
-  cmd->screen = rd7i_current_screen;
+  cmd->screen = RenderD7::R2()->GetCurrentScreen();
   cmd->rect.x = pos.x;
   cmd->rect.y = pos.y;
   cmd->text = text;
@@ -245,6 +260,17 @@ void UI7DrawList::AddText(R7Vec2 pos, const std::string &text, unsigned int clr,
   cmd->text_box = box;
   cmd->clr = clr;
   cmd->type = DrawCmdType_Text;
+  AddDebugCall(cmd);
+  AddCall(cmd);
+}
+
+void UI7DrawList::AddImage(R7Vec2 pos, RenderD7::Image::Ref img) {
+  auto cmd = DrawCmd::New();
+  cmd->screen = RenderD7::R2()->GetCurrentScreen();
+  cmd->rect.x = pos.x;
+  cmd->rect.y = pos.y;
+  cmd->img = img;
+  cmd->type = DrawCmdType_Image;
   AddDebugCall(cmd);
   AddCall(cmd);
 }
@@ -272,7 +298,7 @@ void UI7DrawList::AddDebugCall(std::shared_ptr<DrawCmd> cmd) {
   dcmd->text_box = cmd->text_box;
   dcmd->text_flags = cmd->text_flags;
   dcmd->type = DrawCmdType_Debug;
-  dcmd->screen = rd7i_current_screen;
+  dcmd->screen = RenderD7::R2()->GetCurrentScreen();
   UI7CtxPushDebugCmd(dcmd);
 }
 
@@ -354,7 +380,7 @@ bool UI7CtxBeginMenu(const std::string &lb) {
   ui7_ctx->cm = ui7_ctx->menus[id.ID()];
   ui7_ctx->cm->menuid = id;
   ui7_ctx->cm->cursor = R7Vec2(0, 0);
-  ui7_ctx->cm->has_touch = !rd7i_current_screen;
+  ui7_ctx->cm->has_touch = !RenderD7::R2()->GetCurrentScreen();
   if (!ui7_ctx->cm->background) ui7_ctx->cm->background = UI7DrawList::New();
   if (!ui7_ctx->cm->main) ui7_ctx->cm->main = UI7DrawList::New();
   if (!ui7_ctx->cm->front) ui7_ctx->cm->front = UI7DrawList::New();
@@ -368,7 +394,7 @@ void UI7CtxEndMenu() {
   RenderD7::Ftrace::ScopedTrace tr("ui7", "EndMenu");
   // Draw Scrollbar
   if (ui7_ctx->cm->enable_scrolling) {
-    int sw = (rd7i_current_screen ? 400 : 320);
+    int sw = (RenderD7::R2()->GetCurrentScreen() ? 400 : 320);
     int tsp = 5 + ui7_ctx->cm->tbh;
     int szs = 240 - tsp - 5;
     int lszs = 20;  // Lowest Slider size
@@ -574,7 +600,8 @@ void Label(const std::string &label, RD7TextFlags flags) {
 void Progressbar(float value) {
   if (!UI7CtxValidate()) return;
   R7Vec2 pos = GetCursorPos();
-  R7Vec2 size = R7Vec2((rd7i_current_screen ? 400 : 320) - (pos.x * 2), 20);
+  R7Vec2 size = R7Vec2(
+      (RenderD7::R2()->GetCurrentScreen() ? 400 : 320) - (pos.x * 2), 20);
   if (ui7_ctx->cm->show_scroolbar && ui7_ctx->cm->enable_scrolling)
     size.x -= 16;
   UI7CtxCursorMove(size);
@@ -610,7 +637,7 @@ void Image(RenderD7::Image::Ref img) {
       return;
   }
 
-  // RenderD7::Draw2::Image(img, pos);
+  ui7_ctx->cm->main->AddImage(pos, img);
 }
 
 void BrowserList(const std::vector<std::string> &entrys, int &selection,
@@ -621,7 +648,8 @@ void BrowserList(const std::vector<std::string> &entrys, int &selection,
   RenderD7::R2()->DefaultTextSize();
   R7Vec2 pos = GetCursorPos();
   if (pos.y + 15 * max_entrys > 230) max_entrys = (int)((230 - pos.y) / 15);
-  if (size.x == 0) size.x = (rd7i_current_screen ? 400 : 320) - (pos.x * 2);
+  if (size.x == 0)
+    size.x = (RenderD7::R2()->GetCurrentScreen() ? 400 : 320) - (pos.x * 2);
   if (size.y == 0) size.y = (max_entrys * 15);
   UI7CtxCursorMove(size);
   int selindex = (selection < max_entrys ? selection : (max_entrys - 1));
@@ -705,7 +733,7 @@ bool BeginMenu(const std::string &title, R7Vec2 size, UI7MenuFlags flags) {
   if (!ret) return ret;
   bool titlebar = true;
   if (size.x == 0) {
-    size.x = rd7i_current_screen ? 400 : 320;
+    size.x = RenderD7::R2()->GetCurrentScreen() ? 400 : 320;
   }
   if (size.y == 0) {
     size.y = 240;
@@ -720,7 +748,7 @@ bool BeginMenu(const std::string &title, R7Vec2 size, UI7MenuFlags flags) {
   }
   if (flags & UI7MenuFlags_TitleMid) txtflags = RD7TextFlags_AlignMid;
   ui7_ctx->cm->enable_scrolling = (flags & UI7MenuFlags_Scrolling);
-  if (ui7_ctx->cm->enable_scrolling && !rd7i_current_screen) {
+  if (ui7_ctx->cm->enable_scrolling && !RenderD7::R2()->GetCurrentScreen()) {
     // Patch that sets scrolling to 0 if max pos is not out of screen
     if (ui7_ctx->cm->scrolling_offset != 0.f && ui7_ctx->cm->ms.y < 235) {
       ui7_ctx->cm->scrolling_offset = 0.f;
