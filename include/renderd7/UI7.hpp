@@ -20,6 +20,7 @@
 
 #include <renderd7/DrawV2.hpp>
 #include <renderd7/R7Vec.hpp>
+#include <renderd7/smart_ctor.hpp>
 
 // UI7: The new RenderD7 UI Standart based on
 // Draw2 (based on Citro2D)
@@ -33,6 +34,32 @@ enum UI7MenuFlags_ {
   UI7MenuFlags_NoTitlebar = UI7MAKEFLAG(0),
   UI7MenuFlags_TitleMid = UI7MAKEFLAG(1),
   UI7MenuFlags_Scrolling = MAKEFLAG(2),
+};
+
+class DrawCmd;
+class UI7DrawList {
+ public:
+  UI7DrawList() = default;
+  ~UI7DrawList() = default;
+
+  void AddRectangle(R7Vec2 pos, R7Vec2 szs, RD7Color clr);
+  void AddRectangle(R7Vec2 pos, R7Vec2 szs, unsigned int clr);
+  void AddTriangle(R7Vec2 pos0, R7Vec2 pos1, R7Vec2 pos2, RD7Color clr);
+  void AddTriangle(R7Vec2 pos0, R7Vec2 pos1, R7Vec2 pos2, unsigned int clr);
+  void AddText(R7Vec2 pos, const std::string &text, RD7Color clr,
+               RD7TextFlags flags = 0, R7Vec2 box = R7Vec2());
+  void AddText(R7Vec2 pos, const std::string &text, unsigned int clr,
+               RD7TextFlags flags = 0, R7Vec2 box = R7Vec2());
+  void AddCall(std::shared_ptr<DrawCmd> cmd);
+
+  void Process(bool auto_clear = true);
+  void Clear();
+
+  RD7_SMART_CTOR(UI7DrawList)
+
+ private:
+  void AddDebugCall(std::shared_ptr<DrawCmd> cmd);
+  std::vector<std::shared_ptr<DrawCmd>> list;
 };
 
 namespace UI7 {
@@ -73,4 +100,7 @@ void SetCursorPos(R7Vec2 cp);
 void RestoreCursor();
 void SameLine();
 float GetScrollingOffset();
+// DrawLists
+UI7DrawList::Ref GetForegroundList();
+UI7DrawList::Ref GetBackgroundList();
 }  // namespace UI7

@@ -94,81 +94,29 @@ enum DrawCmdType_ {
   DrawCmdType_Debug,
 };
 
-struct DrawCmd;
 void UI7CtxPushDebugCmd(std::shared_ptr<DrawCmd> ref);
 
-struct DrawCmd {
-  DrawCmd(R7Vec4 r, RD7Color c) : rect(r), clr(c), type(DrawCmdType_Rect) {}
-  DrawCmd(R7Vec4 r, unsigned int c)
-      : rect(r), ovr_clr(c), type(DrawCmdType_Rect) {
-    clr = -1;
-  }
-  DrawCmd(R7Vec4 r, R7Vec2 a, RD7Color c)
-      : rect(r), add_coords(a), clr(c), type(DrawCmdType_Triangle) {}
-  DrawCmd(R7Vec4 r, R7Vec2 a, unsigned int c)
-      : rect(r), add_coords(a), ovr_clr(c), type(DrawCmdType_Triangle) {
-    clr = -1;
-  }
-  DrawCmd(R7Vec2 p, const std::string &t, RD7Color c, RD7TextFlags f = 0)
-      : rect(p, R7Vec2()),
-        text(t),
-        clr(c),
-        text_flags(f),
-        type(DrawCmdType_Text) {}
-  DrawCmd(R7Vec2 p, const std::string &t, unsigned int c, RD7TextFlags f = 0)
-      : rect(p, R7Vec2()),
-        text(t),
-        ovr_clr(c),
-        text_flags(f),
-        type(DrawCmdType_Text) {
-    clr = -1;
-  }
+class DrawCmd {
+ public:
   // Empty Command
   DrawCmd() {}
-  // For Debug API
-  DrawCmd(DrawCmd &thiz) {
-    auto cmd = DrawCmd::New();
-    cmd->add_coords = thiz.add_coords;
-    cmd->clr = thiz.clr;
-    cmd->ovr_clr = thiz.ovr_clr;
-    cmd->rect = thiz.rect;
-    cmd->stype = thiz.type;
-    cmd->text = thiz.text;
-    cmd->text_box = thiz.text_box;
-    cmd->text_flags = thiz.text_flags;
-    cmd->type = DrawCmdType_Debug;
-    cmd->screen = rd7i_current_screen;
-    UI7CtxPushDebugCmd(cmd);
-  }
-  R7Vec4 rect;              // Position / Size
-  R7Vec2 add_coords;        // Additional Coords
-  RD7Color clr;             // Color
-  std::string text;         // Text
-  DrawCmdType type;         // DrawCmd Type
-  DrawCmdType stype;        // Second Type
-  unsigned int ovr_clr;     // Override Color (if not clr)
-  RD7TextFlags text_flags;  // Flags for Text Rendering
-  R7Vec2 text_box;          // Maximum text Box
-  bool screen;
 
   // Process the Command
   void Process() {
-    DrawCmd(*this);
     if (type == DrawCmdType_Skip) {
       return;
     }
-    auto color = (clr == -1 ? ovr_clr : RenderD7::ThemeActive()->Get(clr));
+    RenderD7::OnScreen(screen ? Top : Bottom);
     if (type == DrawCmdType_Rect) {
-      RenderD7::Draw2::RFS(R7Vec2(rect.x, rect.y), R7Vec2(rect.z, rect.w),
-                           color);
+      RenderD7::Draw2::RFS(R7Vec2(rect.x, rect.y), R7Vec2(rect.z, rect.w), clr);
     } else if (type == DrawCmdType_Triangle) {
       RenderD7::Draw2::TriangleSolid(R7Vec2(rect.x, rect.y),
-                                     R7Vec2(rect.z, rect.w), add_coords, color);
+                                     R7Vec2(rect.z, rect.w), add_coords, clr);
     } else if (type == DrawCmdType_Text) {
       if (text_box.x || text_box.y) {
         RenderD7::TextMaxBox(text_box);
       }
-      RenderD7::Draw2::TextClr(R7Vec2(rect.x, rect.y), text, color, text_flags);
+      RenderD7::Draw2::TextClr(R7Vec2(rect.x, rect.y), text, clr, text_flags);
       if (text_box.x || text_box.y) {
         RenderD7::TextDefaultBox();
       }
@@ -188,6 +136,10 @@ struct DrawCmd {
                                      R7Vec2(rect.x + rect.z, rect.y),
                                      R7Vec2(rect.x, rect.y + rect.w),
                                      0xff0000ff);
+    } else if (stype == DrawCmdType_Triangle) {
+      RenderD7::Draw2::TriangleLined(R7Vec2(rect.x, rect.y),
+                                     R7Vec2(rect.z, rect.w), add_coords,
+                                     0xff00ff00);
     } else if (stype == DrawCmdType_Text) {
       auto szs = RenderD7::GetTextDimensions(text);
       if (text_flags & RD7TextFlags_AlignRight) {
@@ -202,13 +154,131 @@ struct DrawCmd {
                                      0xff00ffff);
     }
   }
-  // For Smart Pointer
-  using Ref = std::shared_ptr<DrawCmd>;
-  template <typename... args>
-  static Ref New(args &&...cargs) {
-    return std::make_shared<DrawCmd>(std::forward<args>(cargs)...);
-  }
+  RD7_SMART_CTOR(DrawCmd)
+
+  R7Vec4 rect = R7Vec4();                // Position / Size
+  R7Vec2 add_coords = R7Vec2();          // Additional Coords
+  unsigned int clr = 0;                  // Color
+  std::string text = "";                 // Text
+  DrawCmdType type = DrawCmdType_Skip;   // DrawCmd Type
+  DrawCmdType stype = DrawCmdType_Skip;  // Second Type
+  RD7TextFlags text_flags = 0;           // Flags for Text Rendering
+  R7Vec2 text_box = R7Vec2();            // Maximum text Box
+  bool screen = false;                   // Defines Top or Bottom
 };
+
+void UI7DrawList::AddRectangle(R7Vec2 pos, R7Vec2 szs, RD7Color clr) {
+  auto cmd = DrawCmd::New();
+  cmd->screen = rd7i_current_screen;
+  cmd->rect.x = pos.x;
+  cmd->rect.y = pos.y;
+  cmd->rect.z = szs.x;
+  cmd->rect.w = szs.y;
+  cmd->clr = RenderD7::ThemeActive()->Get(clr);
+  cmd->type = DrawCmdType_Rect;
+  AddDebugCall(cmd);
+  AddCall(cmd);
+}
+
+void UI7DrawList::AddRectangle(R7Vec2 pos, R7Vec2 szs, unsigned int clr) {
+  auto cmd = DrawCmd::New();
+  cmd->screen = rd7i_current_screen;
+  cmd->rect.x = pos.x;
+  cmd->rect.y = pos.y;
+  cmd->rect.z = szs.x;
+  cmd->rect.w = szs.y;
+  cmd->clr = clr;
+  cmd->type = DrawCmdType_Rect;
+  AddDebugCall(cmd);
+  AddCall(cmd);
+}
+
+void UI7DrawList::AddTriangle(R7Vec2 pos0, R7Vec2 pos1, R7Vec2 pos2,
+                              RD7Color clr) {
+  auto cmd = DrawCmd::New();
+  cmd->screen = rd7i_current_screen;
+  cmd->rect.x = pos0.x;
+  cmd->rect.y = pos0.y;
+  cmd->rect.z = pos1.x;
+  cmd->rect.w = pos1.y;
+  cmd->add_coords = pos2;
+  cmd->clr = RenderD7::ThemeActive()->Get(clr);
+  cmd->type = DrawCmdType_Triangle;
+  AddDebugCall(cmd);
+  AddCall(cmd);
+}
+
+void UI7DrawList::AddTriangle(R7Vec2 pos0, R7Vec2 pos1, R7Vec2 pos2,
+                              unsigned int clr) {
+  auto cmd = DrawCmd::New();
+  cmd->screen = rd7i_current_screen;
+  cmd->rect.x = pos0.x;
+  cmd->rect.y = pos0.y;
+  cmd->rect.z = pos1.x;
+  cmd->rect.w = pos1.y;
+  cmd->add_coords = pos2;
+  cmd->clr = clr;
+  cmd->type = DrawCmdType_Triangle;
+  AddDebugCall(cmd);
+  AddCall(cmd);
+}
+
+void UI7DrawList::AddText(R7Vec2 pos, const std::string &text, RD7Color clr,
+                          RD7TextFlags flags, R7Vec2 box) {
+  auto cmd = DrawCmd::New();
+  cmd->screen = rd7i_current_screen;
+  cmd->rect.x = pos.x;
+  cmd->rect.y = pos.y;
+  cmd->text = text;
+  cmd->clr = RenderD7::ThemeActive()->Get(clr);
+  cmd->text_flags = flags;
+  cmd->text_box = box;
+  cmd->type = DrawCmdType_Text;
+  AddDebugCall(cmd);
+  AddCall(cmd);
+}
+
+void UI7DrawList::AddText(R7Vec2 pos, const std::string &text, unsigned int clr,
+                          RD7TextFlags flags, R7Vec2 box) {
+  auto cmd = DrawCmd::New();
+  cmd->screen = rd7i_current_screen;
+  cmd->rect.x = pos.x;
+  cmd->rect.y = pos.y;
+  cmd->text = text;
+  cmd->text_flags = flags;
+  cmd->text_box = box;
+  cmd->clr = clr;
+  cmd->type = DrawCmdType_Text;
+  AddDebugCall(cmd);
+  AddCall(cmd);
+}
+
+void UI7DrawList::AddCall(std::shared_ptr<DrawCmd> cmd) {
+  this->list.push_back(cmd);
+}
+
+void UI7DrawList::Process(bool auto_clear) {
+  for (auto it : this->list) {
+    it->Process();
+  }
+  if (auto_clear) this->Clear();
+}
+
+void UI7DrawList::Clear() { this->list.clear(); }
+
+void UI7DrawList::AddDebugCall(std::shared_ptr<DrawCmd> cmd) {
+  auto dcmd = DrawCmd::New();
+  dcmd->add_coords = cmd->add_coords;
+  dcmd->clr = cmd->clr;
+  dcmd->rect = cmd->rect;
+  dcmd->stype = cmd->type;
+  dcmd->text = cmd->text;
+  dcmd->text_box = cmd->text_box;
+  dcmd->text_flags = cmd->text_flags;
+  dcmd->type = DrawCmdType_Debug;
+  dcmd->screen = rd7i_current_screen;
+  UI7CtxPushDebugCmd(dcmd);
+}
 
 struct UI7Menu {
   UI7Menu() {}
@@ -227,16 +297,15 @@ struct UI7Menu {
   std::string submenu;
 
   // DrawLists
-  std::vector<DrawCmd::Ref> background;
-  std::vector<DrawCmd::Ref> main;
-  std::vector<DrawCmd::Ref> front;
+  UI7DrawList::Ref background;
+  UI7DrawList::Ref main;
+  UI7DrawList::Ref front;
 
   R7Vec2 ms;   // Max Size
   R7Vec2 msr;  // Max Size Real (Slider)
   R7Vec2 mdp;  // Mouse/Touch Initial pos
   // For Smart Pointer
-  using Ref = std::shared_ptr<UI7Menu>;
-  static Ref New() { return std::make_shared<UI7Menu>(); }
+  RD7_SMART_CTOR(UI7Menu)
 };
 
 struct UI7_Ctx {
@@ -255,14 +324,19 @@ struct UI7_Ctx {
   bool in_menu;
   bool debugging;
   std::map<std::string, UI7Menu::Ref> menus;
-  std::vector<DrawCmd::Ref> debug_calls;
+  std::vector<UI7Menu::Ref> active_menus;
+  UI7DrawList::Ref debug_calls;
+  UI7DrawList::Ref bdl;
+  UI7DrawList::Ref fdl;
   UI7Menu::Ref cm;
+
+  RD7_SMART_CTOR(UI7_Ctx)
 };
 
-UI7_Ctx *ui7_ctx;
+UI7_Ctx::Ref ui7_ctx;
 
 void UI7CtxPushDebugCmd(DrawCmd::Ref ref) {
-  ui7_ctx->debug_calls.push_back(ref);
+  if (ui7_ctx->debugging) ui7_ctx->debug_calls->AddCall(ref);
 }
 
 bool UI7CtxValidate() {
@@ -285,6 +359,9 @@ bool UI7CtxBeginMenu(const std::string &lb) {
   ui7_ctx->cm->menuid = id;
   ui7_ctx->cm->cursor = R7Vec2(0, 0);
   ui7_ctx->cm->has_touch = !rd7i_current_screen;
+  if (!ui7_ctx->cm->background) ui7_ctx->cm->background = UI7DrawList::New();
+  if (!ui7_ctx->cm->main) ui7_ctx->cm->main = UI7DrawList::New();
+  if (!ui7_ctx->cm->front) ui7_ctx->cm->front = UI7DrawList::New();
   ui7_ctx->in_menu = true;
   return true;
 }
@@ -311,20 +388,13 @@ void UI7CtxEndMenu() {
                     (szs) * (static_cast<float>(ui7_ctx->cm->scrolling_offset) /
                              static_cast<float>(ui7_ctx->cm->msr.y)))));
     int slider_w = 4;
-    ui7_ctx->cm->front.push_back(
-        DrawCmd::New(R7Vec4(R7Vec2(sw - 12, tsp), R7Vec2(slider_w * 2, szs)),
-                     RD7Color_List0));
-    ui7_ctx->cm->front.push_back(DrawCmd::New(
-        R7Vec4(R7Vec2(sw - 10, slider_pos + 2), R7Vec2(slider_w, slider_rh)),
-        RD7Color_Selector));
+    ui7_ctx->cm->front->AddRectangle(R7Vec2(sw - 12, tsp),
+                                     R7Vec2(slider_w * 2, szs), RD7Color_List0);
+    ui7_ctx->cm->front->AddRectangle(R7Vec2(sw - 10, slider_pos + 2),
+                                     R7Vec2(slider_w, slider_h),
+                                     RD7Color_Selector);
   }
-  // Proccess DrawLists
-  for (auto &it : ui7_ctx->cm->background) it->Process();
-  for (auto &it : ui7_ctx->cm->main) it->Process();
-  for (auto &it : ui7_ctx->cm->front) it->Process();
-  ui7_ctx->cm->background.clear();
-  ui7_ctx->cm->main.clear();
-  ui7_ctx->cm->front.clear();
+  ui7_ctx->active_menus.push_back(ui7_ctx->cm);
   ui7_ctx->cm = nullptr;
   ui7_ctx->in_menu = false;
 }
@@ -351,27 +421,35 @@ bool InBox(R7Vec2 inpos, R7Vec2 boxpos, R7Vec2 boxsize) {
 void Init() {
   // If Context is valid it makes no sense to reinit lol
   if (UI7CtxValidate()) return;
-  ui7_ctx = new UI7_Ctx;
+  ui7_ctx = UI7_Ctx::New();
   ui7_ctx->delta = 0.0f;
   ui7_ctx->time = 0.0f;
   ui7_ctx->_last = __get_time();
+  ui7_ctx->bdl = UI7DrawList::New();
+  ui7_ctx->fdl = UI7DrawList::New();
+  ui7_ctx->debug_calls = UI7DrawList::New();
   ui7_ctx->is_activated = true;
 }
 
 void Deinit() {
-  // Dont deinit something not initialized
-  // Please dont count how often init... was
-  // written wrong by me :(
   if (!UI7CtxValidate()) return;
   ui7_ctx->is_activated = false;
   ui7_ctx->menus.clear();
-  delete ui7_ctx;
+  ui7_ctx->debug_calls->Clear();
+  ui7_ctx->active_menus.clear();
 }
 
 void Update() {
   // Dont do anithing without ctx;
   if (!UI7CtxValidate()) return;
-  ui7_ctx->debug_calls.clear();
+  ui7_ctx->bdl->Process();
+  for (auto &it : ui7_ctx->active_menus) {
+    it->background->Process();
+    it->main->Process();
+    it->front->Process();
+  }
+  ui7_ctx->fdl->Process();
+  ui7_ctx->active_menus.clear();
   float current = __get_time();
   ui7_ctx->delta = (current - ui7_ctx->_last) / 1000.f;
   ui7_ctx->_last = current;
@@ -421,12 +499,11 @@ bool Button(const std::string &label, R7Vec2 size) {
       btn = RD7Color_ButtonHovered;
     }
   }
-
-  ui7_ctx->cm->main.push_back(DrawCmd::New(R7Vec4(pos, size), btn));
+  ui7_ctx->cm->main->AddRectangle(pos, size, btn);
   pos = R7Vec2(pos.x + size.x * 0.5f - textdim.x * 0.5,
                pos.y + size.y * 0.5f - textdim.y * 0.5);
-  ui7_ctx->cm->main.push_back(
-      DrawCmd::New(pos, label, RenderD7::ThemeActive()->AutoText(btn)));
+  ui7_ctx->cm->main->AddText(pos, label,
+                             RenderD7::ThemeActive()->AutoText(btn));
   return ret;
 }
 
@@ -461,14 +538,14 @@ void Checkbox(const std::string &label, bool &c) {
     }
   }
 
-  ui7_ctx->cm->main.push_back(DrawCmd::New(R7Vec4(pos, cbs), bg));
+  ui7_ctx->cm->main->AddRectangle(pos, cbs, bg);
   if (c == true) {
-    ui7_ctx->cm->main.push_back(DrawCmd::New(
-        R7Vec4(pos + R7Vec2(2, 2), cbs - R7Vec2(4, 4)), RD7Color_Checkmark));
+    ui7_ctx->cm->main->AddRectangle(pos + R7Vec2(2, 2), cbs - R7Vec2(4, 4),
+                                    RD7Color_Checkmark);
   }
-  ui7_ctx->cm->main.push_back(
-      DrawCmd::New(pos + R7Vec2(cbs.x + 5, 1), label,
-                   RenderD7::ThemeActive()->AutoText(RD7Color_Background)));
+  ui7_ctx->cm->main->AddText(
+      pos + R7Vec2(cbs.x + 5, 1), label,
+      RenderD7::ThemeActive()->AutoText(RD7Color_Background));
 }
 
 void Label(const std::string &label, RD7TextFlags flags) {
@@ -491,11 +568,11 @@ void Label(const std::string &label, RD7TextFlags flags) {
   auto &list =
       (upos.y + textdim.y < tbh) ? ui7_ctx->cm->front : ui7_ctx->cm->main;
 
-  list.push_back(DrawCmd::New(
+  list->AddText(
       pos, label,
       RenderD7::ThemeActive()->AutoText(
           (upos.y + textdim.y < tbh ? RD7Color_Header : RD7Color_Background)),
-      flags));
+      flags);
 }
 
 void Progressbar(float value) {
@@ -514,15 +591,13 @@ void Progressbar(float value) {
       return;
   }
 
-  ui7_ctx->cm->main.push_back(
-      DrawCmd::New(R7Vec4(pos, size), RD7Color_FrameBg));
-  ui7_ctx->cm->main.push_back(
-      DrawCmd::New(R7Vec4(pos + R7Vec2(2, 2), size - R7Vec2(4, 4)),
-                   RD7Color_FrameBgHovered));
+  ui7_ctx->cm->main->AddRectangle(pos, size, RD7Color_FrameBg);
+  ui7_ctx->cm->main->AddRectangle(pos + R7Vec2(2, 2), size - R7Vec2(4, 4),
+                                  RD7Color_FrameBgHovered);
   if (!(value != value) && !(value < 0.0) && !(value > 1.0)) {
-    ui7_ctx->cm->main.push_back(DrawCmd::New(
-        R7Vec4(pos + R7Vec2(2, 2), R7Vec2((size.x - 4) * value, size.y - 4)),
-        RD7Color_Progressbar));
+    ui7_ctx->cm->main->AddRectangle(pos + R7Vec2(2, 2),
+                                    R7Vec2((size.x - 4) * value, size.y - 4),
+                                    RD7Color_Progressbar);
   }
 }
 
@@ -556,9 +631,9 @@ void BrowserList(const std::vector<std::string> &entrys, int &selection,
   int selindex = (selection < max_entrys ? selection : (max_entrys - 1));
 
   for (int i = 0; i < max_entrys; i++) {
-    ui7_ctx->cm->main.push_back(
-        DrawCmd::New(R7Vec4(pos + R7Vec2(0, 15 * i), R7Vec2(size.x, 15)),
-                     (i % 2 == 0 ? RD7Color_List0 : RD7Color_List1)));
+    ui7_ctx->cm->main->AddRectangle(
+        pos + R7Vec2(0, 15 * i), R7Vec2(size.x, 15),
+        (i % 2 == 0 ? RD7Color_List0 : RD7Color_List1));
   }
   for (size_t i = 0;
        i < ((entrys.size() < (size_t)max_entrys) ? entrys.size()
@@ -567,21 +642,19 @@ void BrowserList(const std::vector<std::string> &entrys, int &selection,
     int list_index =
         (selection < max_entrys ? i : (i + selection - (max_entrys - 1)));
     if (i == (size_t)selindex) {
-      ui7_ctx->cm->main.push_back(DrawCmd::New(
-          R7Vec4(pos + R7Vec2(0, 15 * i), R7Vec2(size.x, 15)),
+      ui7_ctx->cm->main->AddRectangle(
+          pos + R7Vec2(0, 15 * i), R7Vec2(size.x, 15),
           (unsigned int)RenderD7::Color::RGBA(RD7Color_Selector)
               .fade_to(RD7Color_SelectorFade, std::sin(RenderD7::GetTime()))
-              .toRGBA()));
+              .toRGBA());
     }
-    auto cmd =
-        DrawCmd::New(pos + R7Vec2(5, 15 * i), entrys[list_index],
-                     RenderD7::ThemeActive()->AutoText(
-                         selindex == (int)i
-                             ? RD7Color_Selector
-                             : (i % 2 == 0 ? RD7Color_List0 : RD7Color_List1)),
-                     txtflags | RD7TextFlags_Short);
-    cmd->text_box = R7Vec2(size.x, 15);
-    ui7_ctx->cm->main.push_back(cmd);
+    ui7_ctx->cm->main->AddText(
+        pos + R7Vec2(5, 15 * i), entrys[list_index],
+        RenderD7::ThemeActive()->AutoText(
+            selindex == (int)i
+                ? RD7Color_Selector
+                : (i % 2 == 0 ? RD7Color_List0 : RD7Color_List1)),
+        txtflags | RD7TextFlags_Short, R7Vec2(size.x, 15));
   }
   RenderD7::CustomTextSize(tmp_txt);
 }
@@ -620,13 +693,12 @@ void InputText(const std::string &label, std::string &text,
     }
   }
 
-  ui7_ctx->cm->main.push_back(DrawCmd::New(R7Vec4(pos, cbs), bg));
-  ui7_ctx->cm->main.push_back(
-      DrawCmd::New(pos + R7Vec2(5, 1), (text != "" ? text : hint),
-                   RenderD7::ThemeActive()->AutoText(bg)));
-  ui7_ctx->cm->main.push_back(
-      DrawCmd::New(pos + R7Vec2(cbs.x + 5, 1), id.Title(),
-                   RenderD7::ThemeActive()->AutoText(RD7Color_Background)));
+  ui7_ctx->cm->main->AddRectangle(pos, cbs, bg);
+  ui7_ctx->cm->main->AddText(pos + R7Vec2(5, 1), (text != "" ? text : hint),
+                             RenderD7::ThemeActive()->AutoText(bg));
+  ui7_ctx->cm->main->AddText(
+      pos + R7Vec2(cbs.x + 5, 1), id.Title(),
+      RenderD7::ThemeActive()->AutoText(RD7Color_Background));
 }
 
 bool BeginMenu(const std::string &title, R7Vec2 size, UI7MenuFlags flags) {
@@ -726,15 +798,14 @@ bool BeginMenu(const std::string &title, R7Vec2 size, UI7MenuFlags flags) {
     ui7_ctx->cm->scrolling_offset = 0.f;
     ui7_ctx->cm->scrolling_mod = 0.f;
   }
-
-  ui7_ctx->cm->background.push_back(
-      DrawCmd::New(R7Vec4(R7Vec2(), size), RD7Color_Background));
+  ui7_ctx->cm->background->AddRectangle(R7Vec2(), size, RD7Color_Background);
   if (titlebar) {
-    ui7_ctx->cm->front.push_back(
-        DrawCmd::New(R7Vec4(R7Vec2(), R7Vec2(size.x, tbh)), RD7Color_Header));
-    ui7_ctx->cm->front.push_back(DrawCmd::New(
+    ui7_ctx->cm->front->AddRectangle(R7Vec2(), R7Vec2(size.x, tbh),
+                                     RD7Color_Header);
+
+    ui7_ctx->cm->front->AddText(
         R7Vec2(5, 2), id.Title(),
-        RenderD7::ThemeActive()->AutoText(RD7Color_Header), txtflags));
+        RenderD7::ThemeActive()->AutoText(RD7Color_Header), txtflags);
   }
 
   SetCursorPos(R7Vec2(5, ui7_ctx->cm->tbh + 5));
@@ -900,100 +971,81 @@ void ColorSelector(const std::string &label, unsigned int &color) {
     }
     if (!isunlock && !inkbd) RenderD7::Hid::Lock();
     // Draw Frame
-    ui7_ctx->cm->front.push_back(
-        DrawCmd::New(R7Vec4(npos.x, npos.y, 107, 97), RD7Color_FrameBg));
+    ui7_ctx->cm->front->AddRectangle(npos, R7Vec2(107, 97), RD7Color_FrameBg);
     // Draw Color Button
-    ui7_ctx->cm->front.push_back(
-        DrawCmd::New(R7Vec4(npos + R7Vec2(2, 2), cbs), outline));
-    ui7_ctx->cm->front.push_back(
-        DrawCmd::New(R7Vec4(npos + R7Vec2(4, 4), cbs - R7Vec2(4, 4)), color));
-    // Setup TextCommand with Short flag
-    auto cmd =
-        DrawCmd::New(npos + R7Vec2(cbs.x + 7, 1), label,
-                     RenderD7::ThemeActive()->AutoText(RD7Color_FrameBg));
-    cmd->text_box = R7Vec2(93 - cbs.x - 5, 0);
-    cmd->text_flags |= RD7TextFlags_Short;
-    ui7_ctx->cm->front.push_back(cmd);
+    ui7_ctx->cm->front->AddRectangle(npos + R7Vec2(2, 2), cbs, outline);
+    ui7_ctx->cm->front->AddRectangle(npos + R7Vec2(4, 4), cbs - R7Vec2(4, 4),
+                                     color);
+    // Draw Color Name Shorted if needed
+    ui7_ctx->cm->front->AddText(
+        npos + R7Vec2(cbs.x + 7, 1), label,
+        RenderD7::ThemeActive()->AutoText(RD7Color_FrameBg),
+        RD7TextFlags_Short);
     // Add luminance text
-    ui7_ctx->cm->front.push_back(DrawCmd::New(
+    ui7_ctx->cm->front->AddText(
         npos + R7Vec2(2, cbs.y + 4), "lum: " + std::to_string(clr.luminance()),
-        RenderD7::ThemeActive()->AutoText(RD7Color_FrameBg)));
+        RenderD7::ThemeActive()->AutoText(RD7Color_FrameBg));
     // Add Hex value
-    ui7_ctx->cm->front.push_back(
-        DrawCmd::New(npos + R7Vec2(2, cbs.y * 2 + 4),
-                     "hex: " + RenderD7::Color::RGBA2Hex(color),
-                     RenderD7::ThemeActive()->AutoText(RD7Color_FrameBg)));
+    ui7_ctx->cm->front->AddText(
+        npos + R7Vec2(2, cbs.y * 2 + 4),
+        "hex: " + RenderD7::Color::RGBA2Hex(color),
+        RenderD7::ThemeActive()->AutoText(RD7Color_FrameBg));
     // Red
     {
-      ui7_ctx->cm->front.push_back(DrawCmd::New(
-          R7Vec4(npos + R7Vec2(2, cbs.y * 3 + 4), R7Vec2(50, cbs.y)),
-          RD7Color_FrameBgHovered));
-      ui7_ctx->cm->front.push_back(
-          DrawCmd::New(R7Vec4(npos + R7Vec2(2, cbs.y * 3 + 4),
-                              R7Vec2(50 * ((float)clr.m_r / 255.f), cbs.y)),
-                       0xff0000ff));
-
-      auto ncmd = DrawCmd::New(npos + R7Vec2(2, cbs.y * 3 + 4),
-                               "R: " + std::to_string(clr.m_r), RD7Color_Text);
-      ncmd->text_flags |= RD7TextFlags_AlignMid;
-      ncmd->text_box = R7Vec2(50, 0);
-      ui7_ctx->cm->front.push_back(ncmd);
+      ui7_ctx->cm->front->AddRectangle(npos + R7Vec2(2, cbs.y * 3 + 4),
+                                       R7Vec2(50, cbs.y),
+                                       RD7Color_FrameBgHovered);
+      ui7_ctx->cm->front->AddRectangle(
+          npos + R7Vec2(2, cbs.y * 3 + 4),
+          R7Vec2(50 * ((float)clr.m_r / 255.f), cbs.y), 0xff0000ff);
+      ui7_ctx->cm->front->AddText(
+          npos + R7Vec2(2, cbs.y * 3 + 4), "R: " + std::to_string(clr.m_r),
+          RD7Color_Text, RD7TextFlags_AlignMid, R7Vec2(50, 0));
     }
     // Green
     {
-      ui7_ctx->cm->front.push_back(DrawCmd::New(
-          R7Vec4(npos + R7Vec2(54, cbs.y * 3 + 4), R7Vec2(50, cbs.y)),
-          RD7Color_FrameBgHovered));
-      ui7_ctx->cm->front.push_back(
-          DrawCmd::New(R7Vec4(npos + R7Vec2(54, cbs.y * 3 + 4),
-                              R7Vec2(50 * ((float)clr.m_g / 255.f), cbs.y)),
-                       0xff00ff00));
-      auto ncmd = DrawCmd::New(npos + R7Vec2(54, cbs.y * 3 + 4),
-                               "G: " + std::to_string(clr.m_g), RD7Color_Text);
-      ncmd->text_flags |= RD7TextFlags_AlignMid;
-      ncmd->text_box = R7Vec2(50, 0);
-      ui7_ctx->cm->front.push_back(ncmd);
+      ui7_ctx->cm->front->AddRectangle(npos + R7Vec2(54, cbs.y * 3 + 4),
+                                       R7Vec2(50, cbs.y),
+                                       RD7Color_FrameBgHovered);
+      ui7_ctx->cm->front->AddRectangle(
+          npos + R7Vec2(54, cbs.y * 3 + 4),
+          R7Vec2(50 * ((float)clr.m_g / 255.f), cbs.y), 0xff00ff00);
+      ui7_ctx->cm->front->AddText(
+          npos + R7Vec2(54, cbs.y * 3 + 4), "G: " + std::to_string(clr.m_g),
+          RD7Color_Text, RD7TextFlags_AlignMid, R7Vec2(50, 0));
     }
     // Blue
     {
-      ui7_ctx->cm->front.push_back(DrawCmd::New(
-          R7Vec4(npos + R7Vec2(2, cbs.y * 4 + 4), R7Vec2(50, cbs.y)),
-          RD7Color_FrameBgHovered));
-      ui7_ctx->cm->front.push_back(
-          DrawCmd::New(R7Vec4(npos + R7Vec2(2, cbs.y * 4 + 4),
-                              R7Vec2(50 * ((float)clr.m_b / 255.f), cbs.y)),
-                       0xffff0000));
-
-      auto ncmd = DrawCmd::New(npos + R7Vec2(2, cbs.y * 4 + 4),
-                               "B: " + std::to_string(clr.m_b), RD7Color_Text);
-      ncmd->text_flags |= RD7TextFlags_AlignMid;
-      ncmd->text_box = R7Vec2(50, 0);
-      ui7_ctx->cm->front.push_back(ncmd);
+      ui7_ctx->cm->front->AddRectangle(npos + R7Vec2(2, cbs.y * 4 + 4),
+                                       R7Vec2(50, cbs.y),
+                                       RD7Color_FrameBgHovered);
+      ui7_ctx->cm->front->AddRectangle(
+          npos + R7Vec2(2, cbs.y * 4 + 4),
+          R7Vec2(50 * ((float)clr.m_b / 255.f), cbs.y), 0xffff0000);
+      ui7_ctx->cm->front->AddText(
+          npos + R7Vec2(2, cbs.y * 4 + 4), "B: " + std::to_string(clr.m_b),
+          RD7Color_Text, RD7TextFlags_AlignMid, R7Vec2(50, 0));
     }
     // Alpha
     {
-      ui7_ctx->cm->front.push_back(DrawCmd::New(
-          R7Vec4(npos + R7Vec2(54, cbs.y * 4 + 4), R7Vec2(50, cbs.y)),
-          RD7Color_FrameBgHovered));
-      ui7_ctx->cm->front.push_back(
-          DrawCmd::New(R7Vec4(npos + R7Vec2(54, cbs.y * 4 + 4),
-                              R7Vec2(50 * ((float)clr.m_a / 255.f), cbs.y)),
-                       0xffffffff));
-
-      auto ncmd = DrawCmd::New(npos + R7Vec2(54, cbs.y * 4 + 4),
-                               "A: " + std::to_string(clr.m_a), RD7Color_Text);
-      ncmd->text_flags |= RD7TextFlags_AlignMid;
-      ncmd->text_box = R7Vec2(50, 0);
-      ui7_ctx->cm->front.push_back(ncmd);
+      ui7_ctx->cm->front->AddRectangle(npos + R7Vec2(54, cbs.y * 4 + 4),
+                                       R7Vec2(50, cbs.y),
+                                       RD7Color_FrameBgHovered);
+      ui7_ctx->cm->front->AddRectangle(
+          npos + R7Vec2(54, cbs.y * 4 + 4),
+          R7Vec2(50 * ((float)clr.m_a / 255.f), cbs.y), 0xffffffff);
+      ui7_ctx->cm->front->AddText(
+          npos + R7Vec2(54, cbs.y * 4 + 4), "A: " + std::to_string(clr.m_a),
+          RD7Color_Text, RD7TextFlags_AlignMid, R7Vec2(50, 0));
     }
   }
 
-  ui7_ctx->cm->main.push_back(DrawCmd::New(R7Vec4(pos, cbs), outline));
-  ui7_ctx->cm->main.push_back(
-      DrawCmd::New(R7Vec4(pos + R7Vec2(2, 2), cbs - R7Vec2(4, 4)), color));
-  ui7_ctx->cm->main.push_back(
-      DrawCmd::New(pos + R7Vec2(cbs.x + 5, 1), label,
-                   RenderD7::ThemeActive()->AutoText(RD7Color_Background)));
+  ui7_ctx->cm->main->AddRectangle(pos, cbs, outline);
+  ui7_ctx->cm->main->AddRectangle(pos + R7Vec2(2, 2), cbs - R7Vec2(4, 4),
+                                  color);
+  ui7_ctx->cm->main->AddText(
+      pos + R7Vec2(cbs.x + 5, 1), label,
+      RenderD7::ThemeActive()->AutoText(RD7Color_Background));
 }
 
 bool BeginTree(const std::string &text) {
@@ -1033,10 +1085,9 @@ void SameLine() {
 void Debug() {
   if (!UI7CtxValidate()) return;
   if (ui7_ctx->debugging) {
-    for (auto &it : ui7_ctx->debug_calls) {
-      it->Process();
-    }
+    ui7_ctx->debug_calls->Process(false);
   }
+  ui7_ctx->debug_calls->Clear();
 }
 
 float GetScrollingOffset() {
@@ -1054,4 +1105,13 @@ bool &IsDebugging() {
   return ui7_ctx->debugging;
 }
 
+UI7DrawList::Ref GetForegroundList() {
+  if (!UI7CtxValidate()) return nullptr;
+  return ui7_ctx->fdl;
+}
+
+UI7DrawList::Ref GetBackgroundList() {
+  if (!UI7CtxValidate()) return nullptr;
+  return ui7_ctx->bdl;
+}
 }  // namespace UI7

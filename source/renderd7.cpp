@@ -300,7 +300,6 @@ bool RenderD7::MainLoop() {
   d7_hRepeat = hidKeysDownRepeat();
   hidTouchRead(&d7_touch);
   Hid::Update();
-  UI7::Update();
   rd7i_hid_touch_pos = R7Vec2(d7_touch.px, d7_touch.py);
 
   RenderD7::ClearTextBufs();
@@ -500,9 +499,10 @@ void RenderD7::FrameEnd() {
     RenderD7::Scene::doDraw();
     RenderD7::Scene::doLogic();
   }
+  UI7::Update();
+  UI7::Debug();
   RenderD7::ProcessMessages();
   OvlHandler();
-  UI7::Debug();
   Npifade();
   C3D_FrameEnd(0);
 }

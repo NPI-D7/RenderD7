@@ -21,6 +21,7 @@
 
 #include <cstring>
 #include <memory>
+#include <renderd7/smart_ctor.hpp>
 #include <string>
 #include <vector>
 
@@ -28,9 +29,7 @@
 #define UNPACK_BGRA(col) (uint8_t)(col >> 8), (col >> 16), (col >> 24), (col)
 
 inline uint32_t RGBA8(uint8_t r, uint8_t g, uint8_t b, uint8_t a = 255) {
-#define ISIMPLEPAK(x, y) (((x)&0xff) << y)
-  return (ISIMPLEPAK(r, 0) | ISIMPLEPAK(g, 8) | ISIMPLEPAK(b, 16) |
-          ISIMPLEPAK(a, 24));
+  return (r | g << 8 | b << 16 | a << 24);
 }
 
 typedef int RD7Color;
@@ -98,8 +97,7 @@ class Theme {
 
   std::vector<unsigned int> &GetTableRef() { return clr_tab; }
   // For Smart Pointer
-  using Ref = std::shared_ptr<Theme>;
-  static Ref New() { return std::make_shared<Theme>(); }
+  RD7_SMART_CTOR(Theme);
 
   // Loader method
   void CopyOther(Theme::Ref theme);
@@ -188,7 +186,7 @@ class RGBA {
 
   /// @brief Get as Uint32
   /// @return color
-  uint32_t toRGBA() const { return RGBA8(m_r, m_g, m_b, m_a); }
+  unsigned int toRGBA() const { return RGBA8(m_r, m_g, m_b, m_a); }
 
   // Just calculate the "lightness" f.e. to use Text or Text2
   float luminance() const {
@@ -202,7 +200,7 @@ class RGBA {
     return (luminance() >= 0.5);
   }
 
-  uint8_t m_r, m_g, m_b, m_a;
+  uint8_t m_r = 0, m_g = 0, m_b = 0, m_a = 0;
 };
 std::string RGBA2Hex(unsigned int c32);
 /// @brief Convert RGB to Hex
