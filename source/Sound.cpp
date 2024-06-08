@@ -18,7 +18,7 @@
 
 #include <cstring>
 #include <fstream>
-#include <renderd7/Sound2.hpp>
+#include <renderd7/Sound.hpp>
 #include <renderd7/internal_db.hpp>
 #include <string>
 

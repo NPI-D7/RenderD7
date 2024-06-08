@@ -20,7 +20,7 @@
 
 #include <map>
 #include <renderd7/Color.hpp>
-#include <renderd7/Font2.hpp>
+#include <renderd7/Font.hpp>
 #include <renderd7/R7Vec.hpp>
 #include <renderd7/smart_ctor.hpp>
 
