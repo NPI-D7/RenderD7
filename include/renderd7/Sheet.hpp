@@ -21,6 +21,7 @@
 #include <citro2d.h>
 #include <citro3d.h>
 
+#include <renderd7/smart_ctor.hpp>
 #include <string>
 
 namespace RenderD7 {
@@ -33,6 +34,7 @@ class Sheet {
   ~Sheet() {
     if (spritesheet) Free();
   }
+  RD7_SMART_CTOR(Sheet);
   /// @brief Load A Spritesheet File
   /// @param path Path to the t3x
   /// @return Result Code

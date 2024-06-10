@@ -37,6 +37,7 @@
 #include <renderd7/Color.hpp>
 #include <renderd7/FunctionTrace.hpp>
 #include <renderd7/Hardware.hpp>
+#include <renderd7/Log2.hpp>
 #include <renderd7/Memory.hpp>
 #include <renderd7/Overlays.hpp>
 #include <renderd7/Ovl.hpp>
@@ -69,6 +70,8 @@ extern bool rd7_enable_scene_system;
 namespace RenderD7 {
 // Reference to the New Renderer
 R2Base::Ref R2();
+// Reference to Global Logger
+LoggerBase::Ref Logger();
 /// @brief Get Deltatime
 /// @return Deltatime
 float GetDeltaTime();

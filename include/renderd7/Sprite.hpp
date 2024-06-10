@@ -37,7 +37,7 @@ class Sprite {
   /// \brief Load a Sprite From SpriteSheet
   /// \param sheet the Sheet to load from.(RenderD7::Sheet)
   /// \param index the number of the Sprite in the Sheet
-  void FromSheet(RenderD7::Sheet *sheet, size_t index);
+  void FromSheet(RenderD7::Sheet::Ref sheet, size_t index);
   /// \brief Load a Sprite From SpriteSheet
   /// \param img the Image to load from.(RenderD7::Image)
   void FromImage(RenderD7::Image::Ref img);

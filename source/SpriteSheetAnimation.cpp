@@ -17,9 +17,6 @@
  */
 
 #include <renderd7/SpriteAnimation.hpp>
-#include <renderd7/log.hpp>
-
-extern Log renderd7log;
 
 RenderD7::SpriteSheetAnimation::SpriteSheetAnimation() {
   //
@@ -28,7 +25,7 @@ RenderD7::SpriteSheetAnimation::~SpriteSheetAnimation() {
   //
 }
 
-void RenderD7::SpriteSheetAnimation::Setup(RenderD7::Sheet *sheet,
+void RenderD7::SpriteSheetAnimation::Setup(RenderD7::Sheet::Ref sheet,
                                            size_t imagecount, size_t startimage,
                                            float frame_begin,
                                            float frame_finish) {

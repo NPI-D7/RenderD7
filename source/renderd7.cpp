@@ -21,7 +21,6 @@
 #include <renderd7/Overlays.hpp>
 #include <renderd7/ThemeEditor.hpp>
 #include <renderd7/UI7.hpp>
-#include <renderd7/log.hpp>
 #include <renderd7/renderd7.hpp>
 #include <renderd7/renderd7_logo.hpp>
 
@@ -34,6 +33,8 @@
 #include <random>
 
 RenderD7::R2Base::Ref rd7i_render2;
+RenderD7::LoggerBase::Ref rd7i_logger;
+RenderD7::LoggerBase::Ref rd7i_glogger;
 
 static void RD7i_ExitHook() {
   C2D_TextBufDelete(rd7i_text_buffer);
@@ -240,6 +241,14 @@ RenderD7::R2Base::Ref RenderD7::R2() {
   return rd7i_render2;
 }
 
+RenderD7::LoggerBase::Ref RenderD7::Logger() {
+  if (!rd7i_glogger) {
+    RenderD7::Error("Logger Was Called before being Init!");
+    // return schould not be reached then
+  }
+  return rd7i_glogger;
+}
+
 float RenderD7::GetDeltaTime() { return (float)rd7i_dtm; }
 
 bool RenderD7::DrawImageFromSheet(RenderD7::Sheet *sheet, size_t index, float x,
@@ -353,6 +362,9 @@ void RenderD7::Init::Graphics() {
 Result RenderD7::Init::Main(std::string app_name) {
   RenderD7::Ftrace::ScopedTrace st("rd7-core", f2s(Init::Main));
   rd7i_app_name = app_name;
+  rd7i_logger = LoggerBase::New();
+  rd7i_logger->Init("renderd7", true);
+  rd7i_glogger = LoggerBase::New();
 
   gfxInitDefault();
   atexit(gfxExit);
@@ -373,6 +385,7 @@ Result RenderD7::Init::Main(std::string app_name) {
 
   auto ret = rd7i_soc_init();
   if (ret) {
+    rd7i_logger->Write("Failed to Init Soc!");
     RenderD7::PushMessage("RenderD7", "Failed to\nInit Soc!");
   } else {
     atexit(rd7i_soc_deinit);
@@ -413,6 +426,9 @@ Result RenderD7::Init::Main(std::string app_name) {
 Result RenderD7::Init::Minimal(std::string app_name) {
   RenderD7::Ftrace::ScopedTrace st("rd7-core", f2s(Init::Minimal));
   rd7i_app_name = app_name;
+  rd7i_logger = LoggerBase::New();
+  rd7i_logger->Init("renderd7", true);
+  rd7i_glogger = LoggerBase::New();
 
   gfxInitDefault();
   atexit(gfxExit);
@@ -423,6 +439,7 @@ Result RenderD7::Init::Minimal(std::string app_name) {
 
   auto ret = rd7i_soc_init();
   if (ret) {
+    rd7i_logger->Write("Failed to Init Soc!");
     RenderD7::PushMessage("RenderD7", "Failed to\nInit Soc!");
   } else {
     atexit(rd7i_soc_deinit);
@@ -447,6 +464,7 @@ Result RenderD7::Init::Minimal(std::string app_name) {
   rd7i_d2_dimbuf = C2D_TextBufNew(4096);
   rd7i_base_font = C2D_FontLoadSystem(CFG_REGION_USA);
   rd7i_render2 = R2Base::New();
+
   rd7i_graphics_on = true;
   if (rd7_do_splash) PushSplash();
 

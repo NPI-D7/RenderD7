@@ -23,6 +23,7 @@
 
 #include <renderd7/Sheet.hpp>
 #include <renderd7/Sprite.hpp>
+#include <renderd7/smart_ctor.hpp>
 
 namespace RenderD7 {
 /// @brief SpriteSheetAnimation Class
@@ -32,13 +33,14 @@ class SpriteSheetAnimation : public RenderD7::Sprite {
   SpriteSheetAnimation();
   /// @brief Deconstructor
   ~SpriteSheetAnimation();
+  RD7_SMART_CTOR(SpriteSheetAnimation);
   /// @brief Setup an Animation
   /// @param sheet Input Spritesheet
   /// @param imagecount Count of Images
   /// @param startimage Where to Start the Loop
   /// @param frame_begin Current Time (Should be 0)
   /// @param frame_finish Time Length
-  void Setup(RenderD7::Sheet *sheet, size_t imagecount, size_t startimage,
+  void Setup(RenderD7::Sheet::Ref sheet, size_t imagecount, size_t startimage,
              float frame_begin, float frame_finish);
   /// @brief Play the Animation
   /// @param timespeed Speed of the animation
@@ -52,7 +54,7 @@ class SpriteSheetAnimation : public RenderD7::Sprite {
   /// @param D_totaltime Current Time
   float D_totaltime;
   /// @param sheet The Sheet of Images
-  RenderD7::Sheet *sheet;
+  RenderD7::Sheet::Ref sheet;
   /// @param time Total Time from frame_finish
   float time;
 };

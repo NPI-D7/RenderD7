@@ -18,7 +18,7 @@
 
 #include <renderd7/Sprite.hpp>
 
-void RenderD7::Sprite::FromSheet(RenderD7::Sheet *sheet, size_t index) {
+void RenderD7::Sprite::FromSheet(RenderD7::Sheet::Ref sheet, size_t index) {
   C2D_SpriteFromSheet(&this->sprite, sheet->spritesheet, index);
 }
 bool RenderD7::Sprite::Draw() {
