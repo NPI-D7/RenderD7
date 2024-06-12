@@ -18,13 +18,6 @@
 
 #include <renderd7/SpriteAnimation.hpp>
 
-RenderD7::SpriteSheetAnimation::SpriteSheetAnimation() {
-  //
-}
-RenderD7::SpriteSheetAnimation::~SpriteSheetAnimation() {
-  //
-}
-
 void RenderD7::SpriteSheetAnimation::Setup(RenderD7::Sheet::Ref sheet,
                                            size_t imagecount, size_t startimage,
                                            float frame_begin,

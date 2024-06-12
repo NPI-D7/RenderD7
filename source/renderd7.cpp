@@ -33,8 +33,8 @@
 #include <random>
 
 RenderD7::R2Base::Ref rd7i_render2;
-RenderD7::LoggerBase::Ref rd7i_logger;
 RenderD7::LoggerBase::Ref rd7i_glogger;
+extern RenderD7::LoggerBase::Ref rd7i_logger;
 
 static void RD7i_ExitHook() {
   C2D_TextBufDelete(rd7i_text_buffer);
@@ -182,14 +182,12 @@ void rd7i_init_config() {
     rd7i_config.clear();
     rd7i_config["info"]["version"] = CFGVER;
     rd7i_config["info"]["renderd7ver"] = RENDERD7VSTRING;
-    rd7i_config["settings"]["doscreentimeout"] = 0;
-    rd7i_config["settings"]["forcetimeoutLB"] = true;
-    rd7i_config["settings"]["renderer"] = "c3d_c2d";
-    rd7i_config["metrik-settings"]["enableoverlay"] = false;
+    rd7i_config["metrik-settings"]["show"] = false;
     rd7i_config["metrik-settings"]["Screen"] = true;
-    rd7i_config["metrik-settings"]["txtColor"] = "#ffffffff";
-    rd7i_config["metrik-settings"]["Color"] = "#aa000000";
-    rd7i_config["metrik-settings"]["txtSize"] = 0.7f;
+    rd7i_config["metrik-settings"]["Text"] = "#ffffffff";
+    rd7i_config["metrik-settings"]["Bg"] = "#aa000000";
+    rd7i_config["metrik-settings"]["Size"] = 0.7f;
+    rd7i_config["internal_logger"]["nowritetxt"] = true;
     std::fstream cfg_wrt(rd7i_config_path + "/config.rc7", std::ios::out);
     cfg_wrt << rd7i_config.dump(4);
     cfg_wrt.close();
@@ -198,9 +196,10 @@ void rd7i_init_config() {
   cfg_ldr >> rd7i_config;
   cfg_ldr.close();
 
-  rd7i_metrikd = rd7i_config["metrik-settings"]["enableoverlay"].get<bool>();
-  rd7i_mt_txtSize = rd7i_config["metrik-settings"]["txtSize"].get<float>();
+  rd7i_metrikd = rd7i_config["metrik-settings"]["show"].get<bool>();
+  rd7i_mt_txtSize = rd7i_config["metrik-settings"]["Size"].get<float>();
   rd7i_mt_screen = rd7i_config["metrik-settings"]["Screen"].get<bool>();
+  rd7i_lggrf = rd7i_config["internal_logger"]["nowritetxt"].get<bool>();
 
   if (rd7i_metrikd)
     RenderD7::AddOvl(std::make_unique<RenderD7::Ovl_Metrik>(
@@ -363,7 +362,6 @@ Result RenderD7::Init::Main(std::string app_name) {
   RenderD7::Ftrace::ScopedTrace st("rd7-core", f2s(Init::Main));
   rd7i_app_name = app_name;
   rd7i_logger = LoggerBase::New();
-  rd7i_logger->Init("renderd7", true);
   rd7i_glogger = LoggerBase::New();
 
   gfxInitDefault();
@@ -379,6 +377,9 @@ Result RenderD7::Init::Main(std::string app_name) {
   aptInit();
   atexit(aptExit);
   romfsInit();
+
+  rd7i_init_config();
+  _rd7i_logger()->Init("renderd7", rd7i_lggrf);
 
   rd7i_active_theme = Theme::New();
   rd7i_active_theme->Default();
@@ -414,7 +415,6 @@ Result RenderD7::Init::Main(std::string app_name) {
   rd7i_last_tm = svcGetSystemTick();
   if (rd7_do_splash) PushSplash();
 
-  rd7i_init_config();
   rd7i_init_input();
   rd7i_init_theme();
   UI7::Init();
@@ -427,12 +427,14 @@ Result RenderD7::Init::Minimal(std::string app_name) {
   RenderD7::Ftrace::ScopedTrace st("rd7-core", f2s(Init::Minimal));
   rd7i_app_name = app_name;
   rd7i_logger = LoggerBase::New();
-  rd7i_logger->Init("renderd7", true);
   rd7i_glogger = LoggerBase::New();
 
   gfxInitDefault();
   atexit(gfxExit);
   romfsInit();
+
+  rd7i_init_config();
+  _rd7i_logger()->Init("renderd7", rd7i_lggrf);
 
   rd7i_active_theme = Theme::New();
   rd7i_active_theme->Default();
@@ -473,7 +475,6 @@ Result RenderD7::Init::Minimal(std::string app_name) {
   svcGetSystemInfo(&citracheck, 0x20000, 0);
   rd7i_is_citra = citracheck ? true : false;
 
-  rd7i_init_config();
   rd7i_init_input();
   rd7i_init_theme();
   UI7::Init();
@@ -612,6 +613,11 @@ void RenderD7::RSettings::Draw(void) const {
       if (UI7::Button("ThemeEditor")) {
         RenderD7::LoadThemeEditor();
       }
+      if (UI7::Button("Logs")) {
+        shared_request[0x00000001] = RLOGS;
+      }
+      UI7::SameLine();
+      UI7::Checkbox("No File", rd7i_lggrf);
       if (UI7::Button("Back")) {
         shared_request[0x00000002] = 1U;
       }
@@ -800,6 +806,21 @@ void RenderD7::RSettings::Draw(void) const {
       }
       UI7::EndMenu();
     }
+  } else if (m_state == RLOGS) {
+    RenderD7::R2()->OnScreen(R2Screen_Top);
+    if (UI7::BeginMenu("RenderD7 -> Logs")) {
+      UI7::SetCursorPos(R7Vec2(395, 2));
+      UI7::Label(RENDERD7VSTRING, RD7TextFlags_AlignRight);
+      UI7::RestoreCursor();
+      UI7::EndMenu();
+    }
+
+    RenderD7::R2()->OnScreen(R2Screen_Bottom);
+    if (UI7::BeginMenu("Press \uE001 to go back!", R7Vec2(),
+                       UI7MenuFlags_Scrolling)) {
+      for (auto &it : rd7i_logger->Lines()) UI7::Label(it);
+      UI7::EndMenu();
+    }
   }
 }
 
@@ -813,6 +834,7 @@ void RenderD7::RSettings::Logic() {
         std::fstream cfg_wrt(rd7i_config_path + "/config.rc7", std::ios::out);
         rd7i_config["metrik-settings"]["enableoverlay"] = rd7i_metrikd;
         rd7i_config["metrik-settings"]["Screen"] = rd7i_mt_screen;
+        rd7i_config["internal_logger"]["nowritetxt"] = rd7i_lggrf;
         cfg_wrt << rd7i_config.dump(4);
         cfg_wrt.close();
         rd7i_settings = false;
@@ -843,6 +865,7 @@ void RenderD7::RSettings::Logic() {
       std::fstream cfg_wrt(rd7i_config_path + "/config.rc7", std::ios::out);
       rd7i_config["metrik-settings"]["enableoverlay"] = rd7i_metrikd;
       rd7i_config["metrik-settings"]["Screen"] = rd7i_mt_screen;
+      rd7i_config["internal_logger"]["nowritetxt"] = rd7i_lggrf;
       cfg_wrt << rd7i_config.dump(4);
       cfg_wrt.close();
       rd7i_settings = false;
@@ -862,7 +885,7 @@ void RenderD7::RSettings::Logic() {
       m_state = RSETTINGS;
     }
   }
-  if (m_state == RIDB) {
+  if (m_state == RIDB || m_state == RLOGS) {
     if (d7_hDown & KEY_B) {
       m_state = RSETTINGS;
     }

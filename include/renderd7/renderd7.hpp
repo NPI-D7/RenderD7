@@ -37,7 +37,7 @@
 #include <renderd7/Color.hpp>
 #include <renderd7/FunctionTrace.hpp>
 #include <renderd7/Hardware.hpp>
-#include <renderd7/Log2.hpp>
+#include <renderd7/Logger.hpp>
 #include <renderd7/Memory.hpp>
 #include <renderd7/Overlays.hpp>
 #include <renderd7/Ovl.hpp>
@@ -107,6 +107,7 @@ class RSettings : public RenderD7::Scene {
     ROVERLAYS,  // Overlay Settings
     RFTRACE,    // FTRace Menu
     RUI7,       // UI7 Menu
+    RLOGS,      // Logs
   };
 
   /// @param shared_request Defines requests from Draw to Logic

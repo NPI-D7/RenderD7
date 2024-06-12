@@ -19,7 +19,7 @@
 #include <filesystem>
 #include <fstream>
 #include <memory>
-#include <renderd7/Log2.hpp>
+#include <renderd7/Logger.hpp>
 #include <renderd7/Time.hpp>
 #include <renderd7/renderd7.hpp>
 
@@ -46,9 +46,9 @@ void LoggerBase::Init(const std::string& name, bool fileless) {
   this->Write("RenderD7 Log\n\n");
 }
 
-void LoggerBase::Write(const std::string& debug_text) {
+void LoggerBase::Write(const std::string& debug_text, int lvl) {
   std::string msg = "[" + RenderD7::GetTimeStr() + "]: " + debug_text;
-  if (this->_log.is_open()) {
+  if (this->_log.is_open() && lvl <= writelvl) {
     this->_log << msg << std::endl;
   }
   while (msg.find_first_of('\n') != 0) {
@@ -57,4 +57,6 @@ void LoggerBase::Write(const std::string& debug_text) {
   }
   lines.push_back(msg);
 }
+
+const std::vector<std::string>& LoggerBase::Lines() { return this->lines; }
 }  // namespace RenderD7

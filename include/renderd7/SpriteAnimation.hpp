@@ -30,9 +30,9 @@ namespace RenderD7 {
 class SpriteSheetAnimation : public RenderD7::Sprite {
  public:
   /// @brief Constructor
-  SpriteSheetAnimation();
+  SpriteSheetAnimation() = default;
   /// @brief Deconstructor
-  ~SpriteSheetAnimation();
+  ~SpriteSheetAnimation() = default;
   RD7_SMART_CTOR(SpriteSheetAnimation);
   /// @brief Setup an Animation
   /// @param sheet Input Spritesheet

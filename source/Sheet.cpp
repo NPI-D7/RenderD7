@@ -17,13 +17,18 @@
  */
 
 #include <renderd7/Sheet.hpp>
+#include <renderd7/internal_db.hpp>
 
 Result RenderD7::Sheet::Load(const std::string& path) {
   this->spritesheet = C2D_SpriteSheetLoad(path.c_str());
+  if (!this->spritesheet) {
+    _rd7i_logger()->Write("Failed to Load Spritesheet from: " + path, 0);
+  }
   return 0;
 }
 
 void RenderD7::Sheet::Free() {
+  if (!this->spritesheet) return;
   C2D_SpriteSheetFree(this->spritesheet);
   this->spritesheet = nullptr;
 }
