@@ -19,7 +19,7 @@
 #include <renderd7/Sprite.hpp>
 
 void RenderD7::Sprite::FromSheet(RenderD7::Sheet::Ref sheet, size_t index) {
-  C2D_SpriteFromSheet(&this->sprite, sheet->spritesheet, index);
+  C2D_SpriteFromSheet(&this->sprite, sheet->Get(), index);
 }
 bool RenderD7::Sprite::Draw() {
   // Patch Depth before draw

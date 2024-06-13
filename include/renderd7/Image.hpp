@@ -30,10 +30,11 @@ namespace RenderD7 {
 class Image {
  public:
   Image();
-  ~Image();
+  ~Image() = default;
   RD7_SMART_CTOR(Image)
   void Load(const std::string& path);
   void From_NIMG(const nimg& image);
+  void Delete();
 
   C2D_Image Get();
   C2D_Image& GetRef();
@@ -42,8 +43,6 @@ class Image {
   bool Loadet();
 
  private:
-  void safe_del();
-  bool ld = false;
   C2D_Image img;
 };
 }  // namespace RenderD7

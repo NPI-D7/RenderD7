@@ -94,6 +94,7 @@ class Theme {
   void UndoAll();
   void TextBy(RD7Color bg);
   RD7Color AutoText(RD7Color bg);
+  void ClearHistory() { changes.clear(); }
 
   std::vector<unsigned int> &GetTableRef() { return clr_tab; }
   // For Smart Pointer

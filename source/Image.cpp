@@ -21,6 +21,8 @@
 #include <renderd7/Image.hpp>
 #include <vector>
 
+#include <renderd7/internal_db.hpp>
+
 static u32 __rd7i_gp2o__(u32 v) {
   v--;
   v |= v >> 1;
@@ -109,27 +111,27 @@ Image::Image() {
   img.subtex = nullptr;
 }
 
-Image::~Image() { safe_del(); }
-
 void Image::Load(const std::string &path) {
   // Make sure to cleanup
-  safe_del();
-  ld = false;
+  Delete();
   // Setup Func and Load Data
   int w, h, c = 0;
   uint8_t *image = stbi_load(path.c_str(), &w, &h, &c, 4);
   if (image == nullptr) {
+    _rd7i_logger()->Write("Failed to Load Image: " + path);
     return;
   }
   // Size/Fmt Check
   if (w > 1024 || h > 1024) {
     // Reason: Image to Large
+    _rd7i_logger()->Write("Image too Large!");
     stbi_image_free(image);
     return;
   }
 
   std::vector<uint8_t> wimg(w * h * 4);
   if (c == 3) {
+    _rd7i_logger()->Write("Convert Image to RGBA");
     stbi_image_free(image);
     image = stbi_load(path.c_str(), &w, &h, &c, 3);
     __rd7i_r24r32(wimg, std::vector<uint8_t>(image, image + (w * h * 3)), w, h);
@@ -146,13 +148,11 @@ void Image::Load(const std::string &path) {
   __rd7i_c3dc2d__(tex, subtex, wimg.data(), (u32)(w * h * 4), (u32)w, (u32)h);
   img.tex = tex;
   img.subtex = subtex;
-  ld = true;
 }
 
 void Image::From_NIMG(const nimg &image) {
   // Make sure to cleanup
-  safe_del();
-  ld = false;
+  Delete();
   if (image.width > 1024 || image.height > 1024) return;
   C3D_Tex *tex = new C3D_Tex;
   Tex3DS_SubTexture *subtex = new Tex3DS_SubTexture;
@@ -161,14 +161,13 @@ void Image::From_NIMG(const nimg &image) {
                   (u32)image.height);
   img.tex = tex;
   img.subtex = subtex;
-  ld = true;
 }
 
 C2D_Image Image::Get() { return img; }
 C2D_Image &Image::GetRef() { return img; }
 
 void Image::Set(const C2D_Image &i) {
-  safe_del();
+  Delete();
   img = i;
 }
 
@@ -177,10 +176,16 @@ R7Vec2 Image::GetSize() {
   return R7Vec2(img.subtex->width, img.subtex->height);
 }
 
-void Image::safe_del() {
-  if (img.subtex != nullptr) delete img.subtex;
-  if (img.tex != nullptr) delete img.tex;
+void Image::Delete() {
+  if (img.subtex != nullptr) {
+    delete img.subtex;
+    img.subtex = nullptr;
+  }
+  if (img.tex != nullptr) { 
+    delete img.tex;
+    img.tex = nullptr;
+  }
 }
 
-bool Image::Loadet() { return ld; }
+bool Image::Loadet() { return (img.subtex != nullptr && img.tex != nullptr); }
 }  // namespace RenderD7

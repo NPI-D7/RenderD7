@@ -250,16 +250,6 @@ RenderD7::LoggerBase::Ref RenderD7::Logger() {
 
 float RenderD7::GetDeltaTime() { return (float)rd7i_dtm; }
 
-bool RenderD7::DrawImageFromSheet(RenderD7::Sheet *sheet, size_t index, float x,
-                                  float y, float scaleX, float scaleY) {
-  if (sheet->spritesheet != nullptr) {
-    if (C2D_SpriteSheetCount(sheet->spritesheet) >= index) {
-      return C2D_DrawImageAt(C2D_SpriteSheetGetImage(sheet->spritesheet, index),
-                             x, y, 0.5f, nullptr, scaleX, scaleY);
-    }
-  }
-  return false;
-}
 void RenderD7::Init::NdspFirm() {
   if (access("sdmc:/3ds/dspfirm.cdc", F_OK) != -1) {
     ndspInit();

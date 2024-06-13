@@ -158,18 +158,6 @@ int GetFps();
 /// @param e To
 /// @return Random Int
 int GetRandomInt(int b, int e);
-/// @brief DrawMetrikOvl (YOUR OWN RISK)
-void DrawMetrikOvl();
-/// @brief Draw Image from RenderD7 Sheet
-/// @param sheet Spritesheet
-/// @param index Image index Value
-/// @param x Pos X
-/// @param y Pos Y
-/// @param scaleX Scale on X-Axis
-/// @param scaleY Scale on Y-Axis
-/// @return success ?
-bool DrawImageFromSheet(RenderD7::Sheet *sheet, size_t index, float x, float y,
-                        float scaleX = 1.0, float scaleY = 1.0);
 /// @brief Fade In
 /// @param duration Duration in Frames
 void FadeIn();
