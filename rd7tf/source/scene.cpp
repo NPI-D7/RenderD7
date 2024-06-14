@@ -41,17 +41,8 @@ static void Wave(int index, R7Vec2 position, R7Vec2 size, float time,
   }
   // Just to make sure...
   y_position = std::min(y_position, position.y + size.y - (90 - shrink));
-
-  if (dbg)
-    DV2::TriangleLined(
-        R7Vec2(x_position, y_position),
-        R7Vec2(x_position + 300, y_position + (90 - shrink)),
-        R7Vec2(x_position - 300, y_position + (90 - shrink)),
-        RD7::Color::RGBA(.94f - .17f * color_effect, .61f - .25f * color_effect,
-                         .36f + .38f * color_effect)
-            .toRGBA());
-  else
-    DV2::TriangleSolid(
+  
+    RD7::R2()->AddTriangle(
         R7Vec2(x_position, y_position),
         R7Vec2(x_position + 300, y_position + (90 - shrink)),
         R7Vec2(x_position - 300, y_position + (90 - shrink)),
@@ -61,7 +52,7 @@ static void Wave(int index, R7Vec2 position, R7Vec2 size, float time,
 }
 
 void DrawWave(R7Vec2 position, R7Vec2 size, float time, bool dbg) {
-  DV2::RectFilledSolid(position, size, 0xff64c9fd);
+  RD7::R2()->AddRect(position, size, 0xff64c9fd);
   int i = 0;
   for (; i < 44; i++) Wave(i, position, size, time, dbg);
 }
@@ -69,14 +60,9 @@ void DrawWave(R7Vec2 position, R7Vec2 size, float time, bool dbg) {
 R7Vec2 testv2 = R7Vec2(48, 48);
 std::vector<int*> img;
 
-void display_icon(void* v, R7Vec2 p) { DV2::RFS(p, testv2, 0xff00ffff); }
+void display_icon(void* v, R7Vec2 p) { RD7::R2()->AddRect(p, testv2, 0xff00ffff); }
 
 Sample::Sample() {
-  auto t = RD7::FileSystem::GetDirContent("sdmc:/music/");
-  for (const auto& it : t) {
-    names.push_back(it.name);
-    files.push_back(it.path);
-  }
   auto ti = new int;
   ti[0] = 0;
   for (int i = 0; i < 256; i++) {
@@ -92,20 +78,10 @@ Sample::~Sample() {
 void Sample::Draw() const {
   // Draw Things to Screen:
   // Step 1 -> Select Screen
-  RD7::OnScreen(Top);
+  RD7::R2()->OnScreen(R2Screen_Top);
   // Step 2 -> Draw Things
   // The hbloader Triangle Wave
   DrawWave(R7Vec2(0, 0), R7Vec2(400, 240), RD7::GetTime(), debug_background);
-  // For Example A Rect with Draw2 and StyleColorApi
-  // And the RFS Wrapper for RectFilledSolid lol
-  /*DV2::RFS(R7Vec2(0, 0), R7Vec2(400, 20),
-                       RD7::StyleColor(RD7Color_Header));
-  // As the Top bar is Dark you need TextColor2
-  RD7::RedirectColor(RD7Color_Text, RD7Color_Text2);
-  DV2::Text(R7Vec2(5, 2), "RenderD7 - Test Framework");
-  DV2::Text(R7Vec2(395, 2), RENDERD7VSTRING,
-                        RD7TextFlags_AlignRight);
-  RD7::UndoColorEdit(RD7Color_Text);*/
   if (UI7::BeginMenu("RenderD7 Test Framework")) {
     if (state == State_Menu) {
       UI7::Label("SZS: " + std::to_string(img.size()));
@@ -114,7 +90,7 @@ void Sample::Draw() const {
     }
     UI7::EndMenu();
   }
-  RD7::OnScreen(Bottom);
+  RD7::R2()->OnScreen(R2Screen_Bottom);
   if (UI7::BeginMenu("Control Center")) {
     if (state == State_Menu) {
       if (UI7::Button("RenderD7 Settings"))
@@ -128,11 +104,6 @@ void Sample::Draw() const {
       UI7::SameLine();
       UI7::Checkbox("UI7-Debug", UI7::IsDebugging());
       UI7::InputText("Search", search__, "Tap Here");
-      UI7::Label("Text Control:");
-      if (UI7::Button("text++")) txt_size += 0.01;
-      UI7::SameLine();
-      if (UI7::Button("text--")) txt_size -= 0.01;
-      UI7::SameLine();
       if (UI7::Button("def")) txt_size = 0.5;
       UI7::Label("GridControl: ");
       if (UI7::Button("icn++")) testv2 += R7Vec2(1, 1);
@@ -144,7 +115,6 @@ void Sample::Draw() const {
 }
 
 void Sample::Logic() {
-  RD7::CustomTextSize(txt_size);
   for (const auto& it : shared_requests) {
     if (it.first == 1U) {
       if (it.second) RD7::LoadSettings();

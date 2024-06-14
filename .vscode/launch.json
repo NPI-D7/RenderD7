@@ -13,7 +13,10 @@
             "environment": [],
             "externalConsole": true,
             "MIMode": "gdb",
-            "miDebuggerPath": "/opt/devkitPro/devkitARM/bin/arm-none-eabi-gdb",
+            ///  LINUX
+            //"miDebuggerPath": "/opt/devkitPro/devkitARM/bin/arm-none-eabi-gdb",
+            /// WINDOWS
+            "miDebuggerPath": "C:/devkitPro/devkitARM/bin/arm-none-eabi-gdb.exe",
             "miDebuggerServerAddress": "192.168.2.220:4003",
             "setupCommands": [
                 {
@@ -35,7 +38,10 @@
             "environment": [],
             "externalConsole": true,
             "MIMode": "gdb",
-            "miDebuggerPath": "/opt/devkitPro/devkitARM/bin/arm-none-eabi-gdb",
+            ///  LINUX
+            //"miDebuggerPath": "/opt/devkitPro/devkitARM/bin/arm-none-eabi-gdb",
+            /// WINDOWS
+            "miDebuggerPath": "C:/devkitPro/devkitARM/bin/arm-none-eabi-gdb.exe",
             "miDebuggerServerAddress": "localhost:4003",
             "setupCommands": [
                 {

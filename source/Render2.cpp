@@ -148,8 +148,9 @@ void R2Base::Process() {
         line++;
       }
     } else if (it.type == 4) {
-      if(it.img->Loadet())
+      if(it.img->Loadet()) {
         C2D_DrawImageAt(it.img->Get(), it.pos.x, it.pos.y, 0.5f);
+      }
     } else if (it.type == 5) {
       // TODO: Move the Draw Func into this API
       it.spr->Draw();
