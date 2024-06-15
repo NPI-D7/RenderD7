@@ -51,10 +51,10 @@ void LoggerBase::Write(const std::string& debug_text, int lvl) {
   if (this->_log.is_open() && lvl <= writelvl) {
     this->_log << msg << std::endl;
   }
-  while (msg.find_first_of('\n') != 0) {
+  /*while (msg.find_first_of('\n') != 0) {
     lines.push_back(msg.substr(0, msg.find_first_of('\n')));
     msg = msg.substr(msg.find_first_of('\n'));
-  }
+  }*/
   lines.push_back(msg);
 }
 

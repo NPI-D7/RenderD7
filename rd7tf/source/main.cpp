@@ -26,12 +26,9 @@ int main() {
   RD7::FadeIn();
   // RD7::Init::NdspFirm();
   RD7::Scene::Load(std::make_unique<Sample>());
-  auto img = RD7::Image::New();
-  img->Load("romfs:/icons/icon.png");
   RD7::Ftrace::End("app", "app_init");
   while (RD7::MainLoop()) {
-    RD7::R2()->OnScreen(R2Screen_Top);
-    UI7::GetForegroundList()->AddImage(R7Vec2(), img);
+    RD7::R2()->OnScreen(R2Screen_Bottom);
     RD7::Ftrace::Beg("app", "app_mainloop");
     if (d7_hDown & KEY_START) {
       RD7::FadeOut();

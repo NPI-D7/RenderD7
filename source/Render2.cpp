@@ -57,73 +57,96 @@ R7Vec2 R2Base::GetTextDimensions(const std::string& text) {
   return R7Vec2(w, h);
 }
 
+std::string R2Base::WrapText(const std ::string& in, int maxlen) {
+  std::string out;
+  std::string line;
+  int line_x = 0;
+  std::istringstream istream(in);
+  std::string temp;
+
+  while (istream >> temp) {
+    R7Vec2 dim = this->GetTextDimensions(line + temp);
+    if (line_x + dim.x <= maxlen) {
+      line += temp + ' ';
+      line_x += dim.x;
+    } else {
+      out += line + '\n';
+      line = temp + ' ';
+      line_x = dim.x;
+    }
+  }
+  out += line;
+  return out;
+}
+
 // Main Processing of Draw Calls
 void R2Base::Process() {
   for (auto& it : this->commands) {
-    if (it.type <= 0 || it.type > 3) {
+    if (it->type <= 0 || it->type > 5) {
       // Skip
       continue;
     }
-    C2D_SceneBegin(it.Screen ? rd7_top : rd7_bottom);
-    if (it.type == 1) {
+    C2D_SceneBegin(it->Screen ? rd7_top : rd7_bottom);
+    if (it->type == 1) {
       // Rect
-      if (it.lined) {
-        C2D_DrawLine(it.pos.x, it.pos.y, it.clr, it.pos.x + it.pszs.x, it.pos.y,
-                     it.clr, 1.f, 0.5f);
-        C2D_DrawLine(it.pos.x, it.pos.y, it.clr, it.pos.x, it.pos.y + it.pszs.y,
-                     it.clr, 1.f, 0.5f);
-        C2D_DrawLine(it.pos.x + it.pszs.x, it.pos.y, it.clr,
-                     it.pos.x + it.pszs.x, it.pos.y + it.pszs.y, it.clr, 1.f,
+      if (it->lined) {
+        C2D_DrawLine(it->pos.x, it->pos.y, it->clr, it->pos.x + it->pszs.x, it->pos.y,
+                     it->clr, 1.f, 0.5f);
+        C2D_DrawLine(it->pos.x, it->pos.y, it->clr, it->pos.x, it->pos.y + it->pszs.y,
+                     it->clr, 1.f, 0.5f);
+        C2D_DrawLine(it->pos.x + it->pszs.x, it->pos.y, it->clr,
+                     it->pos.x + it->pszs.x, it->pos.y + it->pszs.y, it->clr, 1.f,
                      0.5f);
-        C2D_DrawLine(it.pos.x, it.pos.y + it.pszs.y, it.clr,
-                     it.pos.x + it.pszs.x, it.pos.y + it.pszs.y, it.clr, 1.f,
+        C2D_DrawLine(it->pos.x, it->pos.y + it->pszs.y, it->clr,
+                     it->pos.x + it->pszs.x, it->pos.y + it->pszs.y, it->clr, 1.f,
                      0.5f);
       } else {
-        C2D_DrawRectSolid(it.pos.x, it.pos.y, 0.5, it.pszs.x, it.pszs.y,
-                          it.clr);
+        C2D_DrawRectSolid(it->pos.x, it->pos.y, 0.5, it->pszs.x, it->pszs.y,
+                          it->clr);
       }
-    } else if (it.type == 2) {
+    } else if (it->type == 2) {
       // Triangle
-      if (it.lined) {
-        C2D_DrawLine(it.pos.x, it.pos.y, it.clr, it.pszs.x, it.pszs.y, it.clr,
+      if (it->lined) {
+        C2D_DrawLine(it->pos.x, it->pos.y, it->clr, it->pszs.x, it->pszs.y, it->clr,
                      1, 0.5f);
-        C2D_DrawLine(it.pos.x, it.pos.y, it.clr, it.ap.x, it.ap.y, it.clr, 1,
+        C2D_DrawLine(it->pos.x, it->pos.y, it->clr, it->ap.x, it->ap.y, it->clr, 1,
                      0.5f);
-        C2D_DrawLine(it.pszs.x, it.pszs.y, it.clr, it.ap.x, it.ap.y, it.clr, 1,
+        C2D_DrawLine(it->pszs.x, it->pszs.y, it->clr, it->ap.x, it->ap.y, it->clr, 1,
                      0.5f);
       } else {
-        C2D_DrawTriangle(it.pos.x, it.pos.y, it.clr, it.pszs.x, it.pszs.y,
-                         it.clr, it.ap.x, it.ap.y, it.clr, 0.5);
+        C2D_DrawTriangle(it->pos.x, it->pos.y, it->clr, it->pszs.x, it->pszs.y,
+                         it->clr, it->ap.x, it->ap.y, it->clr, 0.5);
       }
-    } else if (it.type == 3) {
+    } else if (it->type == 3) {
       // Text
       // little patch for a freeze
-      if (it.text.length() < 1) continue;
-      if (it.pszs.x == 0.0f) {
-        it.pszs.x = it.Screen == R2Screen_Top ? 400 : 320;
+      if (it->text.length() < 1) continue;
+      if (it->pszs.x == 0.0f) {
+        it->pszs.x = it->Screen == R2Screen_Top ? 400 : 320;
       }
-      if (it.pszs.y == 0.0f) {
-        it.pszs.y = 240;
+      if (it->pszs.y == 0.0f) {
+        it->pszs.y = 240;
       }
-      std::string edit_text = it.text;
-      if (edit_text.substr(it.text.length() - 1) != "\n")
+      std::string edit_text = it->text;
+      if (edit_text.substr(it->text.length() - 1) != "\n")
         edit_text.append("\n");  // Add \n to end if not exist
       int line = 0;
 
-      // if (it.flags & RD7TextFlags_Wrap)
-      //  edit_text = WrapText(text, rd7i_d7_mwh.x - pos.x);
+      if (it->flags & RD7TextFlags_Wrap) {
+        edit_text = WrapText(it->text, it->pszs.x - it->pos.x);
+      }
 
       while (edit_text.find('\n') != edit_text.npos) {
         std::string current_line = edit_text.substr(0, edit_text.find('\n'));
-        // if (it.flags & RD7TextFlags_Short)
-        //  current_line = GetShortedText(current_line, it.pszs.x - it.pos.x);
-        R7Vec2 newpos = it.pos;
+        // if (it->flags & RD7TextFlags_Short)
+        //  current_line = GetShortedText(current_line, it->pszs.x - it->pos.x);
+        R7Vec2 newpos = it->pos;
         // Check Flags
         R7Vec2 dim = this->GetTextDimensions(current_line);
-        if (it.flags & RD7TextFlags_AlignRight) newpos.x = newpos.x - dim.x;
-        if (it.flags & RD7TextFlags_AlignMid)  // Offset by inpos
-          newpos.x = (it.pszs.x * 0.5) - (dim.x * 0.5) + it.pos.x;
-        if (it.flags & RD7TextFlags_Scroll) {  // Scroll Text
+        if (it->flags & RD7TextFlags_AlignRight) newpos.x = newpos.x - dim.x;
+        if (it->flags & RD7TextFlags_AlignMid)  // Offset by inpos
+          newpos.x = (it->pszs.x * 0.5) - (dim.x * 0.5) + it->pos.x;
+        if (it->flags & RD7TextFlags_Scroll) {  // Scroll Text
           // Look into Old Draw2 Code
           // TODO: Create Code for this
         }
@@ -136,73 +159,73 @@ void R2Base::Process() {
                           current_line.c_str());
         C2D_TextOptimize(&c2dtext);
 
-        if (it.flags & RD7TextFlags_Shaddow)  // performance Killer xd
+        if (it->flags & RD7TextFlags_Shaddow)  // performance Killer xd
           C2D_DrawText(&c2dtext, C2D_WithColor, newpos.x + 1 + (dim.y * line),
                        newpos.y + 1, 0.5, this->text_size, this->text_size,
                        RenderD7::ThemeActive()->Get(RD7Color_TextDisabled));
 
         C2D_DrawText(&c2dtext, C2D_WithColor, newpos.x,
                      newpos.y + (dim.y * line), 0.5, this->text_size,
-                     this->text_size, it.clr);
+                     this->text_size, it->clr);
         edit_text = edit_text.substr(edit_text.find('\n') + 1);
         line++;
       }
-    } else if (it.type == 4) {
-      if(it.img->Loadet()) {
-        C2D_DrawImageAt(it.img->Get(), it.pos.x, it.pos.y, 0.5f);
+    } else if (it->type == 4) {
+      if (it->img->Loadet()) {
+        C2D_DrawImageAt(it->img->Get(), it->pos.x, it->pos.y, 0.5f);
       }
-    } else if (it.type == 5) {
+    } else if (it->type == 5) {
       // TODO: Move the Draw Func into this API
-      it.spr->Draw();
+      it->spr->Draw();
     }
   }
   this->commands.clear();
 }
 
 void R2Base::AddRect(R7Vec2 pos, R7Vec2 size, RD7Color clr) {
-  R2Cmd cmd;
-  cmd.pos = pos;
-  cmd.pszs = size;
-  cmd.clr = RenderD7::ThemeActive()->Get(clr);
-  cmd.type = 1;  // Rect
+  auto cmd = R2Cmd::New();
+  cmd->pos = pos;
+  cmd->pszs = size;
+  cmd->clr = RenderD7::ThemeActive()->Get(clr);
+  cmd->type = 1;  // Rect
   // Just assign current screen as bottom is 0 (false)
   // and Top and TopRight are !0 (true)
-  cmd.Screen = current_screen;
+  cmd->Screen = current_screen;
   if (this->next_lined) {
-    cmd.lined = true;
+    cmd->lined = true;
     this->next_lined = false;
   }
   this->commands.push_back(cmd);
 }
 
 void R2Base::AddRect(R7Vec2 pos, R7Vec2 size, unsigned int clr) {
-  R2Cmd cmd;
-  cmd.pos = pos;
-  cmd.pszs = size;
-  cmd.clr = clr;
-  cmd.type = 1;  // Rect
+  auto cmd = R2Cmd::New();
+  cmd->pos = pos;
+  cmd->pszs = size;
+  cmd->clr = clr;
+  cmd->type = 1;  // Rect
   // Just assign current screen as bottom is 0 (false)
   // and Top and TopRight are !0 (true)
-  cmd.Screen = current_screen;
+  cmd->Screen = current_screen;
   if (this->next_lined) {
-    cmd.lined = true;
+    cmd->lined = true;
     this->next_lined = false;
   }
   this->commands.push_back(cmd);
 }
 
 void R2Base::AddTriangle(R7Vec2 pos0, R7Vec2 pos1, R7Vec2 pos2, RD7Color clr) {
-  R2Cmd cmd;
-  cmd.pos = pos0;
-  cmd.pszs = pos1;
-  cmd.ap = pos2;
-  cmd.clr = RenderD7::ThemeActive()->Get(clr);
-  cmd.type = 2;  // Triangle
+  auto cmd = R2Cmd::New();
+  cmd->pos = pos0;
+  cmd->pszs = pos1;
+  cmd->ap = pos2;
+  cmd->clr = RenderD7::ThemeActive()->Get(clr);
+  cmd->type = 2;  // Triangle
   // Just assign current screen as bottom is 0 (false)
   // and Top and TopRight are !0 (true)
-  cmd.Screen = current_screen;
+  cmd->Screen = current_screen;
   if (this->next_lined) {
-    cmd.lined = true;
+    cmd->lined = true;
     this->next_lined = false;
   }
   this->commands.push_back(cmd);
@@ -210,17 +233,17 @@ void R2Base::AddTriangle(R7Vec2 pos0, R7Vec2 pos1, R7Vec2 pos2, RD7Color clr) {
 
 void R2Base::AddTriangle(R7Vec2 pos0, R7Vec2 pos1, R7Vec2 pos2,
                          unsigned int clr) {
-  R2Cmd cmd;
-  cmd.pos = pos0;
-  cmd.pszs = pos1;
-  cmd.ap = pos2;
-  cmd.clr = clr;
-  cmd.type = 2;  // Triangle
+  auto cmd = R2Cmd::New();
+  cmd->pos = pos0;
+  cmd->pszs = pos1;
+  cmd->ap = pos2;
+  cmd->clr = clr;
+  cmd->type = 2;  // Triangle
   // Just assign current screen as bottom is 0 (false)
   // and Top and TopRight are !0 (true)
-  cmd.Screen = current_screen;
+  cmd->Screen = current_screen;
   if (this->next_lined) {
-    cmd.lined = true;
+    cmd->lined = true;
     this->next_lined = false;
   }
   this->commands.push_back(cmd);
@@ -228,18 +251,18 @@ void R2Base::AddTriangle(R7Vec2 pos0, R7Vec2 pos1, R7Vec2 pos2,
 
 void R2Base::AddText(R7Vec2 pos, const std::string& text, RD7Color clr,
                      RD7TextFlags flags, R7Vec2 tmb) {
-  R2Cmd cmd;
-  cmd.pos = pos;
-  cmd.pszs = tmb;
-  cmd.clr = RenderD7::ThemeActive()->Get(clr);
-  cmd.flags = flags;
-  cmd.text = text;
-  cmd.type = 3;  // Text
+  auto cmd = R2Cmd::New();
+  cmd->pos = pos;
+  cmd->pszs = tmb;
+  cmd->clr = RenderD7::ThemeActive()->Get(clr);
+  cmd->flags = flags;
+  cmd->text = text;
+  cmd->type = 3;  // Text
   // Just assign current screen as bottom is 0 (false)
   // and Top and TopRight are !0 (true)
-  cmd.Screen = current_screen;
+  cmd->Screen = current_screen;
   if (this->next_lined) {
-    cmd.lined = true;
+    cmd->lined = true;
     this->next_lined = false;
   }
   this->commands.push_back(cmd);
@@ -247,47 +270,47 @@ void R2Base::AddText(R7Vec2 pos, const std::string& text, RD7Color clr,
 
 void R2Base::AddText(R7Vec2 pos, const std::string& text, unsigned int clr,
                      RD7TextFlags flags, R7Vec2 tmb) {
-  R2Cmd cmd;
-  cmd.pos = pos;
-  cmd.pszs = tmb;
-  cmd.clr = clr;
-  cmd.flags = flags;
-  cmd.text = text;
-  cmd.type = 3;  // Text
+  auto cmd = R2Cmd::New();
+  cmd->pos = pos;
+  cmd->pszs = tmb;
+  cmd->clr = clr;
+  cmd->flags = flags;
+  cmd->text = text;
+  cmd->type = 3;  // Text
   // Just assign current screen as bottom is 0 (false)
   // and Top and TopRight are !0 (true)
-  cmd.Screen = current_screen;
+  cmd->Screen = current_screen;
   if (this->next_lined) {
-    cmd.lined = true;
+    cmd->lined = true;
     this->next_lined = false;
   }
   this->commands.push_back(cmd);
 }
 
 void R2Base::AddImage(R7Vec2 pos, Image::Ref img) {
-  R2Cmd cmd;
-  cmd.pos = pos;
-  cmd.img = img;
-  cmd.type = 4;  // Image
+  auto cmd = R2Cmd::New();
+  cmd->pos = pos;
+  cmd->img = img;
+  cmd->type = 4;  // Image
   // Just assign current screen as bottom is 0 (false)
   // and Top and TopRight are !0 (true)
-  cmd.Screen = current_screen;
+  cmd->Screen = current_screen;
   if (this->next_lined) {
-    cmd.lined = true;
+    cmd->lined = true;
     this->next_lined = false;
   }
   this->commands.push_back(cmd);
 }
 
 void R2Base::AddSprite(Sprite::Ref spr) {
-  R2Cmd cmd;
-  cmd.spr = spr;
-  cmd.type = 5;  // Sprite
+  auto cmd = R2Cmd::New();
+  cmd->spr = spr;
+  cmd->type = 5;  // Sprite
   // Just assign current screen as bottom is 0 (false)
   // and Top and TopRight are !0 (true)
-  cmd.Screen = current_screen;
+  cmd->Screen = current_screen;
   if (this->next_lined) {
-    cmd.lined = true;
+    cmd->lined = true;
     this->next_lined = false;
   }
   this->commands.push_back(cmd);

@@ -434,16 +434,16 @@ void Ovl_Keyboard::Draw(void) const {
   R2()->AddText(R7Vec2(5, 114), "> " + *typed_text,
                 RenderD7::ThemeActive()->AutoText(RD7Color_Header));
   for (auto const& it : key_table) {
+    R7Vec2 szs = it.size;
+    R7Vec2 pos = it.pos;
     R7Vec2 txtdim = R2()->GetTextDimensions(it.disp);
-    R7Vec2 txtpos = R7Vec2(it.pos.x + it.size.x * 0.5 - txtdim.x * 0.5,
-                           it.pos.y + it.size.y * 0.5 - txtdim.y * 0.5);
     RD7Color btn = RD7Color_Button;
     if (RenderD7::Hid::IsEvent("cancel", RenderD7::Hid::Up)) {
       RenderD7::Hid::Clear();
       shared_data[0x05] = 1;
     }
     if (RenderD7::Hid::IsEvent("touch", RenderD7::Hid::Up) &&
-        UI7_InBox(RenderD7::Hid::GetLastTouchPosition(), it.pos, it.size)) {
+        UI7_InBox(RenderD7::Hid::GetLastTouchPosition(), pos, szs)) {
       if (mode == 2)  // Request Disable Shift
         shared_data[0x02] = 1;
 
@@ -468,8 +468,12 @@ void Ovl_Keyboard::Draw(void) const {
     } else if (RenderD7::Hid::IsEvent("touch", RenderD7::Hid::Held) &&
                UI7_InBox(RenderD7::Hid::GetTouchPosition(), it.pos, it.size)) {
       btn = RD7Color_ButtonHovered;
+      pos -= R7Vec2(1, 1);
+      szs += R7Vec2(2, 2);
     }
-    R2()->AddRect(it.pos, it.size, btn);
+    R7Vec2 txtpos = R7Vec2(pos.x + szs.x * 0.5 - txtdim.x * 0.5,
+                           pos.y + szs.y * 0.5 - txtdim.y * 0.5);
+    R2()->AddRect(pos, szs, btn);
     R2()->AddText(txtpos, it.disp, RenderD7::ThemeActive()->AutoText(btn));
   }
   if (ft3 > 5) RenderD7::Hid::Lock();

@@ -19,9 +19,8 @@
 #include <renderd7/external/stb_image.h>
 
 #include <renderd7/Image.hpp>
-#include <vector>
-
 #include <renderd7/internal_db.hpp>
+#include <vector>
 
 static u32 __rd7i_gp2o__(u32 v) {
   v--;
@@ -50,30 +49,30 @@ static void __rd7i_r24r32(std::vector<uint8_t> &out,
   }
 }
 
-static void __rd7i_maketex__(C3D_Tex* tex, Tex3DS_SubTexture* sub, std::vector<unsigned char>& buf, int w, int h) {
-  if(!tex || !sub) 
-  {
+static void __rd7i_maketex__(C3D_Tex *tex, Tex3DS_SubTexture *sub,
+                             std::vector<unsigned char> &buf, int w, int h) {
+  if (!tex || !sub) {
     _rd7i_logger()->Write("Invalid Inpit (objects have no adress!)");
     return;
   }
   // RGBA -> Abgr
-  for(int y = 0; y < h; y++) {
-    for(int x = 0; x < w; x++) {
-      int pos = (x+y*w)*4;
-      auto r = buf[pos+0];
-      auto g = buf[pos+1];
-      auto b = buf[pos+2];
-      auto a = buf[pos+3];
-      buf[pos+0] = a;
-      buf[pos+1] = b;
-      buf[pos+2] = g;
-      buf[pos+3] = r;
+  for (int y = 0; y < h; y++) {
+    for (int x = 0; x < w; x++) {
+      int pos = (x + y * w) * 4;
+      auto r = buf[pos + 0];
+      auto g = buf[pos + 1];
+      auto b = buf[pos + 2];
+      auto a = buf[pos + 3];
+      buf[pos + 0] = a;
+      buf[pos + 1] = b;
+      buf[pos + 2] = g;
+      buf[pos + 3] = r;
     }
   }
 
   // Pow2
-  int wp2 = __rd7i_gp2o__(w);
-  int hp2 = __rd7i_gp2o__(h);
+  int wp2 = __rd7i_gp2o__((unsigned int)w);
+  int hp2 = __rd7i_gp2o__((unsigned int)h);
 
   sub->width = (u16)w;
   sub->height = (u16)h;
@@ -106,10 +105,6 @@ static void __rd7i_maketex__(C3D_Tex* tex, Tex3DS_SubTexture* sub, std::vector<u
 }
 
 namespace RenderD7 {
-Image::Image() {
-  img.tex = nullptr;
-  img.subtex = nullptr;
-}
 
 void Image::Load(const std::string &path) {
   // Make sure to cleanup
@@ -118,56 +113,57 @@ void Image::Load(const std::string &path) {
   int w, h, c = 0;
   unsigned char *image = stbi_load(path.c_str(), &w, &h, &c, 4);
   if (image == nullptr) {
-    _rd7i_logger()->Write("Failed to Load Image: " + path);
+    //_rd7i_logger()->Write("Failed to Load Image: " + path);
     return;
   }
   // Size/Fmt Check
   if (w > 1024 || h > 1024) {
     // Reason: Image to Large
-    _rd7i_logger()->Write("Image too Large!");
+    //_rd7i_logger()->Write("Image too Large!");
     stbi_image_free(image);
     return;
   }
 
   std::vector<unsigned char> wimg;
   if (c == 3) {
-    _rd7i_logger()->Write("Convert Image to RGBA");
+    //_rd7i_logger()->Write("Convert Image to RGBA");
     stbi_image_free(image);
     image = stbi_load(path.c_str(), &w, &h, &c, 3);
-    wimg.resize(w*h*4);
-    __rd7i_r24r32(wimg, std::vector<unsigned char>(image, image + (w * h * 3)), w, h);
+    wimg.resize(w * h * 4);
+    __rd7i_r24r32(wimg, std::vector<unsigned char>(image, image + (w * h * 3)),
+                  w, h);
   } else {
-    wimg.assign(&image[0], &image[(w*h*4)-1]);
+    wimg.assign(&image[0], &image[(w * h * 4) - 1]);
     stbi_image_free(image);
   }
   // Create C2D_Image
-  C3D_Tex *tex = new C3D_Tex;
-  Tex3DS_SubTexture *subtex = new Tex3DS_SubTexture;
+  C3D_Tex* tex = new C3D_Tex;
+  Tex3DS_SubTexture* subtex = new Tex3DS_SubTexture;
   __rd7i_maketex__(tex, subtex, wimg, w, h);
-  img.tex = tex;
-  img.subtex = subtex;
+  _rd7i_logger()->Write(RenderD7::FormatString("Created Texture (%d, %d)",
+                                               tex->width, tex->height));
+  img = {tex, subtex};
 }
 
 void Image::From_NIMG(const nimg &image) {
   // Make sure to cleanup
   Delete();
   if (image.width > 1024 || image.height > 1024) return;
-  C3D_Tex *tex = new C3D_Tex;
-  Tex3DS_SubTexture *subtex = new Tex3DS_SubTexture;
+  C3D_Tex* tex = new C3D_Tex;
+  Tex3DS_SubTexture* subtex = new Tex3DS_SubTexture;
   std::vector<unsigned char> mdpb = image.pixel_buffer;
   __rd7i_maketex__(tex, subtex, mdpb, image.width, image.height);
-  img.tex = tex;
-  img.subtex = subtex;
+  img = {tex, subtex};
 }
 
-C2D_Image Image::Get() { 
-  if(!Loadet()) {
+C2D_Image Image::Get() {
+  if (!Loadet()) {
     _rd7i_logger()->Write("Image not Loadet!");
   }
   return img;
 }
 C2D_Image &Image::GetRef() {
-  if(!Loadet()) {
+  if (!Loadet()) {
     _rd7i_logger()->Write("Image not Loadet!");
   }
   return img;
@@ -188,7 +184,8 @@ void Image::Delete() {
     delete img.subtex;
     img.subtex = nullptr;
   }
-  if (img.tex != nullptr) { 
+  if (img.tex != nullptr) {
+    C3D_TexDelete(img.tex);
     delete img.tex;
     img.tex = nullptr;
   }

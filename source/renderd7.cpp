@@ -808,7 +808,7 @@ void RenderD7::RSettings::Draw(void) const {
     RenderD7::R2()->OnScreen(R2Screen_Bottom);
     if (UI7::BeginMenu("Press \uE001 to go back!", R7Vec2(),
                        UI7MenuFlags_Scrolling)) {
-      for (auto &it : rd7i_logger->Lines()) UI7::Label(it);
+      for (auto &it : rd7i_logger->Lines()) UI7::Label(it, RD7TextFlags_Wrap);
       UI7::EndMenu();
     }
   }

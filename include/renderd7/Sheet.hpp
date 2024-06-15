@@ -21,8 +21,8 @@
 #include <citro2d.h>
 #include <citro3d.h>
 
-#include <renderd7/smart_ctor.hpp>
 #include <renderd7/Image.hpp>
+#include <renderd7/smart_ctor.hpp>
 #include <string>
 
 namespace RenderD7 {
@@ -44,7 +44,8 @@ class Sheet {
   void Free();
   Image::Ref GetImage(int idx);
   C2D_SpriteSheet Get() { return this->spritesheet; }
-  private:
+
+ private:
   /// \param spritesheet The Sheet
   C2D_SpriteSheet spritesheet;
 };

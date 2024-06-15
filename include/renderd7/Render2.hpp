@@ -64,6 +64,7 @@ class R2Base {
     // Text Specific
     RD7TextFlags flags;  // Text Flags
     std::string text;    // Text
+    RD7_SMART_CTOR(R2Cmd)
   };
   R2Base();
   ~R2Base() = default;
@@ -83,7 +84,7 @@ class R2Base {
   // Processing
   void Process();
   R7Vec2 GetTextDimensions(const std::string& text);
-
+  std::string WrapText(const std ::string& in, int maxlen);
   // Draw Functions
   void AddRect(R7Vec2 pos, R7Vec2 size, RD7Color clr);
   void AddRect(R7Vec2 pos, R7Vec2 size, unsigned int clr);
@@ -103,7 +104,7 @@ class R2Base {
   std::map<std::string, float> ts;
   std::map<std::string, int> mln;
   bool next_lined = false;
-  std::vector<R2Cmd> commands;
+  std::vector<R2Cmd::Ref> commands;
   R2Screen current_screen = R2Screen_Bottom;
 };
 }  // namespace RenderD7

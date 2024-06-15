@@ -1181,4 +1181,22 @@ UI7DrawList::Ref GetBackgroundList() {
   if (!UI7CtxValidate()) return nullptr;
   return ui7_ctx->bdl;
 }
+
+UI7DrawList::Ref Menu::GetBackgroundList() {
+  if (!UI7CtxValidate()) return nullptr;
+  if(!UI7CtxInMenu()) return ui7_ctx->bdl;
+  return ui7_ctx->cm->background;
+}
+
+UI7DrawList::Ref Menu::GetList() {
+  if (!UI7CtxValidate()) return nullptr;
+  if(!UI7CtxInMenu()) return ui7_ctx->bdl;
+  return ui7_ctx->cm->main;
+}
+
+UI7DrawList::Ref Menu::GetForegroundList() {
+  if (!UI7CtxValidate()) return nullptr;
+  if(!UI7CtxInMenu()) return ui7_ctx->bdl;
+  return ui7_ctx->cm->front;
+}
 }  // namespace UI7

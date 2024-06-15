@@ -102,6 +102,12 @@ void SetCursorPos(R7Vec2 cp);
 void RestoreCursor();
 void SameLine();
 float GetScrollingOffset();
+namespace Menu {
+  // All of them return the Main BG DrawList if Menu is null
+  UI7DrawList::Ref GetBackgroundList();
+  UI7DrawList::Ref GetList();
+  UI7DrawList::Ref GetForegroundList();
+}
 // DrawLists
 UI7DrawList::Ref GetForegroundList();
 UI7DrawList::Ref GetBackgroundList();

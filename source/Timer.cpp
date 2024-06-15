@@ -28,22 +28,22 @@ Timer::Timer(bool autostart) {
   current = last;
 }
 
-void Timer::reset() {
+void Timer::Reset() {
   last = svcGetSystemTick();
   current = last;
 }
 
-void Timer::tick() {
+void Timer::Tick() {
   if (is_running) current = svcGetSystemTick();
 }
 
-void Timer::pause() { is_running = false; }
+void Timer::Pause() { is_running = false; }
 
-void Timer::resume() { is_running = true; }
+void Timer::Resume() { is_running = true; }
 
-bool Timer::running() { return is_running; }
+bool Timer::Running() { return is_running; }
 
-float Timer::get() { return (float)((current - last) / TPMS); }
+float Timer::Get() { return (float)((current - last) / TPMS); }
 
-float Timer::get_live() { return (float)((svcGetSystemTick() - last) / TPMS); }
+float Timer::GetLive() { return (float)((svcGetSystemTick() - last) / TPMS); }
 }  // namespace RenderD7

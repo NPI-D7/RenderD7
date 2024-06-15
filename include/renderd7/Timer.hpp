@@ -20,18 +20,21 @@
 
 #include <3ds.h>
 
+#include <renderd7/smart_ctor.hpp>
+
 namespace RenderD7 {
 class Timer {
  public:
   Timer(bool autostart = true);
   ~Timer() {}
-  void reset();
-  void tick();
-  void pause();
-  void resume();
-  float get();
-  float get_live();
-  bool running();
+  RD7_SMART_CTOR(Timer)
+  void Reset();
+  void Tick();
+  void Pause();
+  void Resume();
+  float Get();
+  float GetLive();
+  bool Running();
 
  private:
   uint64_t last = 0;

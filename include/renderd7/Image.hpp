@@ -29,7 +29,7 @@
 namespace RenderD7 {
 class Image {
  public:
-  Image();
+  Image() = default;
   ~Image() = default;
   RD7_SMART_CTOR(Image)
   void Load(const std::string& path);

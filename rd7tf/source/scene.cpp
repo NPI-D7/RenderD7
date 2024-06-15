@@ -41,14 +41,14 @@ static void Wave(int index, R7Vec2 position, R7Vec2 size, float time,
   }
   // Just to make sure...
   y_position = std::min(y_position, position.y + size.y - (90 - shrink));
-  
-    RD7::R2()->AddTriangle(
-        R7Vec2(x_position, y_position),
-        R7Vec2(x_position + 300, y_position + (90 - shrink)),
-        R7Vec2(x_position - 300, y_position + (90 - shrink)),
-        RD7::Color::RGBA(.94f - .17f * color_effect, .61f - .25f * color_effect,
-                         .36f + .38f * color_effect)
-            .toRGBA());
+
+  RD7::R2()->AddTriangle(
+      R7Vec2(x_position, y_position),
+      R7Vec2(x_position + 300, y_position + (90 - shrink)),
+      R7Vec2(x_position - 300, y_position + (90 - shrink)),
+      RD7::Color::RGBA(.94f - .17f * color_effect, .61f - .25f * color_effect,
+                       .36f + .38f * color_effect)
+          .toRGBA());
 }
 
 void DrawWave(R7Vec2 position, R7Vec2 size, float time, bool dbg) {
@@ -60,7 +60,9 @@ void DrawWave(R7Vec2 position, R7Vec2 size, float time, bool dbg) {
 R7Vec2 testv2 = R7Vec2(48, 48);
 std::vector<int*> img;
 
-void display_icon(void* v, R7Vec2 p) { RD7::R2()->AddRect(p, testv2, 0xff00ffff); }
+void display_icon(void* v, R7Vec2 p) {
+  UI7::Menu::GetList()->AddRectangle(p, testv2, 0xff00ffff);
+}
 
 Sample::Sample() {
   auto ti = new int;
