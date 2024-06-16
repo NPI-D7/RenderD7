@@ -80,7 +80,7 @@ class R2Base {
   void SetTextSize(float szs);
   void DefaultTextSize();
   float GetTextSize();
-
+  R7Vec2 GetCurrentScreenSize();
   // Processing
   void Process();
   R7Vec2 GetTextDimensions(const std::string& text);

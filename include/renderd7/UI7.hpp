@@ -103,11 +103,11 @@ void RestoreCursor();
 void SameLine();
 float GetScrollingOffset();
 namespace Menu {
-  // All of them return the Main BG DrawList if Menu is null
-  UI7DrawList::Ref GetBackgroundList();
-  UI7DrawList::Ref GetList();
-  UI7DrawList::Ref GetForegroundList();
-}
+// All of them return the Main BG DrawList if Menu is null
+UI7DrawList::Ref GetBackgroundList();
+UI7DrawList::Ref GetList();
+UI7DrawList::Ref GetForegroundList();
+}  // namespace Menu
 // DrawLists
 UI7DrawList::Ref GetForegroundList();
 UI7DrawList::Ref GetBackgroundList();

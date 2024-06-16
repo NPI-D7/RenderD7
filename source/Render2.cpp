@@ -79,6 +79,10 @@ std::string R2Base::WrapText(const std ::string& in, int maxlen) {
   return out;
 }
 
+R7Vec2 R2Base::GetCurrentScreenSize() {
+  return R7Vec2(this->current_screen == R2Screen_Bottom ? 320 : 400, 240);
+}
+
 // Main Processing of Draw Calls
 void R2Base::Process() {
   for (auto& it : this->commands) {
@@ -90,16 +94,16 @@ void R2Base::Process() {
     if (it->type == 1) {
       // Rect
       if (it->lined) {
-        C2D_DrawLine(it->pos.x, it->pos.y, it->clr, it->pos.x + it->pszs.x, it->pos.y,
-                     it->clr, 1.f, 0.5f);
-        C2D_DrawLine(it->pos.x, it->pos.y, it->clr, it->pos.x, it->pos.y + it->pszs.y,
-                     it->clr, 1.f, 0.5f);
+        C2D_DrawLine(it->pos.x, it->pos.y, it->clr, it->pos.x + it->pszs.x,
+                     it->pos.y, it->clr, 1.f, 0.5f);
+        C2D_DrawLine(it->pos.x, it->pos.y, it->clr, it->pos.x,
+                     it->pos.y + it->pszs.y, it->clr, 1.f, 0.5f);
         C2D_DrawLine(it->pos.x + it->pszs.x, it->pos.y, it->clr,
-                     it->pos.x + it->pszs.x, it->pos.y + it->pszs.y, it->clr, 1.f,
-                     0.5f);
+                     it->pos.x + it->pszs.x, it->pos.y + it->pszs.y, it->clr,
+                     1.f, 0.5f);
         C2D_DrawLine(it->pos.x, it->pos.y + it->pszs.y, it->clr,
-                     it->pos.x + it->pszs.x, it->pos.y + it->pszs.y, it->clr, 1.f,
-                     0.5f);
+                     it->pos.x + it->pszs.x, it->pos.y + it->pszs.y, it->clr,
+                     1.f, 0.5f);
       } else {
         C2D_DrawRectSolid(it->pos.x, it->pos.y, 0.5, it->pszs.x, it->pszs.y,
                           it->clr);
@@ -107,12 +111,12 @@ void R2Base::Process() {
     } else if (it->type == 2) {
       // Triangle
       if (it->lined) {
-        C2D_DrawLine(it->pos.x, it->pos.y, it->clr, it->pszs.x, it->pszs.y, it->clr,
+        C2D_DrawLine(it->pos.x, it->pos.y, it->clr, it->pszs.x, it->pszs.y,
+                     it->clr, 1, 0.5f);
+        C2D_DrawLine(it->pos.x, it->pos.y, it->clr, it->ap.x, it->ap.y, it->clr,
                      1, 0.5f);
-        C2D_DrawLine(it->pos.x, it->pos.y, it->clr, it->ap.x, it->ap.y, it->clr, 1,
-                     0.5f);
-        C2D_DrawLine(it->pszs.x, it->pszs.y, it->clr, it->ap.x, it->ap.y, it->clr, 1,
-                     0.5f);
+        C2D_DrawLine(it->pszs.x, it->pszs.y, it->clr, it->ap.x, it->ap.y,
+                     it->clr, 1, 0.5f);
       } else {
         C2D_DrawTriangle(it->pos.x, it->pos.y, it->clr, it->pszs.x, it->pszs.y,
                          it->clr, it->ap.x, it->ap.y, it->clr, 0.5);

@@ -137,8 +137,8 @@ void Image::Load(const std::string &path) {
     stbi_image_free(image);
   }
   // Create C2D_Image
-  C3D_Tex* tex = new C3D_Tex;
-  Tex3DS_SubTexture* subtex = new Tex3DS_SubTexture;
+  C3D_Tex *tex = new C3D_Tex;
+  Tex3DS_SubTexture *subtex = new Tex3DS_SubTexture;
   __rd7i_maketex__(tex, subtex, wimg, w, h);
   _rd7i_logger()->Write(RenderD7::FormatString("Created Texture (%d, %d)",
                                                tex->width, tex->height));
@@ -149,8 +149,8 @@ void Image::From_NIMG(const nimg &image) {
   // Make sure to cleanup
   Delete();
   if (image.width > 1024 || image.height > 1024) return;
-  C3D_Tex* tex = new C3D_Tex;
-  Tex3DS_SubTexture* subtex = new Tex3DS_SubTexture;
+  C3D_Tex *tex = new C3D_Tex;
+  Tex3DS_SubTexture *subtex = new Tex3DS_SubTexture;
   std::vector<unsigned char> mdpb = image.pixel_buffer;
   __rd7i_maketex__(tex, subtex, mdpb, image.width, image.height);
   img = {tex, subtex};

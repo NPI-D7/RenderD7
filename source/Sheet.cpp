@@ -34,9 +34,7 @@ void RenderD7::Sheet::Free() {
   this->spritesheet = nullptr;
 }
 
-RenderD7::Image::Ref RenderD7::Sheet::GetImage(int idx) {
-  if (!this->spritesheet) return nullptr;
-  Image::Ref img = Image::New();
-  img->GetRef() = C2D_SpriteSheetGetImage(this->spritesheet, idx);
-  return img;
+C2D_Image RenderD7::Sheet::GetImage(int idx) {
+  if (!this->spritesheet) return {nullptr, nullptr};
+  return C2D_SpriteSheetGetImage(this->spritesheet, idx);
 }

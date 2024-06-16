@@ -30,6 +30,8 @@ namespace RenderD7 {
 class Image {
  public:
   Image() = default;
+  Image(C2D_Image img) { this->img = img; }
+  Image(const std::string& path) { this->Load(path); }
   ~Image() = default;
   RD7_SMART_CTOR(Image)
   void Load(const std::string& path);

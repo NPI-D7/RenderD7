@@ -179,6 +179,7 @@ class DrawCmd {
                                   R7Vec2(rect.x + szs.x, rect.y),
                                   R7Vec2(rect.x, rect.y + szs.y), 0xff00ffff);
     } else if (stype == DrawCmdType_Image) {
+      if (!img) return;
       rect.z = img->GetSize().x;
       rect.w = img->GetSize().y;
       RenderD7::R2()->DrawNextLined();
@@ -324,6 +325,7 @@ void UI7DrawList::AddDebugCall(std::shared_ptr<DrawCmd> cmd) {
   dcmd->text = cmd->text;
   dcmd->text_box = cmd->text_box;
   dcmd->text_flags = cmd->text_flags;
+  dcmd->img = cmd->img;
   dcmd->type = DrawCmdType_Debug;
   dcmd->screen = RenderD7::R2()->GetCurrentScreen();
   UI7CtxPushDebugCmd(dcmd);
@@ -351,9 +353,11 @@ struct UI7Menu {
   UI7DrawList::Ref main;
   UI7DrawList::Ref front;
 
-  R7Vec2 ms;   // Max Size
-  R7Vec2 msr;  // Max Size Real (Slider)
-  R7Vec2 mdp;  // Mouse/Touch Initial pos
+  R7Vec2 ms;    // Max Size
+  R7Vec2 msr;   // Max Size Real (Slider)
+  R7Vec2 mdp;   // Mouse/Touch Initial pos
+  R7Vec2 bslp;  // Before SameLine Pos
+  R7Vec2 lszs;  // Last Size
   // For Smart Pointer
   RD7_SMART_CTOR(UI7Menu)
 };
@@ -426,13 +430,22 @@ void UI7CtxEndMenu() {
     ui7_ctx->cm->show_scroolbar = (ui7_ctx->cm->ms.y < 235 ? false : true);
 
     if (ui7_ctx->cm->show_scroolbar) {
-      int sw = (RenderD7::R2()->GetCurrentScreen() ? 400 : 320);
+      // Screen Width
+      int sw = RenderD7::R2()->GetCurrentScreenSize().x;
+      // Top Start Pos
       int tsp = 5 + ui7_ctx->cm->tbh;
+      // Slider Width
+      int slider_w = 4;
+      // Height of Slider
       int szs = 240 - tsp - 5;
+      // Lowest Height of Slider Obj
       int lszs = 20;  // Lowest Slider size
+      // Calculate Slider Height
       float slider_h = (szs - 4) * (static_cast<float>(szs - 4) /
                                     static_cast<float>(ui7_ctx->cm->msr.y));
+      // Create Real Slider Height
       int slider_rh = d7min(d7max(slider_h, (float)lszs), (float)(szs - 4));
+      // Calculate Slider Position
       int slider_pos = d7min(
           static_cast<float>(tsp + szs - slider_rh - 4),
           d7max(static_cast<float>(tsp),
@@ -441,7 +454,7 @@ void UI7CtxEndMenu() {
                         (szs) *
                         (static_cast<float>(ui7_ctx->cm->scrolling_offset) /
                          static_cast<float>(ui7_ctx->cm->msr.y)))));
-      int slider_w = 4;
+      // Render Slider
       ui7_ctx->cm->front->AddRectangle(
           R7Vec2(sw - 12, tsp), R7Vec2(slider_w * 2, szs), RD7Color_List0);
       ui7_ctx->cm->front->AddRectangle(R7Vec2(sw - 10, slider_pos + 2),
@@ -457,9 +470,15 @@ void UI7CtxEndMenu() {
 void UI7CtxCursorMove(R7Vec2 size) {
   if (!UI7CtxValidate()) return;
   if (!UI7CtxInMenu()) return;
+  ui7_ctx->cm->lszs = size;
   ui7_ctx->cm->slc = ui7_ctx->cm->cursor + R7Vec2(size.x + 5, 0);
   ui7_ctx->cm->cursor.x = 5;
-  ui7_ctx->cm->cursor += R7Vec2(0, size.y + 5);
+  if (ui7_ctx->cm->bslp.y) {
+    ui7_ctx->cm->cursor += R7Vec2(0, ui7_ctx->cm->bslp.y + 5);
+    ui7_ctx->cm->bslp = R7Vec2();
+  } else {
+    ui7_ctx->cm->cursor += R7Vec2(0, size.y + 5);
+  }
   ui7_ctx->cm->ms = R7Vec2(ui7_ctx->cm->slc.x, ui7_ctx->cm->cursor.y);
   // TODO: Correct that calculation
   ui7_ctx->cm->msr = R7Vec2(ui7_ctx->cm->slc.x, ui7_ctx->cm->slc.y - 10);
@@ -637,8 +656,8 @@ void Label(const std::string &label, RD7TextFlags flags) {
 void Progressbar(float value) {
   if (!UI7CtxValidate()) return;
   R7Vec2 pos = GetCursorPos();
-  R7Vec2 size = R7Vec2(
-      (RenderD7::R2()->GetCurrentScreen() ? 400 : 320) - (pos.x * 2), 20);
+  R7Vec2 size =
+      R7Vec2(RenderD7::R2()->GetCurrentScreenSize().x - (pos.x * 2), 20);
   if (ui7_ctx->cm->show_scroolbar && ui7_ctx->cm->enable_scrolling)
     size.x -= 16;
   UI7CtxCursorMove(size);
@@ -688,7 +707,7 @@ void BrowserList(const std::vector<std::string> &entrys, int &selection,
   R7Vec2 pos = GetCursorPos();
   if (pos.y + 15 * max_entrys > 230) max_entrys = (int)((230 - pos.y) / 15);
   if (size.x == 0)
-    size.x = (RenderD7::R2()->GetCurrentScreen() ? 400 : 320) - (pos.x * 2);
+    size.x = RenderD7::R2()->GetCurrentScreenSize().x - (pos.x * 2);
   if (size.y == 0) size.y = (max_entrys * 15);
   UI7CtxCursorMove(size);
   ui7_ctx->cm->ctrl->AddObj();
@@ -1146,6 +1165,7 @@ void SameLine() {
   if (!UI7CtxValidate()) return;
   if (!UI7CtxInMenu()) return;
   ui7_ctx->cm->ctrl->NewRow();
+  ui7_ctx->cm->bslp = ui7_ctx->cm->lszs;
   ui7_ctx->cm->cursor = ui7_ctx->cm->slc;
 }
 
@@ -1184,19 +1204,19 @@ UI7DrawList::Ref GetBackgroundList() {
 
 UI7DrawList::Ref Menu::GetBackgroundList() {
   if (!UI7CtxValidate()) return nullptr;
-  if(!UI7CtxInMenu()) return ui7_ctx->bdl;
+  if (!UI7CtxInMenu()) return ui7_ctx->bdl;
   return ui7_ctx->cm->background;
 }
 
 UI7DrawList::Ref Menu::GetList() {
   if (!UI7CtxValidate()) return nullptr;
-  if(!UI7CtxInMenu()) return ui7_ctx->bdl;
+  if (!UI7CtxInMenu()) return ui7_ctx->bdl;
   return ui7_ctx->cm->main;
 }
 
 UI7DrawList::Ref Menu::GetForegroundList() {
   if (!UI7CtxValidate()) return nullptr;
-  if(!UI7CtxInMenu()) return ui7_ctx->bdl;
+  if (!UI7CtxInMenu()) return ui7_ctx->bdl;
   return ui7_ctx->cm->front;
 }
 }  // namespace UI7

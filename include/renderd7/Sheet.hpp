@@ -31,6 +31,7 @@ class Sheet {
  public:
   /// @brief Constructor
   Sheet() = default;
+  Sheet(const std::string& path) { this->Load(path); }
   /// @brief Deconstructor
   ~Sheet() {
     if (spritesheet) Free();
@@ -42,7 +43,7 @@ class Sheet {
   Result Load(const std::string& path);
   /// @brief Unload the Sheet
   void Free();
-  Image::Ref GetImage(int idx);
+  C2D_Image GetImage(int idx);
   C2D_SpriteSheet Get() { return this->spritesheet; }
 
  private:

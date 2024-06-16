@@ -48,10 +48,10 @@ bool RenderD7::Hardware::IsCharging() {
   return (var == 0x01 ? true : false);
 }
 
-float RenderD7::Hardware::GetBatteryPercentage() {
-  uint8_t percentLevel;
-  PTMU_GetBatteryLevel(&percentLevel);
-  return (float)percentLevel / 100;
+int RenderD7::Hardware::GetBatteryPercentage() {
+  uint8_t percentLevel = 0;
+  MCUHWC_GetBatteryLevel(&percentLevel);
+  return percentLevel;
 }
 
 float RenderD7::Hardware::Get3dSliderLevel() { return osGet3DSliderState(); }
@@ -61,3 +61,5 @@ float RenderD7::Hardware::GetSoundSliderLevel() {
   MCUHWC_GetSoundSliderLevel(&percentLevel);
   return (float)percentLevel / 100;
 }
+
+int RenderD7::Hardware::GetWifiLevel() { return osGetWifiStrength(); }

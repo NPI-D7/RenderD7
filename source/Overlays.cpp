@@ -57,7 +57,7 @@ std::vector<Key> keyboard_layout_num{
     {"0", R7Vec2(5, 213), R7Vec2(74, 24), 0},
     {".", R7Vec2(81, 213), R7Vec2(36, 24), 0},
     // additional actions
-    {"bksp", R7Vec2(119, 135), R7Vec2(74, 24), 2},
+    {"<---", R7Vec2(119, 135), R7Vec2(74, 24), 2},
     //{"", R7Vec2(119, 161), R7Vec2(74, 24), 0},
     {"Confirm", R7Vec2(119, 187), R7Vec2(74, 24), 5},
     {"Cancel", R7Vec2(119, 213), R7Vec2(74, 24), 4},
@@ -78,7 +78,7 @@ std::vector<Key> keyboard_layout = {
     {"0", R7Vec2(205, 137), R7Vec2(18, 18), 0},
     {"-", R7Vec2(225, 137), R7Vec2(18, 18), 0},
     {"=", R7Vec2(245, 137), R7Vec2(18, 18), 0},
-    {"Bksp", R7Vec2(265, 137), R7Vec2(50, 18), 2},
+    {"<---", R7Vec2(265, 137), R7Vec2(50, 18), 2},
     // 2nd row
     {"Tab", R7Vec2(5, 157), R7Vec2(40, 18), 6},
     {"q", R7Vec2(47, 157), R7Vec2(18, 18), 0},
@@ -148,7 +148,7 @@ std::vector<Key> keyboard_layout_caps = {
     {"0", R7Vec2(205, 137), R7Vec2(18, 18), 0},
     {"-", R7Vec2(225, 137), R7Vec2(18, 18), 0},
     {"=", R7Vec2(245, 137), R7Vec2(18, 18), 0},
-    {"Bksp", R7Vec2(265, 137), R7Vec2(50, 18), 2},
+    {"<---", R7Vec2(265, 137), R7Vec2(50, 18), 2},
     // 2nd row
     {"Tab", R7Vec2(5, 157), R7Vec2(40, 18), 6},
     {"Q", R7Vec2(47, 157), R7Vec2(18, 18), 0},
@@ -218,7 +218,7 @@ std::vector<Key> keyboard_layout_shift = {
     {")", R7Vec2(205, 137), R7Vec2(18, 18), 0},
     {"_", R7Vec2(225, 137), R7Vec2(18, 18), 0},
     {"+", R7Vec2(245, 137), R7Vec2(18, 18), 0},
-    {"Bksp", R7Vec2(265, 137), R7Vec2(50, 18), 2},
+    {"<---", R7Vec2(265, 137), R7Vec2(50, 18), 2},
     // 2nd row
     {"Tab", R7Vec2(5, 157), R7Vec2(40, 18), 6},
     {"Q", R7Vec2(47, 157), R7Vec2(18, 18), 0},

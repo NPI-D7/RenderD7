@@ -387,6 +387,8 @@ Result RenderD7::Init::Main(std::string app_name) {
     rd7i_is_am_init = true;
   }
 
+  Hardware::Initialisize();
+
   C3D_Init(C3D_DEFAULT_CMDBUF_SIZE);
   atexit(C3D_Fini);
   C2D_Init((size_t)rd7_max_objects);
@@ -441,6 +443,8 @@ Result RenderD7::Init::Minimal(std::string app_name) {
     atexit(amExit);
     rd7i_is_am_init = true;
   }
+
+  Hardware::Initialisize();
 
   osSetSpeedupEnable(true);
   C3D_Init(C3D_DEFAULT_CMDBUF_SIZE);
