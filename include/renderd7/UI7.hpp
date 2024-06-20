@@ -75,6 +75,7 @@ bool &IsDebugging();
 // Internal Function
 // Should not be used
 void Debug();
+bool &DebugMenu();
 
 bool Button(const std::string &label, R7Vec2 size = R7Vec2(0, 0));
 void Checkbox(const std::string &label, bool &c);

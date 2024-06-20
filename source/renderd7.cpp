@@ -683,10 +683,10 @@ void RenderD7::RSettings::Draw(void) const {
     // List Bg
     for (int i = 0; i < 12; i++) {
       if ((i % 2 == 0))
-        UI7::GetBackgroundList()->AddRectangle(R7Vec2(0, 40 + (i)*15),
+        UI7::GetBackgroundList()->AddRectangle(R7Vec2(0, 40 + (i) * 15),
                                                R7Vec2(400, 15), RD7Color_List0);
       else
-        UI7::GetBackgroundList()->AddRectangle(R7Vec2(0, 40 + (i)*15),
+        UI7::GetBackgroundList()->AddRectangle(R7Vec2(0, 40 + (i) * 15),
                                                R7Vec2(400, 15), RD7Color_List1);
     }
 
@@ -763,16 +763,12 @@ void RenderD7::RSettings::Draw(void) const {
     RenderD7::R2()->OnScreen(R2Screen_Bottom);
     if (UI7::BeginMenu("Press \uE001 to go back!", R7Vec2(),
                        UI7MenuFlags_Scrolling)) {
-      for (int i = 0; i < 20; i++) {
-        UI7::Label("Line: " + std::to_string(i));
-      }
-      UI7::Label("Scrolling Offset: " +
-                 std::to_string(UI7::GetScrollingOffset()));
       if (UI7::Button("Go back")) {
         /// Request a state switch to state RSETTINGS
         shared_request[0x00000001] = RSETTINGS;
       }
       UI7::Checkbox("Debug", UI7::IsDebugging());
+      UI7::Checkbox("ShowMenuInfo", UI7::DebugMenu());
       UI7::EndMenu();
     }
   } else if (m_state == ROVERLAYS) {

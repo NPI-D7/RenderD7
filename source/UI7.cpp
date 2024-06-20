@@ -354,7 +354,6 @@ struct UI7Menu {
   UI7DrawList::Ref front;
 
   R7Vec2 ms;    // Max Size
-  R7Vec2 msr;   // Max Size Real (Slider)
   R7Vec2 mdp;   // Mouse/Touch Initial pos
   R7Vec2 bslp;  // Before SameLine Pos
   R7Vec2 lszs;  // Last Size
@@ -370,6 +369,7 @@ struct UI7_Ctx {
     _last = 0;
     in_menu = false;
     debugging = false;
+    debug_menu = false;
   }
   float delta;
   float time;
@@ -377,6 +377,7 @@ struct UI7_Ctx {
   float _last;
   bool in_menu;
   bool debugging;
+  bool debug_menu;
   std::map<std::string, UI7Menu::Ref> menus;
   std::vector<UI7Menu::Ref> active_menus;
   UI7DrawList::Ref debug_calls;
@@ -442,7 +443,7 @@ void UI7CtxEndMenu() {
       int lszs = 20;  // Lowest Slider size
       // Calculate Slider Height
       float slider_h = (szs - 4) * (static_cast<float>(szs - 4) /
-                                    static_cast<float>(ui7_ctx->cm->msr.y));
+                                    static_cast<float>(ui7_ctx->cm->ms.y));
       // Create Real Slider Height
       int slider_rh = d7min(d7max(slider_h, (float)lszs), (float)(szs - 4));
       // Calculate Slider Position
@@ -451,9 +452,9 @@ void UI7CtxEndMenu() {
           d7max(static_cast<float>(tsp),
                 static_cast<float>(tsp) +
                     static_cast<float>(
-                        (szs) *
+                        (szs - slider_rh) *
                         (static_cast<float>(ui7_ctx->cm->scrolling_offset) /
-                         static_cast<float>(ui7_ctx->cm->msr.y)))));
+                         static_cast<float>(ui7_ctx->cm->ms.y - 240.f)))));
       // Render Slider
       ui7_ctx->cm->front->AddRectangle(
           R7Vec2(sw - 12, tsp), R7Vec2(slider_w * 2, szs), RD7Color_List0);
@@ -461,6 +462,42 @@ void UI7CtxEndMenu() {
                                        R7Vec2(slider_w, slider_h),
                                        RD7Color_Selector);
     }
+  }
+  // Debug Print Menu Values
+  if (ui7_ctx->debug_menu) {
+    std::stringstream str;
+    str << "Menu: " << ui7_ctx->cm->menuid.ID() << std::endl;
+    str << "ui7_ctx->cm->cursor: (" << ui7_ctx->cm->cursor.x << ", "
+        << ui7_ctx->cm->cursor.y << ")" << std::endl;
+    str << "ui7_ctx->cm->cb: (" << ui7_ctx->cm->cb.x << ", "
+        << ui7_ctx->cm->cb.y << ")" << std::endl;
+    str << "ui7_ctx->cm->slc: (" << ui7_ctx->cm->slc.x << ", "
+        << ui7_ctx->cm->slc.y << ")" << std::endl;
+    str << "ui7_ctx->cm->scrolling_offset: " << ui7_ctx->cm->scrolling_offset
+        << std::endl;
+    str << "ui7_ctx->cm->enable_scrolling: " << ui7_ctx->cm->enable_scrolling
+        << std::endl;
+    str << "ui7_ctx->cm->scrolling_mod: " << ui7_ctx->cm->scrolling_mod
+        << std::endl;
+    str << "ui7_ctx->cm->tbh: " << ui7_ctx->cm->tbh << std::endl;
+    str << "ui7_ctx->cm->show_scroolbar: " << ui7_ctx->cm->show_scroolbar
+        << std::endl;
+    str << "ui7_ctx->cm->has_touch: " << ui7_ctx->cm->has_touch << std::endl;
+    std::string submenu;
+
+    str << "ui7_ctx->cm->ms: (" << ui7_ctx->cm->ms.x << ", "
+        << ui7_ctx->cm->ms.y << ")" << std::endl;
+    str << "ui7_ctx->cm->mdp: (" << ui7_ctx->cm->mdp.x << ", "
+        << ui7_ctx->cm->mdp.y << ")" << std::endl;
+    str << "ui7_ctx->cm->bslp: (" << ui7_ctx->cm->bslp.x << ", "
+        << ui7_ctx->cm->bslp.y << ")" << std::endl;
+    str << "ui7_ctx->cm->lszs: (" << ui7_ctx->cm->lszs.x << ", "
+        << ui7_ctx->cm->lszs.y << ")" << std::endl;
+    UI7::GetForegroundList()->AddRectangle(
+        R7Vec2(), RenderD7::R2()->GetTextDimensions(str.str()),
+        (unsigned int)RGBA8(0, 0, 0, 110));
+    UI7::GetForegroundList()->AddText(R7Vec2(), str.str(),
+                                      (unsigned int)RGBA8(255, 255, 255, 110));
   }
   ui7_ctx->active_menus.push_back(ui7_ctx->cm);
   ui7_ctx->cm = nullptr;
@@ -480,8 +517,6 @@ void UI7CtxCursorMove(R7Vec2 size) {
     ui7_ctx->cm->cursor += R7Vec2(0, size.y + 5);
   }
   ui7_ctx->cm->ms = R7Vec2(ui7_ctx->cm->slc.x, ui7_ctx->cm->cursor.y);
-  // TODO: Correct that calculation
-  ui7_ctx->cm->msr = R7Vec2(ui7_ctx->cm->slc.x, ui7_ctx->cm->slc.y - 10);
 }
 
 namespace UI7 {
@@ -1190,6 +1225,15 @@ bool &IsDebugging() {
     return t;
   }
   return ui7_ctx->debugging;
+}
+
+bool &DebugMenu() {
+  if (!UI7CtxValidate()) {
+    // Return a Default Val
+    static bool t = false;
+    return t;
+  }
+  return ui7_ctx->debug_menu;
 }
 
 UI7DrawList::Ref GetForegroundList() {
