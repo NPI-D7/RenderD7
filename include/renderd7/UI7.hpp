@@ -102,12 +102,20 @@ R7Vec2 GetCursorPos();
 void SetCursorPos(R7Vec2 cp);
 void RestoreCursor();
 void SameLine();
-float GetScrollingOffset();
+// Internal API (For Creating Custom Objects)
+bool InBox(R7Vec2 inpos, R7Vec2 boxpos, R7Vec2 boxsize);
+void MoveCursor(R7Vec2 size);
+bool HandleScrolling(R7Vec2 &pos, R7Vec2 size);
+bool InMenu();
 namespace Menu {
 // All of them return the Main BG DrawList if Menu is null
 UI7DrawList::Ref GetBackgroundList();
 UI7DrawList::Ref GetList();
 UI7DrawList::Ref GetForegroundList();
+// Other Menu Specific Functions
+float GetScrollingOffset();
+void SetScrollingOffset(float off);
+bool IsScrolling();
 }  // namespace Menu
 // DrawLists
 UI7DrawList::Ref GetForegroundList();

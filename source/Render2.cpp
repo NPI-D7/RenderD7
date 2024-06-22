@@ -79,6 +79,34 @@ std::string R2Base::WrapText(const std ::string& in, int maxlen) {
   return out;
 }
 
+std::string R2Base::ShortText(const std::string& in, int maxlen) {
+  auto textdim = this->GetTextDimensions(in);
+  if (textdim.x < (float)maxlen) return in;
+  std::string ft = "";
+  std::string worker = in;
+  if (in.find_last_of('.') != in.npos) {
+    ft = in.substr(in.find_last_of('.'));
+    worker = in.substr(0, in.find_last_of('.'));
+  }
+
+  maxlen -= this->GetTextDimensions(ft).x - this->GetTextDimensions("(...)").x;
+  float len_mod = (float)maxlen / textdim.x;
+  int pos = (in.length() * len_mod) / rd7_draw2_tsm;
+  std::string out;
+
+  out = in.substr(0, pos);
+
+  for (size_t i = pos; i < worker.length(); i++) {
+    out += worker[i];
+    if (this->GetTextDimensions(out + "(...)" + ft).x > (float)maxlen) {
+      out += "(...)";
+      out += ft;
+      return out;
+    }
+  }
+  return out;  // Impossible to reach
+}
+
 R7Vec2 R2Base::GetCurrentScreenSize() {
   return R7Vec2(this->current_screen == R2Screen_Bottom ? 320 : 400, 240);
 }
@@ -142,8 +170,8 @@ void R2Base::Process() {
 
       while (edit_text.find('\n') != edit_text.npos) {
         std::string current_line = edit_text.substr(0, edit_text.find('\n'));
-        // if (it->flags & RD7TextFlags_Short)
-        //  current_line = GetShortedText(current_line, it->pszs.x - it->pos.x);
+        if (it->flags & RD7TextFlags_Short)
+          current_line = this->ShortText(current_line, it->pszs.x - it->pos.x);
         R7Vec2 newpos = it->pos;
         // Check Flags
         R7Vec2 dim = this->GetTextDimensions(current_line);

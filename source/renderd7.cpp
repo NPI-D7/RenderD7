@@ -683,10 +683,10 @@ void RenderD7::RSettings::Draw(void) const {
     // List Bg
     for (int i = 0; i < 12; i++) {
       if ((i % 2 == 0))
-        UI7::GetBackgroundList()->AddRectangle(R7Vec2(0, 40 + (i) * 15),
+        UI7::GetBackgroundList()->AddRectangle(R7Vec2(0, 40 + (i)*15),
                                                R7Vec2(400, 15), RD7Color_List0);
       else
-        UI7::GetBackgroundList()->AddRectangle(R7Vec2(0, 40 + (i) * 15),
+        UI7::GetBackgroundList()->AddRectangle(R7Vec2(0, 40 + (i)*15),
                                                R7Vec2(400, 15), RD7Color_List1);
     }
 

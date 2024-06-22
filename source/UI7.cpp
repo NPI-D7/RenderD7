@@ -333,17 +333,18 @@ void UI7DrawList::AddDebugCall(std::shared_ptr<DrawCmd> cmd) {
 
 struct UI7Menu {
   UI7Menu() {}
-  UI7ID menuid;                   // menu ID
-  R7Vec2 cursor;                  // cursor
-  R7Vec2 cb;                      // backup cursor
-  R7Vec2 slc;                     // sameline cursor
-  float scrolling_offset = 0.f;   //  MenuScrolling Pos
-  bool enable_scrolling = false;  // Menu Scrolling
-  float scrolling_mod = 0.f;      // For Menu Scrolling effect
-  float tbh;                      // TabBar Height
-  bool show_scroolbar = true;     // Show Scrollbar
-  bool has_touch = false;         // To Disable touch on Top Screen
-  NTCtrl::Ref ctrl;               // NonTouchControl
+  UI7ID menuid;                    // menu ID
+  R7Vec2 cursor;                   // cursor
+  R7Vec2 cb;                       // backup cursor
+  R7Vec2 slc;                      // sameline cursor
+  float scrolling_offset = 0.f;    //  MenuScrolling Pos
+  bool enable_scrolling = false;   // Menu Scrolling
+  float scrolling_mod = 0.f;       // For Menu Scrolling effect
+  float tbh;                       // TabBar Height
+  bool show_scroolbar = true;      // Show Scrollbar
+  bool scrolling_possible = true;  // Scrolling Possible?
+  bool has_touch = false;          // To Disable touch on Top Screen
+  NTCtrl::Ref ctrl;                // NonTouchControl
 
   // SubMenu
   std::string submenu;
@@ -428,7 +429,8 @@ void UI7CtxEndMenu() {
   RenderD7::Ftrace::ScopedTrace tr("ui7", "EndMenu");
   // Draw Scrollbar
   if (ui7_ctx->cm->enable_scrolling) {
-    ui7_ctx->cm->show_scroolbar = (ui7_ctx->cm->ms.y < 235 ? false : true);
+    ui7_ctx->cm->scrolling_possible = (ui7_ctx->cm->ms.y < 235 ? false : true);
+    ui7_ctx->cm->show_scroolbar = ui7_ctx->cm->scrolling_possible;
 
     if (ui7_ctx->cm->show_scroolbar) {
       // Screen Width
@@ -447,19 +449,19 @@ void UI7CtxEndMenu() {
       // Create Real Slider Height
       int slider_rh = d7min(d7max(slider_h, (float)lszs), (float)(szs - 4));
       // Calculate Slider Position
-      int slider_pos = d7min(
-          static_cast<float>(tsp + szs - slider_rh - 4),
-          d7max(static_cast<float>(tsp),
-                static_cast<float>(tsp) +
-                    static_cast<float>(
-                        (szs - slider_rh) *
-                        (static_cast<float>(ui7_ctx->cm->scrolling_offset) /
-                         static_cast<float>(ui7_ctx->cm->ms.y - 240.f)))));
+      int slider_pos =
+          tsp +
+          d7min(static_cast<float>(szs - slider_rh - 4),
+                d7max(0.f,
+                      static_cast<float>(
+                          (szs - slider_rh) *
+                          (static_cast<float>(ui7_ctx->cm->scrolling_offset) /
+                           static_cast<float>(ui7_ctx->cm->ms.y - 240.f)))));
       // Render Slider
       ui7_ctx->cm->front->AddRectangle(
           R7Vec2(sw - 12, tsp), R7Vec2(slider_w * 2, szs), RD7Color_List0);
       ui7_ctx->cm->front->AddRectangle(R7Vec2(sw - 10, slider_pos + 2),
-                                       R7Vec2(slider_w, slider_h),
+                                       R7Vec2(slider_w, slider_rh),
                                        RD7Color_Selector);
     }
   }
@@ -502,21 +504,6 @@ void UI7CtxEndMenu() {
   ui7_ctx->active_menus.push_back(ui7_ctx->cm);
   ui7_ctx->cm = nullptr;
   ui7_ctx->in_menu = false;
-}
-
-void UI7CtxCursorMove(R7Vec2 size) {
-  if (!UI7CtxValidate()) return;
-  if (!UI7CtxInMenu()) return;
-  ui7_ctx->cm->lszs = size;
-  ui7_ctx->cm->slc = ui7_ctx->cm->cursor + R7Vec2(size.x + 5, 0);
-  ui7_ctx->cm->cursor.x = 5;
-  if (ui7_ctx->cm->bslp.y) {
-    ui7_ctx->cm->cursor += R7Vec2(0, ui7_ctx->cm->bslp.y + 5);
-    ui7_ctx->cm->bslp = R7Vec2();
-  } else {
-    ui7_ctx->cm->cursor += R7Vec2(0, size.y + 5);
-  }
-  ui7_ctx->cm->ms = R7Vec2(ui7_ctx->cm->slc.x, ui7_ctx->cm->cursor.y);
 }
 
 namespace UI7 {
@@ -589,16 +576,10 @@ bool Button(const std::string &label, R7Vec2 size) {
   RD7Color btn = RD7Color_Button;
   R7Vec2 pos = GetCursorPos();
 
-  UI7CtxCursorMove(size);
+  MoveCursor(size);
   ui7_ctx->cm->ctrl->AddObj();
 
-  if (ui7_ctx->cm->enable_scrolling) {
-    R7Vec2 pb = pos;
-    pos -= R7Vec2(0, ui7_ctx->cm->scrolling_offset);
-    if (pos.y > 240 ||
-        (pos.y + size.y < ui7_ctx->cm->tbh - 5 && pb.y > ui7_ctx->cm->tbh))
-      return false;
-  }
+  if (HandleScrolling(pos, size)) return false;
 
   if (ui7_ctx->cm->has_touch) {
     if (RenderD7::Hid::IsEvent("touch", RenderD7::Hid::Up) &&
@@ -628,16 +609,10 @@ void Checkbox(const std::string &label, bool &c) {
 
   R7Vec2 pos = GetCursorPos();
 
-  UI7CtxCursorMove(inp);
+  MoveCursor(inp);
   ui7_ctx->cm->ctrl->AddObj();
 
-  if (ui7_ctx->cm->enable_scrolling) {
-    R7Vec2 pb = pos;
-    pos -= R7Vec2(0, ui7_ctx->cm->scrolling_offset);
-    if (pos.y > 240 ||
-        (pos.y + cbs.y < ui7_ctx->cm->tbh - 5 && pb.y > ui7_ctx->cm->tbh))
-      return;
-  }
+  if (HandleScrolling(pos, inp)) return;
 
   if (ui7_ctx->cm->has_touch) {
     if (RenderD7::Hid::IsEvent("touch", RenderD7::Hid::Up) &&
@@ -666,16 +641,10 @@ void Label(const std::string &label, RD7TextFlags flags) {
   R7Vec2 pos = GetCursorPos();
   auto upos = pos;
   // Remove some y offset cause texts have some offset
-  UI7CtxCursorMove(textdim - R7Vec2(0, 4));
+  MoveCursor(textdim - R7Vec2(0, 4));
   ui7_ctx->cm->ctrl->AddObj();
 
-  if (ui7_ctx->cm->enable_scrolling) {
-    R7Vec2 pb = pos;
-    pos -= R7Vec2(0, ui7_ctx->cm->scrolling_offset);
-    if (pos.y > 240 ||
-        (pos.y + textdim.y < ui7_ctx->cm->tbh - 5 && pb.y > ui7_ctx->cm->tbh))
-      return;
-  }
+  if (HandleScrolling(pos, textdim)) return;
 
   float tbh = RenderD7::R2()->GetTextSize() * 40;
   auto &list =
@@ -695,16 +664,10 @@ void Progressbar(float value) {
       R7Vec2(RenderD7::R2()->GetCurrentScreenSize().x - (pos.x * 2), 20);
   if (ui7_ctx->cm->show_scroolbar && ui7_ctx->cm->enable_scrolling)
     size.x -= 16;
-  UI7CtxCursorMove(size);
+  MoveCursor(size);
   ui7_ctx->cm->ctrl->AddObj();
 
-  if (ui7_ctx->cm->enable_scrolling) {
-    R7Vec2 pb = pos;
-    pos -= R7Vec2(0, ui7_ctx->cm->scrolling_offset);
-    if (pos.y > 240 ||
-        (pos.y + size.y < ui7_ctx->cm->tbh - 5 && pb.y > ui7_ctx->cm->tbh))
-      return;
-  }
+  if (HandleScrolling(pos, size)) return;
 
   ui7_ctx->cm->main->AddRectangle(pos, size, RD7Color_FrameBg);
   ui7_ctx->cm->main->AddRectangle(pos + R7Vec2(2, 2), size - R7Vec2(4, 4),
@@ -719,16 +682,10 @@ void Progressbar(float value) {
 void Image(RenderD7::Image::Ref img) {
   if (!UI7CtxValidate()) return;
   R7Vec2 pos = GetCursorPos();
-  UI7CtxCursorMove(R7Vec2(img->GetSize().x, img->GetSize().y));
+  MoveCursor(R7Vec2(img->GetSize().x, img->GetSize().y));
   ui7_ctx->cm->ctrl->AddObj();
 
-  if (ui7_ctx->cm->enable_scrolling) {
-    R7Vec2 pb = pos;
-    pos -= R7Vec2(0, ui7_ctx->cm->scrolling_offset);
-    if (pos.y > 240 || (pos.y + img->GetSize().y < ui7_ctx->cm->tbh - 5 &&
-                        pb.y > ui7_ctx->cm->tbh))
-      return;
-  }
+  if (HandleScrolling(pos, img->GetSize())) return;
 
   ui7_ctx->cm->main->AddImage(pos, img);
 }
@@ -744,7 +701,7 @@ void BrowserList(const std::vector<std::string> &entrys, int &selection,
   if (size.x == 0)
     size.x = RenderD7::R2()->GetCurrentScreenSize().x - (pos.x * 2);
   if (size.y == 0) size.y = (max_entrys * 15);
-  UI7CtxCursorMove(size);
+  MoveCursor(size);
   ui7_ctx->cm->ctrl->AddObj();
   int selindex = (selection < max_entrys ? selection : (max_entrys - 1));
 
@@ -789,16 +746,10 @@ void InputText(const std::string &label, std::string &text,
   RD7KeyboardState kbd_state;  // tmp (goes out of scope)
 
   R7Vec2 pos = GetCursorPos();
-  UI7CtxCursorMove(inp);
+  MoveCursor(inp);
   ui7_ctx->cm->ctrl->AddObj();
 
-  if (ui7_ctx->cm->enable_scrolling) {
-    R7Vec2 pb = pos;
-    pos -= R7Vec2(0, ui7_ctx->cm->scrolling_offset);
-    if (pos.y > 240 ||
-        (pos.y + cbs.y < ui7_ctx->cm->tbh - 5 && pb.y > ui7_ctx->cm->tbh))
-      return;
-  }
+  if (HandleScrolling(pos, inp)) return;
 
   if (ui7_ctx->cm->has_touch) {
     if (RenderD7::Hid::IsEvent("touch", RenderD7::Hid::Up) &&
@@ -843,7 +794,8 @@ bool BeginMenu(const std::string &title, R7Vec2 size, UI7MenuFlags flags) {
   }
   if (flags & UI7MenuFlags_TitleMid) txtflags = RD7TextFlags_AlignMid;
   ui7_ctx->cm->enable_scrolling = (flags & UI7MenuFlags_Scrolling);
-  if (ui7_ctx->cm->enable_scrolling && !RenderD7::R2()->GetCurrentScreen()) {
+  if (ui7_ctx->cm->enable_scrolling && !RenderD7::R2()->GetCurrentScreen() &&
+      ui7_ctx->cm->scrolling_possible) {
     // Patch that sets scrolling to 0 if max pos is not out of screen
     if (ui7_ctx->cm->scrolling_offset != 0.f && ui7_ctx->cm->ms.y < 235) {
       ui7_ctx->cm->scrolling_offset = 0.f;
@@ -972,7 +924,7 @@ void Grid(const std::string &name, const R7Vec2 &size, const R7Vec2 &entry_size,
     }
   }
 
-  UI7CtxCursorMove(size);
+  MoveCursor(size);
 }
 
 void ColorSelector(const std::string &label, unsigned int &color) {
@@ -986,16 +938,10 @@ void ColorSelector(const std::string &label, unsigned int &color) {
   auto id = UI7ID(label);
 
   R7Vec2 pos = GetCursorPos();
-  UI7CtxCursorMove(inp);
+  MoveCursor(inp);
   ui7_ctx->cm->ctrl->AddObj();
 
-  if (ui7_ctx->cm->enable_scrolling) {
-    R7Vec2 pb = pos;
-    pos -= R7Vec2(0, ui7_ctx->cm->scrolling_offset);
-    if (pos.y > 240 ||
-        (pos.y + cbs.y < ui7_ctx->cm->tbh - 5 && pb.y > ui7_ctx->cm->tbh))
-      return;
-  }
+  if (HandleScrolling(pos, inp)) return;
 
   if (ui7_ctx->cm->has_touch) {
     if (RenderD7::Hid::IsEvent("touch", RenderD7::Hid::Up) &&
@@ -1212,10 +1158,54 @@ void Debug() {
   ui7_ctx->debug_calls->Clear();
 }
 
-float GetScrollingOffset() {
+float Menu::GetScrollingOffset() {
   if (!UI7CtxValidate()) return 0.f;
   if (!UI7CtxInMenu()) return 0.f;
   return ui7_ctx->cm->scrolling_offset;
+}
+
+void Menu::SetScrollingOffset(float off) {
+  if (!UI7CtxValidate()) return;
+  if (!UI7CtxInMenu()) return;
+  ui7_ctx->cm->scrolling_offset = off;
+  ui7_ctx->cm->scrolling_mod = 0.f;
+}
+
+bool Menu::IsScrolling() {
+  if (!UI7CtxValidate()) return false;
+  if (!UI7CtxInMenu()) return false;
+  return ui7_ctx->cm->scrolling_mod != 0.f;
+}
+
+void MoveCursor(R7Vec2 size) {
+  if (!UI7CtxValidate()) return;
+  if (!UI7CtxInMenu()) return;
+  ui7_ctx->cm->lszs = size;
+  ui7_ctx->cm->slc = ui7_ctx->cm->cursor + R7Vec2(size.x + 5, 0);
+  ui7_ctx->cm->cursor.x = 5;
+  if (ui7_ctx->cm->bslp.y) {
+    ui7_ctx->cm->cursor += R7Vec2(0, ui7_ctx->cm->bslp.y + 5);
+    ui7_ctx->cm->bslp = R7Vec2();
+  } else {
+    ui7_ctx->cm->cursor += R7Vec2(0, size.y + 5);
+  }
+  ui7_ctx->cm->ms = R7Vec2(ui7_ctx->cm->slc.x, ui7_ctx->cm->cursor.y);
+}
+
+bool HandleScrolling(R7Vec2 &pos, R7Vec2 size) {
+  if (ui7_ctx->cm->enable_scrolling) {
+    R7Vec2 pb = pos;
+    pos -= R7Vec2(0, ui7_ctx->cm->scrolling_offset);
+    if (pos.y > 240 ||
+        (pos.y + size.y < ui7_ctx->cm->tbh - 5 && pb.y > ui7_ctx->cm->tbh))
+      return true;
+  }
+  return false;
+}
+
+bool InMenu() {
+  if (!UI7CtxValidate()) return false;
+  return UI7CtxInMenu();
 }
 
 bool &IsDebugging() {

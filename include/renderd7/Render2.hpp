@@ -85,6 +85,7 @@ class R2Base {
   void Process();
   R7Vec2 GetTextDimensions(const std::string& text);
   std::string WrapText(const std ::string& in, int maxlen);
+  std::string ShortText(const std::string& in, int maxlen);
   // Draw Functions
   void AddRect(R7Vec2 pos, R7Vec2 size, RD7Color clr);
   void AddRect(R7Vec2 pos, R7Vec2 size, unsigned int clr);
