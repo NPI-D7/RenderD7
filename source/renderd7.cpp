@@ -851,7 +851,7 @@ void RenderD7::RSettings::Logic() {
   stateftold = rd7i_ftraced;
 
   if (m_state == RSETTINGS) {
-    if (d7_hDown & KEY_B) {
+    if (d7_hUp & KEY_B) {
       std::fstream cfg_wrt(rd7i_config_path + "/config.rc7", std::ios::out);
       rd7i_config["metrik-settings"]["enableoverlay"] = rd7i_metrikd;
       rd7i_config["metrik-settings"]["Screen"] = rd7i_mt_screen;

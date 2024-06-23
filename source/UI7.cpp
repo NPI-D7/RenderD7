@@ -838,9 +838,9 @@ bool BeginMenu(const std::string &title, R7Vec2 size, UI7MenuFlags flags) {
           float cursor_mod = (ui7_ctx->cm->mdp.y - np.y);
           if (ui7_ctx->cm->scrolling_mod <= 4.f &&
               ui7_ctx->cm->scrolling_mod >= -4 && cursor_mod != 0.0f) {
-            if (cursor_mod > 0) {
+            if (cursor_mod > 2) {
               ui7_ctx->cm->scrolling_mod = cursor_mod;
-            } else {
+            } else if (cursor_mod < -2) {
               ui7_ctx->cm->scrolling_mod = cursor_mod;
             }
           }
