@@ -683,10 +683,10 @@ void RenderD7::RSettings::Draw(void) const {
     // List Bg
     for (int i = 0; i < 12; i++) {
       if ((i % 2 == 0))
-        UI7::GetBackgroundList()->AddRectangle(R7Vec2(0, 40 + (i)*15),
+        UI7::GetBackgroundList()->AddRectangle(R7Vec2(0, 40 + (i) * 15),
                                                R7Vec2(400, 15), RD7Color_List0);
       else
-        UI7::GetBackgroundList()->AddRectangle(R7Vec2(0, 40 + (i)*15),
+        UI7::GetBackgroundList()->AddRectangle(R7Vec2(0, 40 + (i) * 15),
                                                R7Vec2(400, 15), RD7Color_List1);
     }
 
@@ -851,7 +851,7 @@ void RenderD7::RSettings::Logic() {
   stateftold = rd7i_ftraced;
 
   if (m_state == RSETTINGS) {
-    if (d7_hUp & KEY_B) {
+    if (d7_hDown & KEY_B) {
       std::fstream cfg_wrt(rd7i_config_path + "/config.rc7", std::ios::out);
       rd7i_config["metrik-settings"]["enableoverlay"] = rd7i_metrikd;
       rd7i_config["metrik-settings"]["Screen"] = rd7i_mt_screen;
@@ -928,5 +928,15 @@ void RenderD7::FadeDisplay() { Npifade(); }
 float RenderD7::GetTime() { return rd7i_time; }
 
 std::string RenderD7::GetAppDirectory() {
-  return "sdmc:/RenderD7/Apps/" + rd7i_app_name;
+  std::string dir = "sdmc:/RenderD7/Apps/" + rd7i_app_name;
+  if (!std::filesystem::is_directory(dir))
+    std::filesystem::create_directories(dir);
+  return dir;
+}
+
+std::string RenderD7::GetDataDirectory() {
+  std::string dir = GetAppDirectory() + "/data";
+  if (!std::filesystem::is_directory(dir))
+    std::filesystem::create_directories(dir);
+  return dir;
 }

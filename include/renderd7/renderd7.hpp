@@ -215,4 +215,7 @@ void FrameEnd();
 /// @brief Returns App Working Directory path
 /// @return AppDir Path
 std::string GetAppDirectory();
+/// @brief returns path to the Data Directory
+/// @return data dir path
+std::string GetDataDirectory();
 }  // namespace RenderD7
