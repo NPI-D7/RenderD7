@@ -822,26 +822,28 @@ bool BeginMenu(const std::string &title, R7Vec2 size, UI7MenuFlags flags) {
       ui7_ctx->cm->scrolling_mod = 0.f;
     }
     if (ui7_ctx->cm->has_touch) {
+      auto np = RenderD7::Hid::GetTouchPosition();
       if (RenderD7::Hid::IsEvent("touch", RenderD7::Hid::Down)) {
         // Set the mdp Value as Start Pos
-        ui7_ctx->cm->mdp = RenderD7::Hid::GetTouchPosition();
+        ui7_ctx->cm->mdp = np;
       } else if (RenderD7::Hid::IsEvent("touch", RenderD7::Hid::Up)) {
         // 0 out the start pos
         ui7_ctx->cm->mdp = R7Vec2();
       }
       if (RenderD7::Hid::IsEvent("touch", RenderD7::Hid::Held)) {
         // Set modifier
-        auto np = RenderD7::Hid::GetTouchPosition();
-        // Check if and do nothing if the scrolling ofset goes out of screen
-        if (ui7_ctx->cm->scrolling_offset < ui7_ctx->cm->ms.y - 200 &&
-            ui7_ctx->cm->scrolling_offset > -40) {
-          float cursor_mod = (ui7_ctx->cm->mdp.y - np.y);
-          if (ui7_ctx->cm->scrolling_mod <= 4.f &&
-              ui7_ctx->cm->scrolling_mod >= -4 && cursor_mod != 0.0f) {
-            if (cursor_mod > 2) {
-              ui7_ctx->cm->scrolling_mod = cursor_mod;
-            } else if (cursor_mod < -2) {
-              ui7_ctx->cm->scrolling_mod = cursor_mod;
+        if(!InBox(np, R7Vec2(RenderD7::R2()->GetCurrentScreenSize().x - 8 - 5, 5 + ui7_ctx->cm->tbh), R7Vec2(8, 240 - ui7_ctx->cm->tbh - 10))) {
+          // Check if and do nothing if the scrolling ofset goes out of screen
+          if (ui7_ctx->cm->scrolling_offset < ui7_ctx->cm->ms.y - 200 &&
+              ui7_ctx->cm->scrolling_offset > -40) {
+            float cursor_mod = (ui7_ctx->cm->mdp.y - np.y);
+            if (ui7_ctx->cm->scrolling_mod <= 4.f &&
+                ui7_ctx->cm->scrolling_mod >= -4 && cursor_mod != 0.0f) {
+              if (cursor_mod > 2) {
+                ui7_ctx->cm->scrolling_mod = cursor_mod;
+              } else if (cursor_mod < -2) {
+                ui7_ctx->cm->scrolling_mod = cursor_mod;
+              }
             }
           }
         }
