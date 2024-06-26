@@ -448,6 +448,14 @@ void UI7CtxEndMenu() {
                                     static_cast<float>(ui7_ctx->cm->ms.y));
       // Create Real Slider Height
       int slider_rh = d7min(d7max(slider_h, (float)lszs), (float)(szs - 4));
+      // Process Slider Dragging
+      /// TODO: Optimize
+      if(RenderD7::Hid::IsEvent("touch", RenderD7::Hid::Held)) {
+        auto tp = RenderD7::Hid::GetTouchPosition();
+        if(UI7::InBox(tp, R7Vec2(sw-10, tsp), R7Vec2(8, szs))) {
+          ui7_ctx->cm->scrolling_offset = ((tp.y-tsp)/szs)*(ui7_ctx->cm->ms.y-240);
+        }
+      }
       // Calculate Slider Position
       int slider_pos =
           tsp +
