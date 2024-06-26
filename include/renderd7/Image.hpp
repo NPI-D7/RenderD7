@@ -45,6 +45,7 @@ class Image {
   bool Loadet();
 
  private:
+  bool ext = false;
   C2D_Image img;
 };
 }  // namespace RenderD7

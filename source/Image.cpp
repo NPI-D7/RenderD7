@@ -109,6 +109,7 @@ namespace RenderD7 {
 void Image::Load(const std::string &path) {
   // Make sure to cleanup
   Delete();
+  ext = false;
   // Setup Func and Load Data
   int w, h, c = 0;
   unsigned char *image = stbi_load(path.c_str(), &w, &h, &c, 4);
@@ -148,6 +149,7 @@ void Image::Load(const std::string &path) {
 void Image::From_NIMG(const nimg &image) {
   // Make sure to cleanup
   Delete();
+  ext = false;
   if (image.width > 1024 || image.height > 1024) return;
   C3D_Tex *tex = new C3D_Tex;
   Tex3DS_SubTexture *subtex = new Tex3DS_SubTexture;
@@ -171,6 +173,7 @@ C2D_Image &Image::GetRef() {
 
 void Image::Set(const C2D_Image &i) {
   Delete();
+  ext = true;
   img = i;
 }
 
@@ -180,6 +183,7 @@ R7Vec2 Image::GetSize() {
 }
 
 void Image::Delete() {
+  if(ext) return;
   if (img.subtex != nullptr) {
     delete img.subtex;
     img.subtex = nullptr;
