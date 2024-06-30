@@ -41,6 +41,7 @@ typedef struct _WavHeader {
 } WavHeader;
 static_assert(sizeof(WavHeader) == 44, "WavHeader size is not 44 bytes.");
 
+using namespace RenderD7;
 Sound::Sound(const string &path, int channel, bool toloop) {
   if (rd7i_is_ndsp) {
     ndspSetOutputMode(NDSP_OUTPUT_STEREO);

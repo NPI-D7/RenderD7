@@ -381,12 +381,12 @@ void Ovl_Metrik::Draw(void) const {
   // Force Bottom (Debug Touchpos)
   R2()->OnScreen(R2Screen_Bottom);
   if (Hid::IsEvent("touch", Hid::Held)) {
-    /*R2()->AddLine(R7Vec2(Hid::GetTouchPosition().x, 0),
+    R2()->AddLine(R7Vec2(Hid::GetTouchPosition().x, 0),
                   R7Vec2(Hid::GetTouchPosition().x, 240),
                   RenderD7::Color::Hex("#ff0000"));
     R2()->AddLine(R7Vec2(0, Hid::GetTouchPosition().y),
                   R7Vec2(320, Hid::GetTouchPosition().y),
-                  RenderD7::Color::Hex("#ff0000"));*/
+                  RenderD7::Color::Hex("#ff0000"));
   }
   R2()->SetTextSize(tmp_txt);
 }

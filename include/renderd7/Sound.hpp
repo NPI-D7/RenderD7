@@ -23,6 +23,7 @@
 #include <renderd7/smart_ctor.hpp>
 #include <string>
 
+namespace RenderD7 {
 /** Sound Class */
 class Sound {
  public:
@@ -49,3 +50,4 @@ class Sound {
   /// \param chnl Channel of the sound
   int chnl;
 };
+}  // namespace RenderD7

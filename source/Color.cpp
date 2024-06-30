@@ -225,7 +225,7 @@ void RenderD7::ThemeSet(RenderD7::Theme::Ref theme) {
   rd7i_active_theme = theme;
 }
 
-uint32_t RenderD7::Color::Hex(const std::string& color, uint8_t a) {
+unsigned int RenderD7::Color::Hex(const std::string& color, uint8_t a) {
   if (color.length() < 7 ||
       std::find_if(color.begin() + 1, color.end(),
                    [](char c) { return !std::isxdigit(c); }) != color.end()) {

@@ -58,7 +58,7 @@ class R2Base {
     Image::Ref img;    //< Image Reference
     Sprite::Ref spr;   //< Sprite Reference
     // 0 = skip, 1 = rect, 2 = tri, 3 = text,
-    // 4 = image, 5 = sprite
+    // 4 = image, 5 = sprite, 6 = Line
     int type;            //< Command Type
     bool lined = false;  //< Draw Lined Rect/Tri
     // Text Specific
@@ -97,6 +97,8 @@ class R2Base {
                RD7TextFlags flags = 0, R7Vec2 tmb = R7Vec2());
   void AddImage(R7Vec2 pos, Image::Ref img);
   void AddSprite(Sprite::Ref spr);
+  void AddLine(R7Vec2 pos_a, R7Vec2 pos_b, RD7Color clr, int t = 1);
+  void AddLine(R7Vec2 pos_a, R7Vec2 pos_b, unsigned int clr, int t = 1);
 
  private:
   const float default_text_size = 0.5f;

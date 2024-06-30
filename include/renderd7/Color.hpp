@@ -25,10 +25,10 @@
 #include <string>
 #include <vector>
 
-#define UNPACK_RGBA(col) (uint8_t)(col >> 24), (col >> 16), (col >> 8), (col)
-#define UNPACK_BGRA(col) (uint8_t)(col >> 8), (col >> 16), (col >> 24), (col)
+#define UNPACK_RGBA(col) (unsigned char)(col >> 24), (col >> 16), (col >> 8), (col)
+#define UNPACK_BGRA(col) (unsigned char)(col >> 8), (col >> 16), (col >> 24), (col)
 
-inline uint32_t RGBA8(uint8_t r, uint8_t g, uint8_t b, uint8_t a = 255) {
+inline unsigned int RGBA8(unsigned char r, unsigned char g, unsigned char b, unsigned char a = 255) {
   return (r | g << 8 | b << 16 | a << 24);
 }
 
@@ -132,7 +132,7 @@ class RGBA {
   /// @param g
   /// @param b
   /// @param a
-  RGBA(uint8_t r, uint8_t g, uint8_t b, uint8_t a = 255)
+  RGBA(unsigned char r, unsigned char g, unsigned char b, unsigned char a = 255)
       : m_r(r), m_g(g), m_b(b), m_a(a) {}
   /// @brief Construct
   /// @param r
@@ -201,7 +201,7 @@ class RGBA {
     return (luminance() >= 0.5);
   }
 
-  uint8_t m_r = 0, m_g = 0, m_b = 0, m_a = 0;
+  unsigned char m_r = 0, m_g = 0, m_b = 0, m_a = 0;
 };
 std::string RGBA2Hex(unsigned int c32);
 /// @brief Convert RGB to Hex
@@ -214,6 +214,6 @@ std::string RGB2Hex(int r, int g, int b);
 /// @param color
 /// @param a
 /// @return Color32
-uint32_t Hex(const std::string &color, uint8_t a = 255);
+unsigned int Hex(const std::string &color, unsigned char a = 255);
 }  // namespace Color
 }  // namespace RenderD7

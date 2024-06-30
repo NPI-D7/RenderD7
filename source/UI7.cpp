@@ -448,12 +448,16 @@ void UI7CtxEndMenu() {
                                     static_cast<float>(ui7_ctx->cm->ms.y));
       // Create Real Slider Height
       int slider_rh = d7min(d7max(slider_h, (float)lszs), (float)(szs - 4));
+      auto slider_clr = RD7Color_Button;
       // Process Slider Dragging
       /// TODO: Optimize
-      if(RenderD7::Hid::IsEvent("touch", RenderD7::Hid::Held)) {
+      if (RenderD7::Hid::IsEvent("touch", RenderD7::Hid::Held)) {
         auto tp = RenderD7::Hid::GetTouchPosition();
-        if(UI7::InBox(tp, R7Vec2(sw-10, tsp), R7Vec2(8, szs))) {
-          ui7_ctx->cm->scrolling_offset = ((tp.y-tsp)/szs)*(ui7_ctx->cm->ms.y-240);
+        if (UI7::InBox(tp, R7Vec2(sw - 10, tsp), R7Vec2(8, szs))) {
+          slider_clr = RD7Color_ButtonHovered;
+          ui7_ctx->cm->scrolling_offset = d7max(
+              0.f, d7min(ui7_ctx->cm->ms.y - 240,
+                         ((tp.y - tsp) / szs) * (ui7_ctx->cm->ms.y - 240)));
         }
       }
       // Calculate Slider Position
@@ -469,8 +473,7 @@ void UI7CtxEndMenu() {
       ui7_ctx->cm->front->AddRectangle(
           R7Vec2(sw - 12, tsp), R7Vec2(slider_w * 2, szs), RD7Color_List0);
       ui7_ctx->cm->front->AddRectangle(R7Vec2(sw - 10, slider_pos + 2),
-                                       R7Vec2(slider_w, slider_rh),
-                                       RD7Color_Selector);
+                                       R7Vec2(slider_w, slider_rh), slider_clr);
     }
   }
   // Debug Print Menu Values
@@ -840,7 +843,10 @@ bool BeginMenu(const std::string &title, R7Vec2 size, UI7MenuFlags flags) {
       }
       if (RenderD7::Hid::IsEvent("touch", RenderD7::Hid::Held)) {
         // Set modifier
-        if(!InBox(np, R7Vec2(RenderD7::R2()->GetCurrentScreenSize().x - 8 - 5, 5 + ui7_ctx->cm->tbh), R7Vec2(8, 240 - ui7_ctx->cm->tbh - 10))) {
+        if (!InBox(np,
+                   R7Vec2(RenderD7::R2()->GetCurrentScreenSize().x - 8 - 5,
+                          5 + ui7_ctx->cm->tbh),
+                   R7Vec2(8, 240 - ui7_ctx->cm->tbh - 10))) {
           // Check if and do nothing if the scrolling ofset goes out of screen
           if (ui7_ctx->cm->scrolling_offset < ui7_ctx->cm->ms.y - 200 &&
               ui7_ctx->cm->scrolling_offset > -40) {

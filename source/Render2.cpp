@@ -114,7 +114,7 @@ R7Vec2 R2Base::GetCurrentScreenSize() {
 // Main Processing of Draw Calls
 void R2Base::Process() {
   for (auto& it : this->commands) {
-    if (it->type <= 0 || it->type > 5) {
+    if (it->type <= 0 || it->type > 6) {
       // Skip
       continue;
     }
@@ -209,6 +209,8 @@ void R2Base::Process() {
     } else if (it->type == 5) {
       // TODO: Move the Draw Func into this API
       it->spr->Draw();
+    } else if (it->type == 6) {
+      C2D_DrawLine(it->pos.x, it->pos.y, it->clr, it->pszs.x, it->pszs.y, it->clr, it->ap.x, 0.5f);
     }
   }
   this->commands.clear();
@@ -236,6 +238,40 @@ void R2Base::AddRect(R7Vec2 pos, R7Vec2 size, unsigned int clr) {
   cmd->pszs = size;
   cmd->clr = clr;
   cmd->type = 1;  // Rect
+  // Just assign current screen as bottom is 0 (false)
+  // and Top and TopRight are !0 (true)
+  cmd->Screen = current_screen;
+  if (this->next_lined) {
+    cmd->lined = true;
+    this->next_lined = false;
+  }
+  this->commands.push_back(cmd);
+}
+
+void R2Base::AddLine(R7Vec2 pos_a, R7Vec2 pos_b, RD7Color clr, int t) {
+  auto cmd = R2Cmd::New();
+  cmd->pos = pos_a;
+  cmd->pszs = pos_b;
+  cmd->ap.x = t;
+  cmd->clr = RenderD7::ThemeActive()->Get(clr);
+  cmd->type = 6;  // Line
+  // Just assign current screen as bottom is 0 (false)
+  // and Top and TopRight are !0 (true)
+  cmd->Screen = current_screen;
+  if (this->next_lined) {
+    cmd->lined = true;
+    this->next_lined = false;
+  }
+  this->commands.push_back(cmd);
+}
+
+void R2Base::AddLine(R7Vec2 pos_a, R7Vec2 pos_b, unsigned int clr, int t) {
+  auto cmd = R2Cmd::New();
+  cmd->pos = pos_a;
+  cmd->pszs = pos_b;
+  cmd->ap.x = t;
+  cmd->clr = clr;
+  cmd->type = 6;  // Line
   // Just assign current screen as bottom is 0 (false)
   // and Top and TopRight are !0 (true)
   cmd->Screen = current_screen;
