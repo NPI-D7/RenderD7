@@ -33,6 +33,10 @@
 #endif
 
 // Base
+extern bool rd7i_do_splash;
+extern bool rd7i_enable_scene_system;
+extern bool rd7i_debugging;
+extern bool rd7i_enable_memtrack;
 extern std::string rd7i_app_name;
 extern std::string rd7i_config_path;
 extern nlohmann::json rd7i_config;

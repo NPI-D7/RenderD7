@@ -326,7 +326,7 @@ bool RenderD7::MainLoop() {
   C2D_TargetClear(rd7_top, C2D_Color32(0, 0, 0, 0));
   C2D_TargetClear(rd7_bottom, C2D_Color32(0, 0, 0, 0));
   frameloop();
-  if (rd7_enable_scene_system) {
+  if (rd7i_enable_scene_system) {
     RenderD7::Scene::doDraw();
     RenderD7::Scene::doLogic();
   }
@@ -353,6 +353,10 @@ Result RenderD7::Init::Main(std::string app_name) {
   rd7i_app_name = app_name;
   rd7i_logger = LoggerBase::New();
   rd7i_glogger = LoggerBase::New();
+ 
+  rd7i_do_splash = (rd7_flags & RD7Flags_ShowSplash);
+  rd7i_enable_scene_system= (rd7_flags & RD7Flags_SceneSystem);
+  rd7i_enable_memtrack = (rd7_flags & RD7Flags_MemTrack);
 
   gfxInitDefault();
   atexit(gfxExit);
@@ -405,7 +409,7 @@ Result RenderD7::Init::Main(std::string app_name) {
 
   rd7i_graphics_on = true;
   rd7i_last_tm = svcGetSystemTick();
-  if (rd7_do_splash) PushSplash();
+  if (rd7i_do_splash) PushSplash();
 
   rd7i_init_input();
   rd7i_init_theme();
@@ -420,6 +424,10 @@ Result RenderD7::Init::Minimal(std::string app_name) {
   rd7i_app_name = app_name;
   rd7i_logger = LoggerBase::New();
   rd7i_glogger = LoggerBase::New();
+
+  rd7i_do_splash = (rd7_flags & RD7Flags_ShowSplash);
+  rd7i_enable_scene_system= (rd7_flags & RD7Flags_SceneSystem);
+  rd7i_enable_memtrack = (rd7_flags & RD7Flags_MemTrack);
 
   gfxInitDefault();
   atexit(gfxExit);
@@ -462,7 +470,7 @@ Result RenderD7::Init::Minimal(std::string app_name) {
   rd7i_render2 = R2Base::New();
 
   rd7i_graphics_on = true;
-  if (rd7_do_splash) PushSplash();
+  if (rd7i_do_splash) PushSplash();
 
   // Check if citra
   s64 citracheck = 0;
@@ -533,7 +541,7 @@ void OvlHandler() {
 void RenderD7::FrameEnd() {
   Ftrace::ScopedTrace st("rd7-core", f2s(FrameEnd));
   C3D_FrameBegin(2);
-  if (!rd7_enable_scene_system && rd7i_settings) {
+  if (!rd7i_enable_scene_system && rd7i_settings) {
     RenderD7::Scene::doDraw();
     RenderD7::Scene::doLogic();
   }

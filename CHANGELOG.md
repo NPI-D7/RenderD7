@@ -3,7 +3,7 @@
 - Remove Npi Intro and NVID Api
 - Replace Toasts System with Message 
 - Added GetTime
-- Implement Draw2 Api
+- Move from Draw to Render2 Api
 - Implement RD7Color and R7Vec2
 - Add new Features to Color::RGBA
 - Cleanup Code
@@ -32,6 +32,9 @@
 - Remove 0.9.4 Security
 - Tasks now based on std functional/thread
 - Add Network Support (Download Files, APi Requests)
+- Remove RD7TF
+- Add Cia Installer
+- Move from Init bool values to flags
 ## 0.9.4
 - Implement new Security System To prevent from crashes
 - Implement Functiontrace for better Timing Tests

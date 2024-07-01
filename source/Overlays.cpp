@@ -341,7 +341,7 @@ void Ovl_Metrik::Draw(void) const {
   mt_tbs =
       "TextBuf: " + std::to_string(C2D_TextBufGetNumGlyphs(rd7i_text_buffer)) +
       "/4096";
-  if (rd7_enable_memtrack)
+  if (rd7i_enable_memtrack)
     mt_mem = "Mem: " + RenderD7::FormatBytes(RenderD7::Memory::GetCurrent()) +
              " | " +
              RenderD7::FormatBytes(RenderD7::Memory::GetTotalAllocated()) +
@@ -358,7 +358,7 @@ void Ovl_Metrik::Draw(void) const {
                 (unsigned int)i_mt_color[0]);
   R2()->AddRect(R7Vec2(0, 50 + dim_y * 4), R2()->GetTextDimensions(mt_tbs),
                 (unsigned int)i_mt_color[0]);
-  if (rd7_enable_memtrack)
+  if (rd7i_enable_memtrack)
     R2()->AddRect(R7Vec2(0, 50 + dim_y * 5), R2()->GetTextDimensions(mt_mem),
                   (unsigned int)i_mt_color[0]);
   R2()->AddRect(R7Vec2(0, infoy), R2()->GetTextDimensions(info),
@@ -373,7 +373,7 @@ void Ovl_Metrik::Draw(void) const {
                 (unsigned int)i_txt_color[0]);
   R2()->AddText(R7Vec2(0, 50 + dim_y * 4), mt_tbs,
                 (unsigned int)i_txt_color[0]);
-  if (rd7_enable_memtrack)
+  if (rd7i_enable_memtrack)
     R2()->AddText(R7Vec2(0, 50 + dim_y * 5), mt_mem,
                   (unsigned int)i_txt_color[0]);
   R2()->AddText(R7Vec2(0, infoy), info, (unsigned int)i_txt_color[0]);

@@ -23,7 +23,7 @@
 #include <renderd7/renderd7.hpp>
 #include <vector>
 
-extern bool rd7_debugging;
+extern bool rd7i_debugging;
 
 static std::vector<std::shared_ptr<RenderD7::Message>> msg_lst;
 static int fade_outs = 200;  // Start of fadeout
@@ -72,7 +72,7 @@ void ProcessMessages() {
       R2()->AddRect(pos, R7Vec2(150, 50), bgc);
       R2()->AddText(pos + R7Vec2(5, 1), msg_lst[i]->title, tc);
       R2()->AddText(pos + R7Vec2(5, 17), msg_lst[i]->message, tc);
-      if (rd7_debugging)
+      if (rd7i_debugging)
         R2()->AddText(pos + R7Vec2(155, 1),
                       std::to_string(msg_lst[i]->animationframe), tc);
       // Why Frameadd? because Message uses int as frame and

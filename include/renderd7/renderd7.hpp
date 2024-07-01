@@ -57,15 +57,8 @@
 
 #define DEFAULT_CENTER 0.5f
 
-/// @param rd7_do_splash Config Value To Enable RenderD7 Splash
-extern bool rd7_do_splash;
-/// @param rd7_enable_memtrack Config Value to Track Mem Allocations
-extern bool rd7_enable_memtrack;
 /// @param rd7_max_objects Config Param for C2D Mac objects
 extern int rd7_max_objects;
-/// @param rd7_enable_scene_system Enable/Disable Scene System (for example for
-/// your own implementations)
-extern bool rd7_enable_scene_system;
 
 namespace RenderD7 {
 // Reference to the New Renderer

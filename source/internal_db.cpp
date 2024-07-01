@@ -31,6 +31,7 @@
 #include <renderd7/renderd7.hpp>
 
 /// Base ///
+RD7Flags rd7_flags = RD7Flags_Default;
 static RenderD7::Thread rd7i_idb_server;  // Protected
 std::string rd7i_app_name;
 std::string rd7i_config_path;
@@ -96,9 +97,9 @@ touchPosition d7_touch;
 
 // Modern Global Api
 int rd7_max_objects = C2D_DEFAULT_MAX_OBJECTS;
-bool rd7_do_splash = false;
-bool rd7_enable_scene_system = true;
-bool rd7_debugging = false;
+bool rd7i_do_splash = false;
+bool rd7i_enable_scene_system = true;
+bool rd7i_debugging = false;
 C3D_RenderTarget *rd7_top;
 C3D_RenderTarget *rd7_top_right;
 C3D_RenderTarget *rd7_bottom;

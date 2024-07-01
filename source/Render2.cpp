@@ -182,7 +182,7 @@ void R2Base::Process() {
           // Look into Old Draw2 Code
           // TODO: Create Code for this
         }
-        if (rd7_debugging) {
+        if (rd7i_debugging) {
           this->DrawNextLined();
           this->AddRect(newpos, dim, 0xff0000ff);
         }
