@@ -1,21 +1,3 @@
-/**
- *   This file is part of RenderD7
- *   Copyright (C) 2021-2024 NPI-D7, tobid7
- *
- *   This program is free software: you can redistribute it and/or modify
- *   it under the terms of the GNU General Public License as published by
- *   the Free Software Foundation, either version 3 of the License, or
- *   (at your option) any later version.
- *
- *   This program is distributed in the hope that it will be useful,
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *   GNU General Public License for more details.
- *
- *   You should have received a copy of the GNU General Public License
- *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-
 #include <renderd7/Hid.hpp>  // Integate HidApi
 #include <renderd7/Message.hpp>
 #include <renderd7/Overlays.hpp>
@@ -353,9 +335,9 @@ Result RenderD7::Init::Main(std::string app_name) {
   rd7i_app_name = app_name;
   rd7i_logger = LoggerBase::New();
   rd7i_glogger = LoggerBase::New();
- 
+
   rd7i_do_splash = (rd7_flags & RD7Flags_ShowSplash);
-  rd7i_enable_scene_system= (rd7_flags & RD7Flags_SceneSystem);
+  rd7i_enable_scene_system = (rd7_flags & RD7Flags_SceneSystem);
   rd7i_enable_memtrack = (rd7_flags & RD7Flags_MemTrack);
 
   gfxInitDefault();
@@ -426,7 +408,7 @@ Result RenderD7::Init::Minimal(std::string app_name) {
   rd7i_glogger = LoggerBase::New();
 
   rd7i_do_splash = (rd7_flags & RD7Flags_ShowSplash);
-  rd7i_enable_scene_system= (rd7_flags & RD7Flags_SceneSystem);
+  rd7i_enable_scene_system = (rd7_flags & RD7Flags_SceneSystem);
   rd7i_enable_memtrack = (rd7_flags & RD7Flags_MemTrack);
 
   gfxInitDefault();
