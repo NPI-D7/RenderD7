@@ -26,10 +26,10 @@ namespace RenderD7 {
 float GetDeltaTime();  // Extern from renderd7.cpp
 
 void ProcessMessages() {
-  float tmp_txt = R2()->GetTextSize();
-  R2()->DefaultTextSize();
+  float tmp_txt = R2::GetTextSize();
+  R2::DefaultTextSize();
   // Draw in ovl mode
-  R2()->OnScreen(R2Screen_Top);
+  R2::OnScreen(R2Screen_Top);
   float fol = anim_len - fade_outs;
   std::reverse(msg_lst.begin(), msg_lst.end());
   for (size_t i = 0; i < msg_lst.size(); i++) {
@@ -51,11 +51,11 @@ void ProcessMessages() {
                      .toRGBA();
       auto tc =
           RenderD7::Color::RGBA(RD7Color_Text2).changeA(new_alpha).toRGBA();
-      R2()->AddRect(pos, R7Vec2(150, 50), bgc);
-      R2()->AddText(pos + R7Vec2(5, 1), msg_lst[i]->title, tc);
-      R2()->AddText(pos + R7Vec2(5, 17), msg_lst[i]->message, tc);
+      R2::AddRect(pos, R7Vec2(150, 50), bgc);
+      R2::AddText(pos + R7Vec2(5, 1), msg_lst[i]->title, tc);
+      R2::AddText(pos + R7Vec2(5, 17), msg_lst[i]->message, tc);
       if (rd7i_debugging)
-        R2()->AddText(pos + R7Vec2(155, 1),
+        R2::AddText(pos + R7Vec2(155, 1),
                       std::to_string(msg_lst[i]->animationframe), tc);
       // Why Frameadd? because Message uses int as frame and
       // It seems that lower 0.5 will be rounded to 0
@@ -78,7 +78,7 @@ void ProcessMessages() {
   // ReReverse ?? lol
   // Cause otherwise the Toasts will swap
   std::reverse(msg_lst.begin(), msg_lst.end());
-  R2()->SetTextSize(tmp_txt);
+  R2::SetTextSize(tmp_txt);
 }
 
 void PushMessage(const Message &msg) {

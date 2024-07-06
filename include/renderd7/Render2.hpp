@@ -29,7 +29,7 @@ enum R2Screen {
 };
 
 namespace RenderD7 {
-class R2Base {
+class R2 {
  public:
   struct R2Cmd {
     R7Vec2 pos;        //< Position
@@ -48,48 +48,50 @@ class R2Base {
     std::string text;    // Text
     RD7_SMART_CTOR(R2Cmd)
   };
-  R2Base();
-  ~R2Base() = default;
-  RD7_SMART_CTOR(R2Base)
+  R2() = default;
+  ~R2() = default;
+
+  static void Init();
 
   // Settings
-  void SetFont(Font::Ref fnt);
-  Font::Ref GetFont();
-  void DefaultFont();
-  void DrawNextLined();
-  void OnScreen(R2Screen screen);
-  R2Screen GetCurrentScreen();
-  void SetTextSize(float szs);
-  void DefaultTextSize();
-  float GetTextSize();
-  R7Vec2 GetCurrentScreenSize();
+  static void SetFont(Font::Ref fnt);
+  static Font::Ref GetFont();
+  static void DefaultFont();
+  static void DrawNextLined();
+  static void OnScreen(R2Screen screen);
+  static R2Screen GetCurrentScreen();
+  static void SetTextSize(float szs);
+  static void DefaultTextSize();
+  static float GetTextSize();
+  static R7Vec2 GetCurrentScreenSize();
   // Processing
-  void Process();
-  R7Vec2 GetTextDimensions(const std::string& text);
-  std::string WrapText(const std ::string& in, int maxlen);
-  std::string ShortText(const std::string& in, int maxlen);
+  static void Process();
+  static R7Vec2 GetTextDimensions(const std::string& text);
+  static std::string WrapText(const std ::string& in, int maxlen);
+  static std::string ShortText(const std::string& in, int maxlen);
   // Draw Functions
-  void AddRect(R7Vec2 pos, R7Vec2 size, RD7Color clr);
-  void AddRect(R7Vec2 pos, R7Vec2 size, unsigned int clr);
-  void AddTriangle(R7Vec2 pos0, R7Vec2 pos1, R7Vec2 pos2, RD7Color clr);
-  void AddTriangle(R7Vec2 pos0, R7Vec2 pos1, R7Vec2 pos2, unsigned int clr);
-  void AddText(R7Vec2 pos, const std::string& text, RD7Color clr,
-               RD7TextFlags flags = 0, R7Vec2 tmb = R7Vec2());
-  void AddText(R7Vec2 pos, const std::string& text, unsigned int clr,
-               RD7TextFlags flags = 0, R7Vec2 tmb = R7Vec2());
-  void AddImage(R7Vec2 pos, Image::Ref img);
-  void AddSprite(Sprite::Ref spr);
-  void AddLine(R7Vec2 pos_a, R7Vec2 pos_b, RD7Color clr, int t = 1);
-  void AddLine(R7Vec2 pos_a, R7Vec2 pos_b, unsigned int clr, int t = 1);
+  static void AddRect(R7Vec2 pos, R7Vec2 size, RD7Color clr);
+  static void AddRect(R7Vec2 pos, R7Vec2 size, unsigned int clr);
+  static void AddTriangle(R7Vec2 pos0, R7Vec2 pos1, R7Vec2 pos2, RD7Color clr);
+  static void AddTriangle(R7Vec2 pos0, R7Vec2 pos1, R7Vec2 pos2,
+                          unsigned int clr);
+  static void AddText(R7Vec2 pos, const std::string& text, RD7Color clr,
+                      RD7TextFlags flags = 0, R7Vec2 tmb = R7Vec2());
+  static void AddText(R7Vec2 pos, const std::string& text, unsigned int clr,
+                      RD7TextFlags flags = 0, R7Vec2 tmb = R7Vec2());
+  static void AddImage(R7Vec2 pos, Image::Ref img);
+  static void AddSprite(Sprite::Ref spr);
+  static void AddLine(R7Vec2 pos_a, R7Vec2 pos_b, RD7Color clr, int t = 1);
+  static void AddLine(R7Vec2 pos_a, R7Vec2 pos_b, unsigned int clr, int t = 1);
 
  private:
-  const float default_text_size = 0.5f;
-  float text_size = 0.5;
-  Font::Ref font;
-  std::map<std::string, float> ts;
-  std::map<std::string, int> mln;
-  bool next_lined = false;
-  std::vector<R2Cmd::Ref> commands;
-  R2Screen current_screen = R2Screen_Bottom;
+  static const float default_text_size;
+  static float text_size;
+  static Font::Ref font;
+  static std::map<std::string, float> ts;
+  static std::map<std::string, int> mln;
+  static bool next_lined;
+  static std::vector<R2Cmd::Ref> commands;
+  static R2Screen current_screen;
 };
 }  // namespace RenderD7

@@ -14,7 +14,6 @@
 #include <filesystem>
 #include <random>
 
-RenderD7::R2Base::Ref rd7i_render2;
 RenderD7::LoggerBase::Ref rd7i_glogger;
 extern RenderD7::LoggerBase::Ref rd7i_logger;
 
@@ -66,11 +65,11 @@ void Npifade() {
     // No fade
   }
   /*if (rd7i_fadein || rd7i_fadeout) {
-    RenderD7::R2()->OnScreen(RenderD7::R2Screen_Top);
-    RenderD7::R2()->AddRect(R7Vec2(0, 0), R7Vec2(400, 240),
+    RenderD7::R2::OnScreen(RenderD7::R2Screen_Top);
+    RenderD7::R2::AddRect(R7Vec2(0, 0), R7Vec2(400, 240),
                             ((rd7i_fadealpha << 24) | 0x00000000));
-    RenderD7::R2()->OnScreen(RenderD7::R2Screen_Bottom);
-    RenderD7::R2()->AddRect(R7Vec2(0, 0), R7Vec2(320, 240),
+    RenderD7::R2::OnScreen(RenderD7::R2Screen_Bottom);
+    RenderD7::R2::AddRect(R7Vec2(0, 0), R7Vec2(320, 240),
                             ((rd7i_fadealpha << 24) | 0x00000000));
   }*/
 }
@@ -86,7 +85,7 @@ void PushSplash() {
     C2D_TargetClear(rd7_bottom, 0xff000000);
     RenderD7::ClearTextBufs();
     C2D_SceneBegin(rd7_top);
-    RenderD7::R2()->OnScreen(R2Screen_Top);
+    RenderD7::R2::OnScreen(R2Screen_Top);
     C2D_DrawImageAt(C2D_SpriteSheetGetImage(sheet, 0), 400 / 2 - 300 / 2,
                     240 / 2 - 100 / 2, 0.5);
     C3D_FrameEnd(0);
@@ -214,14 +213,6 @@ void rd7i_init_theme() {
   }
 }
 
-RenderD7::R2Base::Ref RenderD7::R2() {
-  if (!rd7i_render2) {
-    RenderD7::Error("Render2 Was Called before being Init!");
-    // return schould not be reached then
-  }
-  return rd7i_render2;
-}
-
 RenderD7::LoggerBase::Ref RenderD7::Logger() {
   if (!rd7i_glogger) {
     RenderD7::Error("Logger Was Called before being Init!");
@@ -327,7 +318,7 @@ void RenderD7::Init::Graphics() {
   rd7i_text_buffer = C2D_TextBufNew(4096);
   rd7i_d2_dimbuf = C2D_TextBufNew(4096);
   rd7i_base_font = C2D_FontLoadSystem(CFG_REGION_USA);
-  rd7i_render2 = R2Base::New();
+  R2::Init();
 }
 
 Result RenderD7::Init::Main(std::string app_name) {
@@ -387,7 +378,7 @@ Result RenderD7::Init::Main(std::string app_name) {
   rd7i_text_buffer = C2D_TextBufNew(4096);
   rd7i_d2_dimbuf = C2D_TextBufNew(4096);
   rd7i_base_font = C2D_FontLoadSystem(CFG_REGION_USA);
-  rd7i_render2 = R2Base::New();
+  R2::Init();
 
   rd7i_graphics_on = true;
   rd7i_last_tm = svcGetSystemTick();
@@ -449,7 +440,7 @@ Result RenderD7::Init::Minimal(std::string app_name) {
   rd7i_text_buffer = C2D_TextBufNew(4096);
   rd7i_d2_dimbuf = C2D_TextBufNew(4096);
   rd7i_base_font = C2D_FontLoadSystem(CFG_REGION_USA);
-  rd7i_render2 = R2Base::New();
+  R2::Init();
 
   rd7i_graphics_on = true;
   if (rd7i_do_splash) PushSplash();
@@ -470,7 +461,6 @@ Result RenderD7::Init::Minimal(std::string app_name) {
 Result RenderD7::Init::Reload() {
   rd7i_graphics_on = false;
   C2D_TextBufDelete(rd7i_text_buffer);
-  rd7i_render2 = nullptr;  // Delete Render2
   C2D_Fini();
   C3D_Fini();
   C3D_Init(C3D_DEFAULT_CMDBUF_SIZE);
@@ -481,7 +471,7 @@ Result RenderD7::Init::Reload() {
   rd7_bottom = C2D_CreateScreenTarget(GFX_BOTTOM, GFX_LEFT);
   rd7i_text_buffer = C2D_TextBufNew(4096);
   rd7i_base_font = C2D_FontLoadSystem(CFG_REGION_USA);
-  rd7i_render2 = R2Base::New();
+  R2::Init();
   rd7i_graphics_on = true;
 
   return 0;
@@ -532,16 +522,16 @@ void RenderD7::FrameEnd() {
   RenderD7::ProcessMessages();
   OvlHandler();
   Npifade();
-  R2()->Process();
+  R2::Process();
   C3D_FrameEnd(0);
 }
 
 RenderD7::RSettings::RSettings() {
   // RenderD7 Settings is designed for
   // System Font
-  R2()->DefaultFont();
-  tmp_txt = R2()->GetTextSize();
-  R2()->DefaultTextSize();
+  R2::DefaultFont();
+  tmp_txt = R2::GetTextSize();
+  R2::DefaultTextSize();
   RenderD7::FadeIn();
   std::fstream cfg_ldr(rd7i_config_path + "/config.rc7", std::ios::in);
   cfg_ldr >> rd7i_config;
@@ -551,7 +541,7 @@ RenderD7::RSettings::RSettings() {
   stateftold = rd7i_ftraced;
 }
 
-RenderD7::RSettings::~RSettings() { R2()->SetTextSize(tmp_txt); }
+RenderD7::RSettings::~RSettings() { R2::SetTextSize(tmp_txt); }
 
 std::vector<std::string> StrHelper(std::string input) {
   std::string ss(input);
@@ -565,7 +555,7 @@ std::vector<std::string> StrHelper(std::string input) {
 
 void RenderD7::RSettings::Draw(void) const {
   if (m_state == RSETTINGS) {
-    RenderD7::R2()->OnScreen(R2Screen_Top);
+    RenderD7::R2::OnScreen(R2Screen_Top);
     if (UI7::BeginMenu("RenderD7 -> Settings")) {
       UI7::SetCursorPos(R7Vec2(395, 2));
       UI7::Label(RENDERD7VSTRING, RD7TextFlags_AlignRight);
@@ -580,7 +570,7 @@ void RenderD7::RSettings::Draw(void) const {
       UI7::Label("Kbd test: " + kbd_test);
       UI7::EndMenu();
     }
-    RenderD7::R2()->OnScreen(R2Screen_Bottom);
+    RenderD7::R2::OnScreen(R2Screen_Bottom);
     if (UI7::BeginMenu("Press \uE001 to go back!")) {
       if (UI7::Button("FTrace")) {
         shared_request[0x00000001] = RFTRACE;
@@ -612,7 +602,7 @@ void RenderD7::RSettings::Draw(void) const {
     }
 
   } else if (m_state == RIDB) {
-    RenderD7::R2()->OnScreen(R2Screen_Top);
+    RenderD7::R2::OnScreen(R2Screen_Top);
     if (UI7::BeginMenu("RenderD7 -> Debugger")) {
       UI7::SetCursorPos(R7Vec2(395, 2));
       UI7::Label(RENDERD7VSTRING, RD7TextFlags_AlignRight);
@@ -621,7 +611,7 @@ void RenderD7::RSettings::Draw(void) const {
                  std::string(rd7i_idb_running ? "true" : "false"));
       UI7::EndMenu();
     }
-    RenderD7::R2()->OnScreen(R2Screen_Bottom);
+    RenderD7::R2::OnScreen(R2Screen_Bottom);
     if (UI7::BeginMenu("Press \uE001 to go back!")) {
       if (UI7::Button("Start Server")) {
         RenderD7::IDB::Start();
@@ -639,7 +629,7 @@ void RenderD7::RSettings::Draw(void) const {
     }
 
   } else if (m_state == RFTRACE) {
-    RenderD7::R2()->OnScreen(R2Screen_Top);
+    RenderD7::R2::OnScreen(R2Screen_Top);
     // Draw Top Screen Into Background DrawList
     UI7::GetBackgroundList()->AddRectangle(R7Vec2(0, 0), R7Vec2(400, 240),
                                            RD7Color_Background);
@@ -711,7 +701,7 @@ void RenderD7::RSettings::Draw(void) const {
 
     RenderD7::Ftrace::End("rd7ft", "display_traces");
 
-    RenderD7::R2()->OnScreen(R2Screen_Bottom);
+    RenderD7::R2::OnScreen(R2Screen_Bottom);
     if (UI7::BeginMenu("Press \uE001 to go back!")) {
       auto jt = RenderD7::Ftrace::rd7_traces.begin();
       std::advance(jt, ftrace_index);
@@ -726,7 +716,7 @@ void RenderD7::RSettings::Draw(void) const {
       UI7::EndMenu();
     }
   } else if (m_state == RUI7) {
-    RenderD7::R2()->OnScreen(R2Screen_Top);
+    RenderD7::R2::OnScreen(R2Screen_Top);
     if (UI7::BeginMenu("RenderD7 -> UI7")) {
       UI7::SetCursorPos(R7Vec2(395, 2));
       UI7::Label(RENDERD7VSTRING, RD7TextFlags_AlignRight);
@@ -750,7 +740,7 @@ void RenderD7::RSettings::Draw(void) const {
       UI7::EndMenu();
     }
 
-    RenderD7::R2()->OnScreen(R2Screen_Bottom);
+    RenderD7::R2::OnScreen(R2Screen_Bottom);
     if (UI7::BeginMenu("Press \uE001 to go back!", R7Vec2(),
                        UI7MenuFlags_Scrolling)) {
       if (UI7::Button("Go back")) {
@@ -762,7 +752,7 @@ void RenderD7::RSettings::Draw(void) const {
       UI7::EndMenu();
     }
   } else if (m_state == ROVERLAYS) {
-    RenderD7::R2()->OnScreen(R2Screen_Top);
+    RenderD7::R2::OnScreen(R2Screen_Top);
     if (UI7::BeginMenu("RenderD7 -> Overlays")) {
       UI7::SetCursorPos(R7Vec2(395, 2));
       UI7::Label(RENDERD7VSTRING, RD7TextFlags_AlignRight);
@@ -772,7 +762,7 @@ void RenderD7::RSettings::Draw(void) const {
       UI7::EndMenu();
     }
 
-    RenderD7::R2()->OnScreen(R2Screen_Bottom);
+    RenderD7::R2::OnScreen(R2Screen_Bottom);
     if (UI7::BeginMenu("Press \uE001 to go back!")) {
       UI7::Label("Metrik:");
       UI7::Checkbox("Enable Overlay", rd7i_metrikd);
@@ -787,7 +777,7 @@ void RenderD7::RSettings::Draw(void) const {
       UI7::EndMenu();
     }
   } else if (m_state == RLOGS) {
-    RenderD7::R2()->OnScreen(R2Screen_Top);
+    RenderD7::R2::OnScreen(R2Screen_Top);
     if (UI7::BeginMenu("RenderD7 -> Logs")) {
       UI7::SetCursorPos(R7Vec2(395, 2));
       UI7::Label(RENDERD7VSTRING, RD7TextFlags_AlignRight);
@@ -795,7 +785,7 @@ void RenderD7::RSettings::Draw(void) const {
       UI7::EndMenu();
     }
 
-    RenderD7::R2()->OnScreen(R2Screen_Bottom);
+    RenderD7::R2::OnScreen(R2Screen_Bottom);
     if (UI7::BeginMenu("Press \uE001 to go back!", R7Vec2(),
                        UI7MenuFlags_Scrolling)) {
       for (auto &it : rd7i_logger->Lines()) UI7::Label(it, RD7TextFlags_Wrap);
