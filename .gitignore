@@ -2,3 +2,5 @@ release/
 debug/
 lib/
 *.bz2
+rd7le/
+*.DS_Store*

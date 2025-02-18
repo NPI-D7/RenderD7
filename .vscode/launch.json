@@ -1,0 +1,115 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "(gdb) Launch",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/rd7tf/rd7tf.elf",
+            "targetArchitecture": "arm",
+            "serverLaunchTimeout": 10000,
+            "stopAtEntry": true,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": true,
+            "MIMode": "gdb",
+            "miDebuggerPath": "/opt/devkitPro/devkitARM/bin/arm-none-eabi-gdb",
+            "miDebuggerServerAddress": "192.168.2.220:4003",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing",
+                    "text": "file ${workspaceFolder}/rd7tf/rd7tf.elf -enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ]
+        }, 
+        {
+            "name": "(gdb-emu) Launch",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/rd7tf/rd7tf.elf",
+            "targetArchitecture": "arm",
+            "serverLaunchTimeout": 10000,
+            "stopAtEntry": true,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": true,
+            "MIMode": "gdb",
+            "miDebuggerPath": "/opt/devkitPro/devkitARM/bin/arm-none-eabi-gdb",
+            "miDebuggerServerAddress": "localhost:4003",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing",
+                    "text": "file ${workspaceFolder}/rd7tf/rd7tf.elf -enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ]
+        },
+        {
+            "name": "(gdb-emu) lua",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/rd7le/rd7le.elf",
+            "targetArchitecture": "arm",
+            "serverLaunchTimeout": 10000,
+            "stopAtEntry": true,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": true,
+            "MIMode": "gdb",
+            "miDebuggerPath": "C:\\devkitPro\\devkitARM\\bin\\arm-none-eabi-gdb.exe",
+            "miDebuggerServerAddress": "localhost:4003",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing",
+                    "text": "file ${workspaceFolder}/rd7le/rd7le.elf -enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ]
+        },
+        {
+            "name": "(gdb) lua",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/rd7le/rd7le.elf",
+            "targetArchitecture": "arm",
+            "serverLaunchTimeout": 10000,
+            "stopAtEntry": true,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": true,
+            "MIMode": "gdb",
+            "miDebuggerPath": "C:\\devkitPro\\devkitARM\\bin\\arm-none-eabi-gdb.exe",
+            "miDebuggerServerAddress": "192.168.2.220:4003",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing",
+                    "text": "file ${workspaceFolder}/rd7le/rd7le.elf -enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ]
+        },
+        {
+            "name": "(gdb) testgame",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/testgame/testgame.elf",
+            "targetArchitecture": "arm",
+            "serverLaunchTimeout": 10000,
+            "stopAtEntry": true,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": true,
+            "MIMode": "gdb",
+            "miDebuggerPath": "C:\\devkitPro\\devkitARM\\bin\\arm-none-eabi-gdb.exe",
+            "miDebuggerServerAddress": "localhost:4003",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing",
+                    "text": "file ${workspaceFolder}/testgame/testgame.elf -enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ]
+        }
+    ]
+}

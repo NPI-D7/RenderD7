@@ -1,4 +1,4 @@
-# <img alt="LOGO" src="https://github.com/NPI-D7/RenderD7/blob/main/logo.png" height="90">
+# <img alt="LOGO" src="https://github.com/NPI-D7/RenderD7/raw/main/logo.png" height="90">
 RenderD7 is now LibRenderD7.
 ### Installation
 Download a Package From Releses Page

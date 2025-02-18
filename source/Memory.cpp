@@ -1,4 +1,5 @@
 #include <map>
+#include <cstdlib>
 #include <renderd7/Memory.hpp>
 
 static RenderD7::Memory::memory_metrics metrics;

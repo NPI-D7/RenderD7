@@ -52,7 +52,7 @@ else
 GIT_VER := $(shell git rev-parse --short HEAD)
 endif
 
-TIME_TIME := $(shell date --iso=seconds)
+TIME_TIME := unk
 
 #---------------------------------------------------------------------------------
 # Version number
@@ -70,8 +70,11 @@ VERSION_MICRO := 0
 # is located somewhere else
 # Using ../ cause rd7tf is shipped with the RenderD7
 # Repository!
-RENDERD7_SRC := ../source ../external
+RENDERD7_SRC := ../source ../external ../source/music
 RENDERD7_INC := ../include
+# Libraries used for RenderD7
+# if you already use -lm, -lctru etc place a # before -lm
+RENDERD7_LIBS := -lcurl -lm -lcitro2dd -lcitro3d -lctru
 TARGET		:=	rd7tf
 BUILD		:=	build
 SOURCES		:=	source $(RENDERD7_SRC)
@@ -93,7 +96,7 @@ ARCH	:=	-march=armv6k -mtune=mpcore -mfloat-abi=hard -mtp=soft
 CFLAGS	:=	-g -Wall -Wno-psabi -O2 -mword-relocations \
 			-DV_STRING=\"$(GIT_VER)\" \
 			-DV_TIME=\"$(TIME_TIME)\" \
-			-fomit-frame-pointer -ffunction-sections \
+			-ffunction-sections \
 			$(ARCH)
 
 CFLAGS	+=	$(INCLUDE) -D__3DS__ -D_GNU_SOURCE=1
@@ -103,7 +106,7 @@ CXXFLAGS	:= $(CFLAGS) -fno-rtti -fno-exceptions -std=gnu++20
 ASFLAGS	:=	-g $(ARCH)
 LDFLAGS	=	-specs=3dsx.specs -g $(ARCH) -Wl,-Map,$(notdir $*.map)
 
-LIBS	:= -lcurl -lstdc++ -lm -lz -lcitro2d -lcitro3d -lctru -ljpeg 
+LIBS	:= -lstdc++ $(RENDERD7_LIBS) 
 
 
 #---------------------------------------------------------------------------------

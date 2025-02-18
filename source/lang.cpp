@@ -67,13 +67,11 @@ std::string RenderD7::Lang::getSys() {
 std::string RenderD7::Lang::get(const std::string &key) {
   if (!appJson.contains(key))
     return key;
-
   return appJson.at(key).get<std::string>();
 }
 
 void RenderD7::Lang::load(const std::string &lang) {
   std::fstream values;
-
   if(std::filesystem::is_character_file("romfs:/lang/" + lang + "/app.json")) {
     values.open("romfs:/lang/" + lang + "/app.json", std::ios::in);
     if(values.is_open()) {

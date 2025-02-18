@@ -9,7 +9,11 @@ RenderD7::Sprite::~Sprite() {
 void RenderD7::Sprite::FromSheet(RenderD7::Sheet *sheet, size_t index) {
   C2D_SpriteFromSheet(&this->sprite, sheet->spritesheet, index);
 }
-bool RenderD7::Sprite::Draw() { return C2D_DrawSprite(&this->sprite); }
+bool RenderD7::Sprite::Draw() {
+  // Patch Depth before draw
+  sprite.params.depth = 0.5;
+  return C2D_DrawSprite(&this->sprite);
+}
 void RenderD7::Sprite::SetCenter(float x, float y) {
   C2D_SpriteSetCenter(&this->sprite, x, y);
 }
@@ -28,7 +32,7 @@ float RenderD7::Sprite::getPosX() { return this->sprite.params.pos.x; }
 float RenderD7::Sprite::getPosY() { return this->sprite.params.pos.y; }
 
 void RenderD7::Sprite::FromImage(RenderD7::Image *img) {
-  C2D_SpriteFromImage(&this->sprite, img->img);
+  C2D_SpriteFromImage(&this->sprite, img->get());
 }
 
 void RenderD7::Sprite::SetScale(float x, float y) {

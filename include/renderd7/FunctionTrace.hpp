@@ -24,6 +24,7 @@ struct FTRes {
   uint64_t time_start; ///< when started
   uint64_t time_end;   ///< when stopped
   float time_of;       ///< stop - start (how long)
+  bool is_ovl; ///< is displayed in overlay?
 };
 
 /// @brief Map of Traces

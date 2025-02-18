@@ -43,6 +43,8 @@ public:
   /// @brief Get the Summary Value
   /// @return Summary Value
   int GetSummaryInt();
+  /// @brief Write a Result log file to sd
+  void WriteLog(void);
 
 private:
   /// @param m_rescode Result code

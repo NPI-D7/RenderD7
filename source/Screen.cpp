@@ -1,8 +1,7 @@
 #include <renderd7/Screen.hpp>
-
-extern bool currentScreen;
+#include <renderd7/internal_db.hpp>
 
 void RenderD7::OnScreen(C3D_RenderTarget *target) {
   C2D_SceneBegin(target);
-  currentScreen = (target == Top || target == TopRight) ? 1 : 0;
+  rd7i_current_screen = (target == Top || target == TopRight) ? 1 : 0;
 }

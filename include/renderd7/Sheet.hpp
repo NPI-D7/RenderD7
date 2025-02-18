@@ -1,6 +1,8 @@
 #pragma once
 #include <citro2d.h>
 #include <citro3d.h>
+#include <3ds.h> // Result
+#include <string>
 
 namespace RenderD7 {
 /// @brief SpriteSheet Class
@@ -13,7 +15,7 @@ public:
   /// @brief Load A Spritesheet File
   /// @param path Path to the t3x
   /// @return Result Code
-  Result Load(const char *path);
+  Result Load(const std::string& path);
   /// @brief Unload the Sheet
   void Free();
   /// \param spritesheet The Sheet

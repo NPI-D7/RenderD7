@@ -4,7 +4,7 @@
 #include <string>
 #include <cstring>
 
-extern bool isndspinit;
+#include <renderd7/internal_db.hpp>
 using std::string;
 
 // Reference: http://yannesposito.com/Scratch/en/blog/2010-10-14-Fun-with-wav/
@@ -25,7 +25,7 @@ typedef struct _WavHeader {
 static_assert(sizeof(WavHeader) == 44, "WavHeader size is not 44 bytes.");
 
 sound::sound(const string &path, int channel, bool toloop) {
-  if (isndspinit) {
+  if (rd7i_is_ndsp) {
     ndspSetOutputMode(NDSP_OUTPUT_STEREO);
     ndspSetOutputCount(2); // Num of buffers
 
@@ -104,7 +104,7 @@ sound::sound(const string &path, int channel, bool toloop) {
 }
 
 sound::~sound() {
-  if (isndspinit) {
+  if (rd7i_is_ndsp) {
     waveBuf.data_vaddr = 0;
     waveBuf.nsamples = 0;
     waveBuf.looping = false;
@@ -118,7 +118,7 @@ sound::~sound() {
 }
 
 void sound::play() {
-  if (isndspinit) {
+  if (rd7i_is_ndsp) {
     if (!data)
       return;
     DSP_FlushDataCache(data, dataSize);
@@ -127,7 +127,7 @@ void sound::play() {
 }
 
 void sound::stop() {
-  if (isndspinit) {
+  if (rd7i_is_ndsp) {
     if (!data)
       return;
     ndspChnWaveBufClear(chnl);

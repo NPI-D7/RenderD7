@@ -3,10 +3,10 @@
 #include <3ds.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <renderd7/internal_db.hpp>
 
 RenderD7::Security *rd7_security;
 
-extern bool running;
 bool *running_addr = NULL;
 
 struct SecurityReport {
@@ -27,7 +27,7 @@ void RenderD7::Security::Report(uint32_t addr, void *result_ptr) {
   // Create Report
 }
 namespace RenderD7 {
-Security::Security() { running_addr = &running; }
+Security::Security() { running_addr = &rd7i_running; }
 
 Security::~Security() { *running_addr = false; }
 void Security::SafeExit(void (*exit_func)()) { atexit(exit_func); }

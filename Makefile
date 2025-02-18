@@ -32,7 +32,7 @@ TIME_TIME := $(shell date --iso=seconds)
 # INCLUDES is a list of directories containing header files
 #---------------------------------------------------------------------------------
 TARGET		:=	renderd7
-SOURCES		:=	source external/source
+SOURCES		:=	source source/external source/music
 DATA		:=	data
 INCLUDES	:=	include
 
@@ -41,9 +41,9 @@ INCLUDES	:=	include
 #---------------------------------------------------------------------------------
 ARCH	:=	-march=armv6k -mtune=mpcore -mfloat-abi=hard -mtp=soft
 
-CFLAGS	:=	-g -Wall -Werror -mword-relocations -save-temps\
-			-DV_STRING=\"$(GIT_VER)\" \
-			-DV_TIME=\"$(TIME_TIME)\" \
+CFLAGS	:=	-g -Wall -mword-relocations -save-temps\
+			-DV_RD7CSTRING=\"$(GIT_VER)\" \
+			-DV_RD7BTIME=\"$(TIME_TIME)\" \
 			-ffunction-sections -fdata-sections \
 			$(ARCH) $(BUILD_CFLAGS)
 

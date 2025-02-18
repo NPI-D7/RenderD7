@@ -1,6 +1,10 @@
 #include <map>
 #include <renderd7/ResultDecoder.hpp>
 #include <sstream>
+#include <fstream>
+#include <filesystem>
+
+extern std::string D_app_name;
 
 static std::map<int, std::string> modules = {
     {0, "common"},
@@ -416,6 +420,25 @@ std::string ResultDecoder::GetSummary() {
   std::string res = summaries.at(this->GetSummaryInt()) + " (" +
                     std::to_string(this->GetSummaryInt()) + ")";
   return res;
+}
+
+void RenderD7::ResultDecoder::WriteLog() {
+  std::string out_path = "sdmc:/RenderD7/Apps/" + D_app_name + "/resdec/";
+  std::filesystem::create_directories(out_path);
+  out_path += "/err_result_" + std::to_string(time(0)) + ".log";
+  std::ofstream out(out_path, std::ios::app);
+  out << "--------------------\n";
+  out << "| Error: " << GetCode() << "\n";
+  out << "|-------------------\n";
+  out << "| Module: " << GetModule() << "\n";
+  out << "|-------------------\n";
+  out << "| Level: " << GetLevel() << "\n";
+  out << "|-------------------\n";
+  out << "| Summary: " << GetSummary() << "\n";
+  out << "|-------------------\n";
+  out << "| Description: " << GetDescription() << "\n";
+  out << "--------------------\n";
+  out.close();
 }
 
 int ResultDecoder::GetSummaryInt() { return R_SUMMARY(m_rescode); }
